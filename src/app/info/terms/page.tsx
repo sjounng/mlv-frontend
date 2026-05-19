@@ -1,0 +1,93 @@
+import Link from "next/link";
+import { History, ChevronLeft } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Button, Card, Badge } from "@/components/ui";
+
+const sections = [
+  {
+    title: "제1조 (목적)",
+    body: `본 약관은 마이리틀밸리(이하 "회사")가 운영하는 마리벨 마인크래프트 서버 및 관련 웹사이트(이하 "서비스")를 이용함에 있어 회사와 회원 간의 권리, 의무 및 책임 사항을 규정함을 목적으로 합니다.`,
+  },
+  {
+    title: "제2조 (정의)",
+    body: `① "서비스"란 회사가 제공하는 마인크래프트 서버 접속, 웹상점, 커뮤니티, 이벤트 등 일체의 서비스를 의미합니다.\n② "회원"이란 Microsoft 계정을 통해 회사와 이용계약을 체결한 자를 말합니다.\n③ "캐시"란 서비스 내에서 콘텐츠를 구매하는 데 사용되는 결제 수단을 의미합니다.\n④ "리딤코드"란 특정 보상을 우편함으로 수령할 수 있도록 발급된 일회용 또는 다회용 코드를 의미합니다.`,
+  },
+  {
+    title: "제3조 (약관의 효력 및 변경)",
+    body: `① 본 약관은 서비스 화면에 게시함으로써 그 효력이 발생합니다.\n② 회사는 관련 법령을 위배하지 않는 범위에서 약관을 변경할 수 있으며, 변경된 약관은 적용일자 7일 전(회원에게 불리하거나 중대한 변경의 경우 30일 전)부터 공지합니다.\n③ 회원이 변경된 약관에 동의하지 않을 경우 이용계약을 해지할 수 있습니다.`,
+  },
+  {
+    title: "제4조 (이용계약의 성립)",
+    body: `이용계약은 회원이 약관에 동의하고 Microsoft 계정을 통해 로그인함으로써 자동으로 성립됩니다. 정상적인 마인크래프트 정품 계정 보유자만 가입할 수 있습니다.`,
+  },
+  {
+    title: "제5조 (회원의 의무)",
+    body: `① 회원은 다음 행위를 하여서는 안 됩니다.\n  1. 타인의 계정·정보를 도용하는 행위\n  2. 서버 운영을 방해하거나 비정상적인 방법으로 게임 데이터를 조작하는 행위\n  3. 서비스 내에서 욕설, 차별, 혐오 표현 등 타인에게 불쾌감을 주는 행위\n  4. 캐시·아이템을 현금 또는 외부 재화와 거래하는 행위\n② 회원은 회사가 정한 게임 규칙 및 커뮤니티 가이드라인을 준수해야 합니다.`,
+  },
+  {
+    title: "제6조 (회사의 의무)",
+    body: `① 회사는 안정적인 서비스 제공을 위하여 최선을 다합니다.\n② 회사는 회원의 개인정보를 본 서비스 및 관련 법령에서 정한 범위 내에서만 수집·이용합니다.\n③ 회사는 서비스 운영상 부득이한 경우 서비스의 일부 또는 전부를 일시 중단할 수 있으며, 이 경우 사전에 공지합니다.`,
+  },
+  {
+    title: "제7조 (유료 서비스 및 결제)",
+    body: `① 회원은 웹상점을 통해 캐시 충전 또는 상품 결제를 할 수 있습니다.\n② 결제는 Stella IT 결제 시스템을 통해 처리되며, 결제 즉시 해당 보상이 인게임 우편함으로 발송됩니다.\n③ 인게임 우편함 수령은 회원의 책임 하에 이루어집니다.`,
+  },
+  {
+    title: "제8조 (환불)",
+    body: `환불 정책은 별도의 "환불 정책" 문서에 따르며, 본 약관과 함께 적용됩니다. 디지털 콘텐츠의 특성상 수령 후에는 환불이 제한될 수 있습니다.`,
+  },
+  {
+    title: "제9조 (이용 제한 및 계약 해지)",
+    body: `① 회사는 회원이 본 약관 또는 운영 규칙을 위반한 경우 사전 통지 없이 이용을 제한할 수 있습니다.\n② 회원은 언제든지 마이페이지를 통해 회원 탈퇴를 신청할 수 있습니다.\n③ 탈퇴 시 보유 캐시·아이템은 환불되지 않으며, 관련 법령에 따라 일부 기록은 일정 기간 보관됩니다.`,
+  },
+  {
+    title: "제10조 (면책 조항)",
+    body: `① 회사는 천재지변, 통신 두절, 제3자의 침해 등 불가항력적인 사유로 인한 손해에 대해 책임을 지지 않습니다.\n② 회원 간 게임 내 거래·분쟁에 대해서는 회사가 개입하지 않는 것을 원칙으로 합니다.`,
+  },
+  {
+    title: "부칙",
+    body: `본 약관은 2026년 5월 19일부터 적용됩니다.`,
+  },
+];
+
+export default function TermsPage() {
+  return (
+    <>
+      <Navbar />
+      <main className="pt-16">
+        <section className="max-w-3xl mx-auto px-6 py-12">
+          <Link
+            href="/info"
+            className="inline-flex items-center gap-1 text-xs text-white/40 hover:text-white/70 mb-4"
+          >
+            <ChevronLeft size={14} /> 서비스 정보로 돌아가기
+          </Link>
+
+          <div className="flex items-start justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-3xl font-bold">이용약관</h1>
+              <div className="mt-3 flex items-center gap-2">
+                <Badge variant="info">v1.0</Badge>
+                <span className="text-xs text-white/40">시행일: 2026-05-19</span>
+              </div>
+            </div>
+            <Button variant="outline" size="sm" leftIcon={<History size={14} />}>
+              이전 버전
+            </Button>
+          </div>
+
+          <Card padding="lg" className="space-y-7">
+            {sections.map((s) => (
+              <section key={s.title}>
+                <h2 className="text-base font-semibold text-white mb-2">{s.title}</h2>
+                <p className="text-sm text-white/60 leading-7 whitespace-pre-line">{s.body}</p>
+              </section>
+            ))}
+          </Card>
+        </section>
+      </main>
+      <Footer />
+    </>
+  );
+}

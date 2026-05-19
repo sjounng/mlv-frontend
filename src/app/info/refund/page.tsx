@@ -1,0 +1,77 @@
+import Link from "next/link";
+import { History, ChevronLeft } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Button, Card, Badge } from "@/components/ui";
+
+const sections = [
+  {
+    title: "제1조 (목적)",
+    body: `본 환불 정책은 회원이 마리벨 웹상점에서 구매한 캐시 및 디지털 상품의 환불에 관한 기준을 규정합니다.`,
+  },
+  {
+    title: "제2조 (청약 철회의 기간)",
+    body: `회원은 결제일로부터 7일 이내에 청약을 철회(환불 요청)할 수 있습니다. 단, 다음 각 호의 경우에는 청약 철회가 제한될 수 있습니다.\n\n① 회원의 책임 있는 사유로 상품(보상)이 멸실 또는 훼손된 경우\n② 회원이 상품의 사용 또는 일부 소비로 그 가치가 현저히 감소한 경우\n③ 시간의 경과에 의하여 재판매가 곤란할 정도로 상품의 가치가 현저히 감소한 경우`,
+  },
+  {
+    title: "제3조 (디지털 콘텐츠의 환불 제한)",
+    body: `다음의 경우 청약 철회가 제한됩니다.\n\n① 인게임 우편함을 통해 보상이 수령된 경우\n② 캐시를 사용하여 다른 상품을 구매한 경우\n③ 사용 기간이 한정된 상품을 1회 이상 사용한 경우 (비행권, 부스터 등)\n\n다만, 이 경우에도 회사의 귀책 사유로 상품이 정상적으로 지급되지 않았다면 환불이 가능합니다.`,
+  },
+  {
+    title: "제4조 (환불 신청 방법)",
+    body: `① 마이페이지 → 결제 내역에서 해당 결제 건의 [환불 요청] 버튼으로 신청할 수 있습니다.\n② 또는 문의하기를 통해 결제 ID와 환불 사유를 첨부하여 요청할 수 있습니다.\n③ 환불 처리는 영업일 기준 3~5일 이내에 완료됩니다.`,
+  },
+  {
+    title: "제5조 (환불 금액 및 수단)",
+    body: `환불 금액은 결제 시 사용한 동일 수단으로 환급되는 것을 원칙으로 합니다. 카드 취소가 불가한 경우 계좌 이체로 환급될 수 있으며, 결제 수수료 등 부득이한 차감이 있을 수 있습니다.`,
+  },
+  {
+    title: "제6조 (운영 정책 위반자의 환불)",
+    body: `이용 약관 또는 운영 정책 위반으로 계정이 정지된 회원의 경우, 사용한 캐시 및 보상에 대해서는 환불되지 않습니다.`,
+  },
+  {
+    title: "부칙",
+    body: `본 정책은 2026년 5월 19일부터 시행됩니다.`,
+  },
+];
+
+export default function RefundPage() {
+  return (
+    <>
+      <Navbar />
+      <main className="pt-16">
+        <section className="max-w-3xl mx-auto px-6 py-12">
+          <Link
+            href="/info"
+            className="inline-flex items-center gap-1 text-xs text-white/40 hover:text-white/70 mb-4"
+          >
+            <ChevronLeft size={14} /> 서비스 정보로 돌아가기
+          </Link>
+
+          <div className="flex items-start justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-3xl font-bold">환불 정책</h1>
+              <div className="mt-3 flex items-center gap-2">
+                <Badge variant="info">v1.0</Badge>
+                <span className="text-xs text-white/40">시행일: 2026-05-19</span>
+              </div>
+            </div>
+            <Button variant="outline" size="sm" leftIcon={<History size={14} />}>
+              이전 버전
+            </Button>
+          </div>
+
+          <Card padding="lg" className="space-y-7">
+            {sections.map((s) => (
+              <section key={s.title}>
+                <h2 className="text-base font-semibold text-white mb-2">{s.title}</h2>
+                <p className="text-sm text-white/60 leading-7 whitespace-pre-line">{s.body}</p>
+              </section>
+            ))}
+          </Card>
+        </section>
+      </main>
+      <Footer />
+    </>
+  );
+}
