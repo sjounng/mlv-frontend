@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 import { Card, Separator } from "@/components/ui";
+import MicrosoftLoginButton from "./MicrosoftLoginButton";
 
 export default function LoginPage() {
   return (
@@ -28,13 +29,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <button
-          type="button"
-          className="mt-7 w-full flex items-center justify-center gap-3 bg-white text-black hover:bg-white/90 transition-colors rounded-xl py-3.5 font-medium"
-        >
-          <MicrosoftLogo />
-          <span>Microsoft 계정으로 계속하기</span>
-        </button>
+        <MicrosoftLoginButton />
 
         <Separator label="또는" className="my-6" />
 
@@ -65,16 +60,5 @@ export default function LoginPage() {
         ← 홈으로 돌아가기
       </Link>
     </div>
-  );
-}
-
-function MicrosoftLogo() {
-  return (
-    <svg viewBox="0 0 23 23" className="w-5 h-5" aria-hidden="true">
-      <rect x="1" y="1" width="10" height="10" fill="#F25022" />
-      <rect x="12" y="1" width="10" height="10" fill="#7FBA00" />
-      <rect x="1" y="12" width="10" height="10" fill="#00A4EF" />
-      <rect x="12" y="12" width="10" height="10" fill="#FFB900" />
-    </svg>
   );
 }
