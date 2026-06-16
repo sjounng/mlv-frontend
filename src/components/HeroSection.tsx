@@ -30,7 +30,7 @@ export default function HeroSection() {
     <>
       <section className="relative min-h-screen flex items-center overflow-hidden">
         {/* Gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0d0d0d] via-[#111111] to-[#1a1a1a]" />
+        <div className="absolute inset-0 bg-linear-to-br from-[#0d0d0d] via-[#111111] to-[#1a1a1a]" />
 
         {/* Minecraft world illustration placeholder (right side) */}
         <div className="absolute right-0 top-0 w-1/2 h-full opacity-30 pointer-events-none">
