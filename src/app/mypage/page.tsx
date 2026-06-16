@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
+  AlertTriangle,
   Coins,
   CreditCard,
   Gift,
+  Loader2,
   Mail,
-  Pencil,
-  Plus,
   Receipt,
+  ShoppingBag,
   User,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -17,61 +19,55 @@ import {
   Badge,
   Button,
   Card,
-  Pagination,
+  EmptyState,
+  Modal,
   Tabs,
   Table,
+  useToast,
   type TableColumn,
 } from "@/components/ui";
 import MinecraftHead from "@/components/minecraft/MinecraftHead";
 import CashDisplay from "@/components/minecraft/CashDisplay";
+import { api, ApiError } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 
-interface CashRow extends Record<string, unknown> {
-  date: string;
-  type: "충전" | "사용" | "환불";
+interface CashTransaction extends Record<string, unknown> {
+  id: number;
+  type: "CHARGE" | "SPEND" | "REFUND" | "ADJUSTMENT";
   amount: number;
-  balance: number;
-  memo: string;
+  balanceAfter: number;
+  memo: string | null;
+  createdAt: string;
 }
 
-interface PaymentRow extends Record<string, unknown> {
-  date: string;
-  product: string;
-  amount: number;
-  status: "완료" | "환불";
-  id: string;
+interface ChargeHistory extends Record<string, unknown> {
+  id: number;
+  merchantOrderId: string;
+  cashAmount: number;
+  paymentAmountKrw: number;
+  status: "READY" | "PAID" | "FAILED" | "CANCELLED" | "REFUNDED";
+  receiptUrl: string | null;
+  createdAt: string;
+  paidAt: string | null;
 }
 
-interface RewardRow extends Record<string, unknown> {
-  date: string;
-  source: "이벤트" | "구매" | "리딤코드";
-  title: string;
-  status: "발송완료" | "발송중" | "실패";
+interface PurchaseHistory extends Record<string, unknown> {
+  id: number;
+  orderNumber: string;
+  productName: string;
+  quantity: number;
+  totalPrice: number;
+  status: "COMPLETED" | "CANCELLED" | "MAIL_PENDING" | "MAIL_FAILED";
+  createdAt: string;
 }
 
-const cashHistory: CashRow[] = [
-  { date: "2026-05-19 14:32", type: "사용", amount: -3300, balance: 12500, memo: "비행권 [7일] 구매" },
-  { date: "2026-05-18 19:11", type: "충전", amount: 15000, balance: 15800, memo: "신용카드 결제" },
-  { date: "2026-05-15 12:04", type: "사용", amount: -2200, balance: 800, memo: "랜덤 박스 구매" },
-  { date: "2026-05-10 21:48", type: "환불", amount: 1500, balance: 3000, memo: "경험치 부스터 환불" },
-  { date: "2026-05-07 09:25", type: "충전", amount: 5000, balance: 1500, memo: "카카오페이 결제" },
-];
-
-const payments: PaymentRow[] = [
-  { date: "2026-05-19", product: "비행권 [7일]", amount: 5500, status: "완료", id: "P-26051901" },
-  { date: "2026-05-18", product: "캐시 충전 15,000C", amount: 15000, status: "완료", id: "P-26051803" },
-  { date: "2026-05-15", product: "랜덤 박스 × 3", amount: 6600, status: "완료", id: "P-26051502" },
-  { date: "2026-05-10", product: "경험치 부스터 [1시간]", amount: 1500, status: "환불", id: "P-26051002" },
-  { date: "2026-05-07", product: "캐시 충전 5,000C", amount: 5000, status: "완료", id: "P-26050701" },
-];
-
-const rewards: RewardRow[] = [
-  { date: "2026-05-19 14:33", source: "구매", title: "비행권 [7일] 보상", status: "발송완료" },
-  { date: "2026-05-18 19:12", source: "구매", title: "캐시 충전 15,000C", status: "발송완료" },
-  { date: "2026-05-17 09:00", source: "이벤트", title: "출석 14일차 보상", status: "발송완료" },
-  { date: "2026-05-15 12:05", source: "구매", title: "랜덤 박스 × 3", status: "발송완료" },
-  { date: "2026-05-12 21:00", source: "리딤코드", title: "5월 시즌 시작 보상", status: "발송완료" },
-  { date: "2026-05-08 18:40", source: "이벤트", title: "친구 초대 1단계 보상", status: "실패" },
-];
+interface MailHistory extends Record<string, unknown> {
+  id: number;
+  subject: string;
+  sourceType: "EVENT" | "PURCHASE" | "ADMIN" | "REDEEM_CODE";
+  status: "PENDING" | "SENT" | "FAILED" | "CANCELLED";
+  createdAt: string;
+}
 
 const tabs = [
   { id: "profile", label: "프로필", icon: User },
@@ -80,18 +76,264 @@ const tabs = [
   { id: "rewards", label: "보상 내역", icon: Gift },
 ];
 
-const cashColumns: TableColumn<CashRow>[] = [
-  { key: "date", label: "일시", width: "180px" },
+const CASH_TYPE_LABEL: Record<CashTransaction["type"], string> = {
+  CHARGE: "충전",
+  SPEND: "사용",
+  REFUND: "환불",
+  ADJUSTMENT: "조정",
+};
+
+const MAIL_SOURCE_LABEL: Record<MailHistory["sourceType"], string> = {
+  EVENT: "이벤트",
+  PURCHASE: "구매",
+  ADMIN: "운영지급",
+  REDEEM_CODE: "리딤코드",
+};
+
+function formatDateTime(iso: string) {
+  return new Date(iso).toLocaleString("ko-KR", { dateStyle: "medium", timeStyle: "short" });
+}
+
+export default function MyPage() {
+  const router = useRouter();
+  const { status, profile, cashBalance, logout } = useAuth();
+  const { toast } = useToast();
+
+  const [active, setActive] = useState("profile");
+  const [loading, setLoading] = useState(true);
+  const [transactions, setTransactions] = useState<CashTransaction[]>([]);
+  const [balance, setBalance] = useState<number | null>(null);
+  const [charges, setCharges] = useState<ChargeHistory[]>([]);
+  const [purchases, setPurchases] = useState<PurchaseHistory[]>([]);
+  const [mails, setMails] = useState<MailHistory[]>([]);
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [withdrawing, setWithdrawing] = useState(false);
+
+  useEffect(() => {
+    if (status === "anonymous") {
+      router.replace("/login");
+    }
+  }, [status, router]);
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [cash, chargeList, purchaseList, mailList] = await Promise.all([
+        api.get<{ balance: number; recentTransactions: CashTransaction[] }>("/api/me/cash"),
+        api.get<ChargeHistory[]>("/api/me/charges"),
+        api.get<PurchaseHistory[]>("/api/me/purchases"),
+        api.get<MailHistory[]>("/api/me/mails"),
+      ]);
+      setBalance(cash.balance);
+      setTransactions(cash.recentTransactions);
+      setCharges(chargeList);
+      setPurchases(purchaseList);
+      setMails(mailList);
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : "데이터를 불러오지 못했습니다.";
+      toast({ title: "불러오기 실패", description: message, variant: "error" });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      // 데이터 로딩 시작 시의 setLoading 은 의도된 동작이다.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      void loadData();
+    }
+  }, [status, loadData]);
+
+  const onWithdraw = async () => {
+    setWithdrawing(true);
+    try {
+      await api.del("/api/me/withdraw");
+      toast({ title: "회원 탈퇴가 완료되었습니다", variant: "success" });
+      await logout();
+      router.replace("/");
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : "탈퇴 처리에 실패했습니다.";
+      toast({ title: "탈퇴 실패", description: message, variant: "error" });
+      setWithdrawing(false);
+    }
+  };
+
+  if (status !== "authenticated" || !profile) {
+    return (
+      <>
+        <Navbar />
+        <main className="pt-16 min-h-screen flex items-center justify-center text-white/50">
+          <Loader2 className="animate-spin" size={26} />
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Navbar />
+      <main className="pt-16">
+        <section className="max-w-6xl mx-auto px-6 py-12">
+          <h1 className="text-3xl font-bold">마이페이지</h1>
+          <p className="mt-2 text-sm text-white/50">계정 정보, 캐시·결제·보상 내역을 확인할 수 있어요.</p>
+
+          <div className="mt-8">
+            <Tabs tabs={tabs} activeTab={active} onChange={setActive} />
+
+            {active === "profile" && (
+              <div className="mt-6 space-y-4">
+                <Card padding="lg">
+                  <div className="flex flex-col sm:flex-row gap-6 items-start">
+                    <div className="flex items-center gap-4">
+                      <MinecraftHead username={profile.minecraftUsername} size="lg" />
+                      <div>
+                        <h2 className="text-xl font-bold">{profile.minecraftUsername}</h2>
+                        <p className="text-xs text-white/45 mt-0.5">
+                          가입일: {new Date(profile.createdAt).toLocaleDateString("ko-KR")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex-1 grid sm:grid-cols-2 gap-x-8 gap-y-3 w-full">
+                      <Field label="UUID" value={profile.minecraftUuid} mono />
+                      <Field label="이메일" value={profile.email ?? "미등록"} />
+                      <Field label="상태" value={profile.status === "ACTIVE" ? "정상" : profile.status} />
+                      <Field
+                        label="약관 동의"
+                        value={profile.agreedTermsAt ? formatDateTime(profile.agreedTermsAt) : "미동의"}
+                      />
+                    </div>
+                  </div>
+                </Card>
+
+                <Card padding="lg" className="border-red-500/20">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle size={18} className="text-red-300 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium text-white/85">회원 탈퇴</p>
+                        <p className="text-xs text-white/45 mt-1 leading-relaxed">
+                          탈퇴 시 보유 캐시는 소멸되며 계정 정보가 익명화됩니다. 결제/보상 내역은 법정 보관 기간 동안 유지됩니다.
+                        </p>
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => setWithdrawOpen(true)}>
+                      탈퇴하기
+                    </Button>
+                  </div>
+                </Card>
+              </div>
+            )}
+
+            {active === "cash" && (
+              <div className="mt-6 space-y-4">
+                <Card padding="lg">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                      <p className="text-xs text-white/40">현재 보유 캐시</p>
+                      <div className="mt-1">
+                        <CashDisplay amount={balance ?? cashBalance ?? 0} size="lg" />
+                      </div>
+                    </div>
+                    <Button onClick={() => router.push("/shop")}>충전하러 가기</Button>
+                  </div>
+                </Card>
+                <Card padding="none">
+                  {loading ? (
+                    <LoadingRow />
+                  ) : transactions.length === 0 ? (
+                    <EmptyState icon={Coins} title="캐시 변동 내역이 없습니다" />
+                  ) : (
+                    <Table columns={cashColumns} data={transactions} />
+                  )}
+                </Card>
+              </div>
+            )}
+
+            {active === "payments" && (
+              <div className="mt-6 space-y-6">
+                <div>
+                  <h3 className="text-sm font-semibold mb-3 text-white/70">충전 내역</h3>
+                  <Card padding="none">
+                    {loading ? (
+                      <LoadingRow />
+                    ) : charges.length === 0 ? (
+                      <EmptyState icon={CreditCard} title="충전 내역이 없습니다" />
+                    ) : (
+                      <Table columns={chargeColumns} data={charges} />
+                    )}
+                  </Card>
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold mb-3 text-white/70">구매 내역</h3>
+                  <Card padding="none">
+                    {loading ? (
+                      <LoadingRow />
+                    ) : purchases.length === 0 ? (
+                      <EmptyState icon={ShoppingBag} title="구매 내역이 없습니다" />
+                    ) : (
+                      <Table columns={purchaseColumns} data={purchases} />
+                    )}
+                  </Card>
+                </div>
+              </div>
+            )}
+
+            {active === "rewards" && (
+              <Card padding="none" className="mt-6">
+                {loading ? (
+                  <LoadingRow />
+                ) : mails.length === 0 ? (
+                  <EmptyState icon={Mail} title="보상 발송 이력이 없습니다" />
+                ) : (
+                  <>
+                    <Table columns={mailColumns} data={mails} />
+                    <div className="px-4 py-3 border-t border-white/5 text-xs text-white/40 flex items-center gap-1.5">
+                      <Mail size={13} /> 발송 실패 시 자동으로 재시도됩니다.
+                    </div>
+                  </>
+                )}
+              </Card>
+            )}
+          </div>
+        </section>
+      </main>
+      <Footer />
+
+      <Modal
+        isOpen={withdrawOpen}
+        onClose={() => !withdrawing && setWithdrawOpen(false)}
+        title="정말 탈퇴하시겠어요?"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setWithdrawOpen(false)} disabled={withdrawing}>
+              취소
+            </Button>
+            <Button variant="solid" onClick={onWithdraw} disabled={withdrawing} leftIcon={withdrawing ? <Loader2 className="animate-spin" size={15} /> : undefined}>
+              탈퇴하기
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm text-white/70 leading-relaxed">
+          보유하신 캐시 <strong className="text-white">{(balance ?? cashBalance ?? 0).toLocaleString()} C</strong> 가 모두 소멸되며 되돌릴 수 없습니다.
+          계속 진행하시겠어요?
+        </p>
+      </Modal>
+    </>
+  );
+}
+
+const cashColumns: TableColumn<CashTransaction>[] = [
+  { key: "createdAt", label: "일시", width: "180px", render: (r) => formatDateTime(r.createdAt) },
   {
     key: "type",
     label: "유형",
     width: "100px",
     render: (r) => (
-      <Badge
-        variant={r.type === "충전" ? "info" : r.type === "환불" ? "warning" : "default"}
-        size="sm"
-      >
-        {r.type}
+      <Badge variant={r.type === "CHARGE" ? "info" : r.type === "REFUND" ? "warning" : "default"} size="sm">
+        {CASH_TYPE_LABEL[r.type]}
       </Badge>
     ),
   },
@@ -107,157 +349,86 @@ const cashColumns: TableColumn<CashRow>[] = [
     ),
   },
   {
-    key: "balance",
+    key: "balanceAfter",
     label: "잔액",
     align: "right",
-    render: (r) => <span className="text-white/70">{r.balance.toLocaleString()} C</span>,
+    render: (r) => <span className="text-white/70">{r.balanceAfter.toLocaleString()} C</span>,
   },
-  { key: "memo", label: "비고" },
+  { key: "memo", label: "비고", render: (r) => r.memo ?? "-" },
 ];
 
-const paymentColumns: TableColumn<PaymentRow>[] = [
-  { key: "date", label: "결제일", width: "120px" },
-  { key: "product", label: "상품명" },
-  {
-    key: "amount",
-    label: "금액",
-    align: "right",
-    render: (r) => `${r.amount.toLocaleString()}원`,
-  },
+const chargeColumns: TableColumn<ChargeHistory>[] = [
+  { key: "createdAt", label: "일시", width: "160px", render: (r) => formatDateTime(r.createdAt) },
+  { key: "cashAmount", label: "충전 캐시", align: "right", render: (r) => `${r.cashAmount.toLocaleString()} C` },
+  { key: "paymentAmountKrw", label: "결제 금액", align: "right", render: (r) => `${r.paymentAmountKrw.toLocaleString()}원` },
   {
     key: "status",
     label: "상태",
     width: "100px",
     render: (r) => (
-      <Badge variant={r.status === "완료" ? "success" : "warning"} size="sm">
+      <Badge variant={r.status === "PAID" ? "success" : r.status === "REFUNDED" ? "warning" : r.status === "FAILED" ? "error" : "default"} size="sm">
         {r.status}
       </Badge>
     ),
   },
   {
-    key: "id",
+    key: "receiptUrl",
     label: "영수증",
-    width: "120px",
-    render: (r) => (
-      <button type="button" className="inline-flex items-center gap-1 text-xs text-white/50 hover:text-white">
-        <Receipt size={13} />
-        {r.id}
-      </button>
-    ),
+    width: "100px",
+    render: (r) =>
+      r.receiptUrl ? (
+        <a href={r.receiptUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-white/60 hover:text-white">
+          <Receipt size={13} /> 보기
+        </a>
+      ) : (
+        <span className="text-white/30 text-xs">-</span>
+      ),
   },
 ];
 
-const rewardColumns: TableColumn<RewardRow>[] = [
-  { key: "date", label: "수령일", width: "180px" },
-  {
-    key: "source",
-    label: "출처",
-    width: "120px",
-    render: (r) => <Badge variant="default" size="sm">{r.source}</Badge>,
-  },
-  { key: "title", label: "우편 제목" },
+const purchaseColumns: TableColumn<PurchaseHistory>[] = [
+  { key: "createdAt", label: "일시", width: "160px", render: (r) => formatDateTime(r.createdAt) },
+  { key: "productName", label: "상품명" },
+  { key: "quantity", label: "수량", align: "right", width: "70px" },
+  { key: "totalPrice", label: "금액", align: "right", render: (r) => `${r.totalPrice.toLocaleString()} C` },
   {
     key: "status",
     label: "상태",
     width: "120px",
     render: (r) => (
-      <Badge
-        variant={r.status === "발송완료" ? "success" : r.status === "발송중" ? "info" : "error"}
-        size="sm"
-      >
+      <Badge variant={r.status === "COMPLETED" ? "success" : r.status === "MAIL_FAILED" || r.status === "CANCELLED" ? "error" : "info"} size="sm">
         {r.status}
       </Badge>
     ),
   },
 ];
 
-export default function MyPage() {
-  const [active, setActive] = useState("profile");
-  const [paymentPage, setPaymentPage] = useState(1);
+const mailColumns: TableColumn<MailHistory>[] = [
+  { key: "createdAt", label: "발송일", width: "180px", render: (r) => formatDateTime(r.createdAt) },
+  {
+    key: "sourceType",
+    label: "출처",
+    width: "110px",
+    render: (r) => <Badge variant="default" size="sm">{MAIL_SOURCE_LABEL[r.sourceType]}</Badge>,
+  },
+  { key: "subject", label: "우편 제목" },
+  {
+    key: "status",
+    label: "상태",
+    width: "110px",
+    render: (r) => (
+      <Badge variant={r.status === "SENT" ? "success" : r.status === "PENDING" ? "info" : "error"} size="sm">
+        {r.status}
+      </Badge>
+    ),
+  },
+];
 
+function LoadingRow() {
   return (
-    <>
-      <Navbar />
-      <main className="pt-16">
-        <section className="max-w-6xl mx-auto px-6 py-12">
-          <h1 className="text-3xl font-bold">마이페이지</h1>
-          <p className="mt-2 text-sm text-white/50">계정 정보, 캐시·결제·보상 내역을 확인할 수 있어요.</p>
-
-          <div className="mt-8">
-            <Tabs tabs={tabs} activeTab={active} onChange={setActive} />
-
-            {active === "profile" && (
-              <Card padding="lg" className="mt-6">
-                <div className="flex flex-col sm:flex-row gap-6 items-start">
-                  <div className="flex items-center gap-4">
-                    <MinecraftHead username="Steve_KR" size="lg" />
-                    <div>
-                      <h2 className="text-xl font-bold">Steve_KR</h2>
-                      <p className="text-xs text-white/45 mt-0.5">가입일: 2024-08-12</p>
-                    </div>
-                  </div>
-                  <div className="flex-1 grid sm:grid-cols-2 gap-x-8 gap-y-3 w-full">
-                    <Field label="UUID" value="a8f3b1d2-9c7e-4f5b-9b2a-12ef34cd5678" mono />
-                    <Field label="이메일" value="steve.kr@example.com" />
-                    <Field label="Microsoft ID" value="MS_xuid_2008143728****" mono />
-                    <Field label="역할" value="일반 회원" />
-                  </div>
-                  <Button variant="outline" size="sm" leftIcon={<Pencil size={14} />}>
-                    프로필 수정
-                  </Button>
-                </div>
-              </Card>
-            )}
-
-            {active === "cash" && (
-              <div className="mt-6 space-y-4">
-                <Card padding="lg">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div>
-                      <p className="text-xs text-white/40">현재 보유 캐시</p>
-                      <div className="mt-1">
-                        <CashDisplay amount={12500} size="lg" />
-                      </div>
-                      <p className="text-xs text-white/35 mt-1">최근 충전: 2026-05-18</p>
-                    </div>
-                    <Button leftIcon={<Plus size={16} />}>충전하기</Button>
-                  </div>
-                </Card>
-                <Card padding="none">
-                  <Table columns={cashColumns} data={cashHistory} />
-                </Card>
-              </div>
-            )}
-
-            {active === "payments" && (
-              <div className="mt-6 space-y-4">
-                <Card padding="none">
-                  <Table columns={paymentColumns} data={payments} />
-                </Card>
-                <Pagination
-                  currentPage={paymentPage}
-                  totalPages={3}
-                  onPageChange={setPaymentPage}
-                />
-              </div>
-            )}
-
-            {active === "rewards" && (
-              <Card padding="none" className="mt-6">
-                <Table columns={rewardColumns} data={rewards} />
-                <div className="px-4 py-3 border-t border-white/5 flex items-center justify-between text-xs">
-                  <p className="text-white/40 flex items-center gap-1.5">
-                    <Mail size={13} /> 발송 실패 시 자동으로 재시도됩니다.
-                  </p>
-                  <Button variant="ghost" size="sm">실패 보상 다시 보내기</Button>
-                </div>
-              </Card>
-            )}
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </>
+    <div className="flex items-center justify-center py-10 text-white/40">
+      <Loader2 className="animate-spin" size={20} />
+    </div>
   );
 }
 
