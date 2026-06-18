@@ -1,32 +1,66 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { Minus, Plus, ShoppingCart, Zap } from "lucide-react";
-import { Button, Card } from "@/components/ui";
+import { useRouter } from "next/navigation";
+import { Loader2, Minus, Plus, Zap } from "lucide-react";
+import { Button, Card, useToast } from "@/components/ui";
 import CashDisplay from "@/components/minecraft/CashDisplay";
-import { useToast } from "@/components/ui";
+import { useAuth } from "@/lib/auth";
+import { shopApi } from "@/lib/shop-api";
+import { ApiError } from "@/lib/api";
 
 interface Props {
+  productId: number;
   price: number;
   productName: string;
+  stockQuantity: number | null;
 }
 
-const CASH_BALANCE = 12500;
-
-export default function ProductPurchasePanel({ price, productName }: Props) {
-  const [qty, setQty] = useState(1);
+export default function ProductPurchasePanel({ productId, price, productName, stockQuantity }: Props) {
+  const router = useRouter();
+  const { status, cashBalance, refresh } = useAuth();
   const { toast } = useToast();
+  const [qty, setQty] = useState(1);
+  const [buying, setBuying] = useState(false);
 
+  const maxQty = stockQuantity != null ? Math.max(1, Math.min(99, stockQuantity)) : 99;
   const total = price * qty;
-  const insufficient = total > CASH_BALANCE;
+  const balance = cashBalance ?? 0;
+  const insufficient = status === "authenticated" && total > balance;
+
+  const onBuy = async () => {
+    if (status !== "authenticated") {
+      toast({ title: "로그인이 필요합니다", variant: "warning" });
+      router.push("/login");
+      return;
+    }
+    if (insufficient) {
+      toast({
+        title: "보유 캐시가 부족합니다",
+        description: "캐시 충전 기능은 현재 준비 중입니다.",
+        variant: "warning",
+      });
+      return;
+    }
+    setBuying(true);
+    try {
+      await shopApi.purchase(productId, qty);
+      toast({ title: "구매 완료!", description: `${productName} 보상이 인게임 우편함으로 발송됩니다.`, variant: "success" });
+      await refresh();
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : "구매에 실패했습니다.";
+      toast({ title: "구매 실패", description: message, variant: "error" });
+    } finally {
+      setBuying(false);
+    }
+  };
 
   return (
     <Card padding="lg">
       <p className="text-xs text-white/40">단가</p>
       <div className="flex items-baseline gap-1.5 mt-1">
         <span className="text-2xl font-bold">{price.toLocaleString()}</span>
-        <span className="text-sm text-white/50">원</span>
+        <span className="text-sm text-white/50">C</span>
       </div>
 
       <div className="mt-5">
@@ -43,65 +77,52 @@ export default function ProductPurchasePanel({ price, productName }: Props) {
           <input
             type="number"
             min={1}
-            max={99}
+            max={maxQty}
             value={qty}
-            onChange={(e) =>
-              setQty(Math.max(1, Math.min(99, Number(e.target.value) || 1)))
-            }
+            onChange={(e) => setQty(Math.max(1, Math.min(maxQty, Number(e.target.value) || 1)))}
             className="flex-1 bg-white/5 border border-white/10 rounded-lg text-center py-2 text-sm focus:outline-none focus:border-white/25"
           />
           <button
             type="button"
-            onClick={() => setQty(Math.min(99, qty + 1))}
+            onClick={() => setQty(Math.min(maxQty, qty + 1))}
             className="w-9 h-9 rounded-lg border border-white/10 text-white/70 hover:bg-white/5 flex items-center justify-center transition-colors"
             aria-label="수량 증가"
           >
             <Plus size={14} />
           </button>
         </div>
+        {stockQuantity != null && (
+          <p className="mt-2 text-xs text-white/35">재고 {stockQuantity.toLocaleString()}개</p>
+        )}
       </div>
 
       <div className="mt-5 py-4 border-y border-white/8 flex items-center justify-between">
-        <span className="text-sm text-white/60">총 결제 금액</span>
-        <span className="text-xl font-bold">{total.toLocaleString()}원</span>
+        <span className="text-sm text-white/60">총 결제 캐시</span>
+        <span className="text-xl font-bold">{total.toLocaleString()} C</span>
       </div>
 
-      <div className="mt-5 flex flex-col gap-2">
+      <div className="mt-5">
         <Button
-          variant="outline"
-          leftIcon={<ShoppingCart size={16} />}
-          onClick={() =>
-            toast({ title: `${productName} 장바구니에 담겼어요`, variant: "success" })
-          }
+          className="w-full"
+          disabled={buying}
+          leftIcon={buying ? <Loader2 className="animate-spin" size={16} /> : <Zap size={16} />}
+          onClick={onBuy}
         >
-          장바구니 담기
-        </Button>
-        <Button
-          leftIcon={<Zap size={16} />}
-          onClick={() =>
-            toast({
-              title: insufficient ? "캐시가 부족해요" : "결제 화면으로 이동합니다",
-              variant: insufficient ? "warning" : "default",
-            })
-          }
-        >
-          바로 구매
+          {status === "authenticated" ? "캐시로 구매" : "로그인하고 구매"}
         </Button>
       </div>
 
-      <div className="mt-5 p-3 bg-white/3 rounded-lg flex items-center justify-between">
-        <div>
-          <p className="text-xs text-white/40">보유 캐시</p>
-          <div className="mt-0.5">
-            <CashDisplay amount={CASH_BALANCE} size="md" />
+      {status === "authenticated" && (
+        <div className="mt-5 p-3 bg-white/3 rounded-lg flex items-center justify-between">
+          <div>
+            <p className="text-xs text-white/40">보유 캐시</p>
+            <div className="mt-0.5">
+              <CashDisplay amount={balance} size="md" />
+            </div>
           </div>
+          {insufficient && <span className="text-xs text-yellow-300">캐시 부족</span>}
         </div>
-        {insufficient && (
-          <Link href="/shop" className="text-xs text-yellow-300 hover:text-yellow-200 underline">
-            캐시 충전하기
-          </Link>
-        )}
-      </div>
+      )}
     </Card>
   );
 }
