@@ -91,7 +91,39 @@ export const adminApi = {
   inquiries: () => api.get<Inquiry[]>("/api/admin/inquiries"),
   replyInquiry: (id: number, content: string) =>
     api.post<Inquiry>(`/api/admin/inquiries/${id}/reply`, { content }),
+
+  charges: (opts: { status?: string; page?: number; size?: number }) =>
+    api.get<PageResponse<ChargeHistory>>(`/api/admin/payments/charges${query(opts)}`),
+  refunds: () => api.get<Refund[]>("/api/admin/refunds"),
+  processRefund: (id: number, status: RefundStatus, operatorMemo: string) =>
+    api.patch<Refund>(`/api/admin/refunds/${id}/process`, { status, operatorMemo }),
 };
+
+export type ChargeStatus = "READY" | "PAID" | "FAILED" | "CANCELLED" | "REFUNDED";
+
+export interface ChargeHistory extends Record<string, unknown> {
+  id: number;
+  merchantOrderId: string;
+  cashAmount: number;
+  paymentAmountKrw: number;
+  status: ChargeStatus;
+  stellaPaymentId: string | null;
+  receiptUrl: string | null;
+  createdAt: string;
+  paidAt: string | null;
+}
+
+export type RefundStatus = "REQUESTED" | "APPROVED" | "REJECTED" | "COMPLETED";
+
+export interface Refund extends Record<string, unknown> {
+  id: number;
+  cashChargeId: number;
+  reason: string;
+  status: RefundStatus;
+  operatorMemo: string | null;
+  processedAt: string | null;
+  createdAt: string;
+}
 
 export interface Category {
   id: number;
