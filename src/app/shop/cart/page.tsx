@@ -1,0 +1,161 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Loader2, Minus, Package, Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { Button, Card, EmptyState, useToast } from "@/components/ui";
+import CashDisplay from "@/components/minecraft/CashDisplay";
+import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
+import { shopApi } from "@/lib/shop-api";
+import { ApiError } from "@/lib/api";
+
+export default function CartPage() {
+  const router = useRouter();
+  const { items, totalPrice, setQuantity, remove, clear } = useCart();
+  const { status, cashBalance, refresh } = useAuth();
+  const { toast } = useToast();
+  const [checkingOut, setCheckingOut] = useState(false);
+
+  const balance = cashBalance ?? 0;
+  const insufficient = status === "authenticated" && totalPrice > balance;
+
+  const onCheckout = async () => {
+    if (status !== "authenticated") {
+      toast({ title: "로그인이 필요합니다", variant: "warning" });
+      router.push("/login");
+      return;
+    }
+    if (insufficient) {
+      toast({ title: "보유 캐시가 부족합니다", description: "캐시 충전 기능은 준비 중입니다.", variant: "warning" });
+      return;
+    }
+    setCheckingOut(true);
+    try {
+      // 백엔드는 단건 구매 API 이므로 항목별로 순차 구매한다.
+      for (const item of items) {
+        await shopApi.purchase(item.productId, item.quantity);
+      }
+      toast({ title: "구매 완료!", description: "보상이 인게임 우편함으로 발송됩니다.", variant: "success" });
+      clear();
+      await refresh();
+      router.push("/mypage");
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : "구매 처리 중 문제가 발생했습니다.";
+      toast({ title: "구매 실패", description: `${message} (일부 항목은 이미 처리되었을 수 있어요)`, variant: "error" });
+      await refresh();
+    } finally {
+      setCheckingOut(false);
+    }
+  };
+
+  return (
+    <div className="flex-1 max-w-5xl w-full mx-auto px-4 py-8">
+      <div className="flex items-center gap-2 mb-6">
+        <ShoppingCart size={22} />
+        <h1 className="text-2xl font-bold">장바구니</h1>
+      </div>
+
+      {items.length === 0 ? (
+        <Card padding="lg">
+          <EmptyState
+            icon={Package}
+            title="장바구니가 비어 있습니다"
+            description="웹상점에서 원하는 상품을 담아보세요."
+            action={<Link href="/shop" className="text-sm text-emerald-300 hover:text-emerald-200 underline">상점으로 가기</Link>}
+          />
+        </Card>
+      ) : (
+        <div className="grid lg:grid-cols-[1fr_320px] gap-6">
+          <div className="space-y-3">
+            {items.map((item) => (
+              <Card key={item.productId} padding="md">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-lg bg-white/5 flex items-center justify-center shrink-0 overflow-hidden">
+                    {item.imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <Package size={22} className="text-white/25" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <Link href={`/shop/product/${item.productId}`} className="text-sm font-medium hover:underline line-clamp-1">
+                      {item.name}
+                    </Link>
+                    <p className="text-xs text-white/45 mt-0.5">{item.price.toLocaleString()} C</p>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setQuantity(item.productId, item.quantity - 1)}
+                      className="w-7 h-7 rounded-md border border-white/10 text-white/70 hover:bg-white/5 flex items-center justify-center"
+                      aria-label="수량 감소"
+                    >
+                      <Minus size={12} />
+                    </button>
+                    <span className="w-8 text-center text-sm tabular-nums">{item.quantity}</span>
+                    <button
+                      type="button"
+                      onClick={() => setQuantity(item.productId, item.quantity + 1)}
+                      className="w-7 h-7 rounded-md border border-white/10 text-white/70 hover:bg-white/5 flex items-center justify-center"
+                      aria-label="수량 증가"
+                    >
+                      <Plus size={12} />
+                    </button>
+                  </div>
+                  <p className="w-24 text-right text-sm font-semibold tabular-nums shrink-0">
+                    {(item.price * item.quantity).toLocaleString()} C
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => remove(item.productId)}
+                    className="p-1.5 rounded-md text-white/40 hover:text-red-400 hover:bg-red-500/10"
+                    aria-label="삭제"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              </Card>
+            ))}
+            <button type="button" onClick={clear} className="text-xs text-white/40 hover:text-white/70">
+              장바구니 비우기
+            </button>
+          </div>
+
+          <div className="lg:sticky lg:top-20 lg:self-start">
+            <Card padding="lg">
+              <h2 className="text-sm font-semibold mb-4">주문 요약</h2>
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="text-white/55">상품 수</span>
+                <span>{items.reduce((s, i) => s + i.quantity, 0)}개</span>
+              </div>
+              <div className="py-4 border-y border-white/8 flex items-center justify-between">
+                <span className="text-sm text-white/60">총 결제 캐시</span>
+                <span className="text-xl font-bold">{totalPrice.toLocaleString()} C</span>
+              </div>
+              <Button
+                className="w-full mt-5"
+                disabled={checkingOut}
+                leftIcon={checkingOut ? <Loader2 className="animate-spin" size={16} /> : undefined}
+                onClick={onCheckout}
+              >
+                {status === "authenticated" ? "캐시로 결제" : "로그인하고 결제"}
+              </Button>
+              {status === "authenticated" && (
+                <div className="mt-4 p-3 bg-white/3 rounded-lg flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-white/40">보유 캐시</p>
+                    <div className="mt-0.5"><CashDisplay amount={balance} size="md" /></div>
+                  </div>
+                  {insufficient && <span className="text-xs text-yellow-300">캐시 부족</span>}
+                </div>
+              )}
+            </Card>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

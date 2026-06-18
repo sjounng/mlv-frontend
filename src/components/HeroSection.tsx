@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { Copy, Check, Play, BookOpen } from "lucide-react";
+import { siteConfig } from "@/lib/site-config";
 
-const SERVER_ADDRESS = "mc.example.com";
+const SERVER_ADDRESS = siteConfig.serverAddress;
 const SERVER_MAX = 2000;
 const SERVER_ONLINE = 1234;
 const SERVER_STATUS: "open" | "maintenance" | "closed" = "open";

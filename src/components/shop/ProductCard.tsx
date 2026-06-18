@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
-import { Package } from "lucide-react";
+import { Package, Plus } from "lucide-react";
+import { useCart } from "@/lib/cart";
+import { useToast } from "@/components/ui";
 
 export interface Product {
   id: string;
@@ -22,10 +26,19 @@ const badgeStyles = {
 };
 
 export default function ProductCard({ product, size = "md" }: ProductCardProps) {
+  const { add } = useCart();
+  const { toast } = useToast();
+
+  const onAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    add({ productId: Number(product.id), name: product.name, price: product.price, imageUrl: product.imageUrl });
+    toast({ title: "장바구니에 담았어요", variant: "success" });
+  };
+
   return (
     <Link
       href={`/shop/product/${product.id}`}
-      className="group flex flex-col bg-[#161616] hover:bg-[#1c1c1c] border border-white/8 hover:border-white/15 rounded-xl overflow-hidden transition-all"
+      className="group relative flex flex-col bg-[#161616] hover:bg-[#1c1c1c] border border-white/8 hover:border-white/15 rounded-xl overflow-hidden transition-all"
     >
       {/* Image area */}
       <div className={`relative flex items-center justify-center bg-white/5 ${size === "sm" ? "h-24" : "h-32"}`}>
@@ -40,6 +53,14 @@ export default function ProductCard({ product, size = "md" }: ProductCardProps) 
             {product.badge}
           </span>
         )}
+        <button
+          type="button"
+          onClick={onAdd}
+          aria-label="장바구니 담기"
+          className="absolute bottom-2 right-2 w-7 h-7 rounded-lg bg-black/60 hover:bg-emerald-500 text-white opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center"
+        >
+          <Plus size={15} />
+        </button>
       </div>
 
       {/* Info */}
