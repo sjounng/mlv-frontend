@@ -80,4 +80,71 @@ export const adminApi = {
 
   mails: () => api.get<AdminMail[]>("/api/admin/mails"),
   retryMail: (id: number) => api.post<AdminMail>(`/api/admin/mails/${id}/retry`),
+
+  categories: () => api.get<Category[]>("/api/admin/categories"),
+  mailTemplates: () => api.get<MailTemplate[]>("/api/admin/mail-templates"),
+
+  products: () => api.get<AdminProduct[]>("/api/admin/products"),
+  createProduct: (body: ProductUpsert) => api.post<AdminProduct>("/api/admin/products", body),
+  updateProduct: (id: number, body: ProductUpsert) => api.patch<AdminProduct>(`/api/admin/products/${id}`, body),
+
+  inquiries: () => api.get<Inquiry[]>("/api/admin/inquiries"),
+  replyInquiry: (id: number, content: string) =>
+    api.post<Inquiry>(`/api/admin/inquiries/${id}/reply`, { content }),
 };
+
+export interface Category {
+  id: number;
+  name: string;
+  sortOrder: number;
+  active: boolean;
+}
+
+export interface MailTemplate {
+  id: number;
+  mailCode: string;
+  subject: string;
+  content: string;
+  rewardsJson: string;
+  createdAt: string;
+}
+
+export interface AdminProduct extends Record<string, unknown> {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  imageUrl: string | null;
+  category: Category;
+  mailTemplateId: number;
+  active: boolean;
+  stockQuantity: number | null;
+  recommended: boolean;
+  newBadge: boolean;
+}
+
+export interface ProductUpsert {
+  name: string;
+  description: string;
+  price: number;
+  imageUrl: string | null;
+  categoryId: number;
+  mailTemplateId: number;
+  active: boolean;
+  stockQuantity: number | null;
+  recommended: boolean;
+  newBadge: boolean;
+}
+
+export type ContactCategory = "PAYMENT" | "ACCOUNT" | "EVENT" | "OTHER";
+export type ContactStatus = "OPEN" | "ANSWERED" | "CLOSED";
+
+export interface Inquiry extends Record<string, unknown> {
+  id: number;
+  category: ContactCategory;
+  title: string;
+  content: string;
+  attachmentUrl: string | null;
+  status: ContactStatus;
+  createdAt: string;
+}
