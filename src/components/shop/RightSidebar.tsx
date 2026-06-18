@@ -1,8 +1,15 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { type Product } from "./ProductCard";
 
-const popularItems: Pick<Product, "id" | "name" | "price" | "emoji" | "emojiColor">[] = [
+interface PopularItem {
+  id: string;
+  name: string;
+  price: number;
+  emoji: string;
+  emojiColor: string;
+}
+
+const popularItems: PopularItem[] = [
   { id: "vip-30", name: "VIP 등급 [30일]", price: 9900, emoji: "👑", emojiColor: "bg-yellow-900/40" },
   { id: "emerald-1000", name: "에메랄드 1,000개", price: 11000, emoji: "💚", emojiColor: "bg-green-900/40" },
   { id: "starter", name: "스타터 패키지", price: 5500, emoji: "📦", emojiColor: "bg-amber-900/40" },
@@ -45,7 +52,7 @@ export default function RightSidebar() {
                   {item.name}
                 </span>
                 <span className="text-xs text-white/50 shrink-0 tabular-nums">
-                  {item.price.toLocaleString()}원
+                  {item.price.toLocaleString()} C
                 </span>
               </Link>
             </li>
