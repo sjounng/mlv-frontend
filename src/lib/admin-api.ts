@@ -98,12 +98,82 @@ export const adminApi = {
   replyInquiry: (id: number, content: string) =>
     api.post<Inquiry>(`/api/admin/inquiries/${id}/reply`, { content }),
 
+  events: () => api.get<AdminEvent[]>("/api/admin/events"),
+  createEvent: (body: EventUpsert) => api.post<AdminEvent>("/api/admin/events", body),
+  updateEvent: (id: number, body: EventUpsert) => api.patch<AdminEvent>(`/api/admin/events/${id}`, body),
+
+  popups: () => api.get<Popup[]>("/api/admin/popups"),
+  createPopup: (body: PopupUpsert) => api.post<Popup>("/api/admin/popups", body),
+  updatePopup: (id: number, body: PopupUpsert) => api.patch<Popup>(`/api/admin/popups/${id}`, body),
+  setPopupActive: (id: number, active: boolean) =>
+    api.patch<Popup>(`/api/admin/popups/${id}/active?active=${active}`),
+
+  terms: () => api.get<Terms[]>("/api/admin/terms"),
+  publishTerms: (body: TermsCreate) => api.post<Terms>("/api/admin/terms", body),
+
   charges: (opts: { status?: string; page?: number; size?: number }) =>
     api.get<PageResponse<ChargeHistory>>(`/api/admin/payments/charges${query(opts)}`),
   refunds: () => api.get<Refund[]>("/api/admin/refunds"),
   processRefund: (id: number, status: RefundStatus, operatorMemo: string) =>
     api.patch<Refund>(`/api/admin/refunds/${id}/process`, { status, operatorMemo }),
 };
+
+export type EventType = "ATTENDANCE" | "INVITE" | "PAYBACK" | "GENERAL";
+
+export interface AdminEvent extends Record<string, unknown> {
+  id: number;
+  name: string;
+  type: EventType;
+  description: string;
+  startAt: string;
+  endAt: string;
+  active: boolean;
+  mailTemplateId: number;
+}
+
+export interface EventUpsert {
+  name: string;
+  type: EventType;
+  description: string;
+  startAt: string;
+  endAt: string;
+  mailTemplateId: number;
+  active: boolean;
+}
+
+export interface Popup extends Record<string, unknown> {
+  id: number;
+  imageUrl: string;
+  linkUrl: string | null;
+  startAt: string;
+  endAt: string;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface PopupUpsert {
+  imageUrl: string;
+  linkUrl: string | null;
+  startAt: string;
+  endAt: string;
+  active: boolean;
+}
+
+export type TermsType = "TERMS" | "PRIVACY" | "REFUND";
+
+export interface Terms extends Record<string, unknown> {
+  id: number;
+  type: TermsType;
+  version: string;
+  content: string;
+  publishedAt: string;
+}
+
+export interface TermsCreate {
+  type: TermsType;
+  version: string;
+  content: string;
+}
 
 export type ChargeStatus = "READY" | "PAID" | "FAILED" | "CANCELLED" | "REFUNDED";
 
