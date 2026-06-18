@@ -83,6 +83,12 @@ export const adminApi = {
 
   categories: () => api.get<Category[]>("/api/admin/categories"),
   mailTemplates: () => api.get<MailTemplate[]>("/api/admin/mail-templates"),
+  createMailTemplate: (body: { mailCode: string; subject: string; content: string; rewardsJson: string }) =>
+    api.post<MailTemplate>("/api/admin/mail-templates", body),
+  sendMail: (body: { targetUuid: string; mailTemplateId: number; sourceRefId: string }) =>
+    api.post<AdminMail>("/api/admin/mails/send", body),
+  createRedeemCode: (body: { code: string; mailTemplateId: number; maxUses: number; expiresAt: string }) =>
+    api.post<{ id: number; code: string }>("/api/admin/redeem-codes", body),
 
   products: () => api.get<AdminProduct[]>("/api/admin/products"),
   createProduct: (body: ProductUpsert) => api.post<AdminProduct>("/api/admin/products", body),
@@ -132,7 +138,7 @@ export interface Category {
   active: boolean;
 }
 
-export interface MailTemplate {
+export interface MailTemplate extends Record<string, unknown> {
   id: number;
   mailCode: string;
   subject: string;
