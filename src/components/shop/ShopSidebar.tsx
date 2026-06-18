@@ -1,59 +1,15 @@
-"use client";
-
 import Link from "next/link";
-import { Home, Star, Package, Coins, Sword, Settings, Palette, MoreHorizontal, MessageCircle, Info } from "lucide-react";
-
-const categories = [
-  { label: "전체 상품", icon: Home, href: "/shop", id: "all" },
-  { label: "추천 상품", icon: Star, href: "/shop?cat=featured", id: "featured" },
-  { label: "패키지", icon: Package, href: "/shop?cat=package", id: "package" },
-  { label: "재화", icon: Coins, href: "/shop?cat=currency", id: "currency" },
-  { label: "게임 아이템", icon: Sword, href: "/shop?cat=item", id: "item" },
-  { label: "편의 기능", icon: Settings, href: "/shop?cat=utility", id: "utility" },
-  { label: "치장 아이템", icon: Palette, href: "/shop?cat=cosmetic", id: "cosmetic" },
-  { label: "기타", icon: MoreHorizontal, href: "/shop?cat=etc", id: "etc" },
-];
+import { Info, MessageCircle } from "lucide-react";
 
 const notices = [
-  "구매한 상품은 서버 내에서 자동으로 지급됩니다.",
+  "구매한 상품은 인게임 우편함으로 자동 지급됩니다.",
   "결제 후 문제가 발생하면 문의 페이지를 이용해주세요.",
-  "환불 및 기타 정책은 문의 페이지에서 확인하세요.",
+  "환불 정책은 서버 정보 > 환불 정책에서 확인하세요.",
 ];
 
-interface ShopSidebarProps {
-  activeCategory?: string;
-}
-
-export default function ShopSidebar({ activeCategory = "all" }: ShopSidebarProps) {
+export default function ShopSidebar() {
   return (
-    <aside className="w-52 shrink-0 flex flex-col gap-6">
-      {/* Categories */}
-      <div>
-        <p className="text-xs text-white/35 font-medium uppercase tracking-wider px-3 mb-2">
-          카테고리
-        </p>
-        <ul className="flex flex-col gap-0.5">
-          {categories.map((cat) => {
-            const active = cat.id === activeCategory;
-            return (
-              <li key={cat.id}>
-                <Link
-                  href={cat.href}
-                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
-                    active
-                      ? "bg-white/10 text-white font-medium"
-                      : "text-white/50 hover:text-white/80 hover:bg-white/5"
-                  }`}
-                >
-                  <cat.icon size={15} className={active ? "text-white" : "text-white/40"} />
-                  {cat.label}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-
+    <aside className="hidden lg:flex w-56 shrink-0 flex-col gap-4">
       {/* Purchase Guide */}
       <div className="bg-white/3 border border-white/8 rounded-xl p-4">
         <p className="text-xs font-semibold text-white/60 mb-3">구매 안내</p>
