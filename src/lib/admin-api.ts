@@ -1,5 +1,38 @@
 // 관리자 API 호출 모음. 응답 DTO 타입과 fetch 헬퍼를 한 곳에서 관리한다.
-import { api } from "@/lib/api";
+import { api, API_BASE_URL, ApiError, getAccessToken, refreshAccessToken } from "@/lib/api";
+
+/** 이미지 파일 업로드 → 공개 URL 반환 (multipart, 401 시 refresh 1회 재시도). */
+export async function uploadImage(file: File): Promise<{ url: string }> {
+  const send = () => {
+    const form = new FormData();
+    form.append("file", file);
+    const token = getAccessToken();
+    return fetch(`${API_BASE_URL}/api/admin/uploads`, {
+      method: "POST",
+      credentials: "include",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    });
+  };
+
+  let response = await send();
+  if (response.status === 401 && (await refreshAccessToken())) {
+    response = await send();
+  }
+  if (!response.ok) {
+    let code = "UPLOAD_FAILED";
+    let message = "업로드에 실패했습니다.";
+    try {
+      const body = await response.json();
+      code = body?.code ?? code;
+      message = body?.message ?? message;
+    } catch {
+      // ignore
+    }
+    throw new ApiError(response.status, code, message);
+  }
+  return response.json();
+}
 
 export interface PageResponse<T> {
   content: T[];
