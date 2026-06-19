@@ -51,7 +51,7 @@ export default function ShopPage() {
         )}
       </main>
 
-      <RightSidebar />
+      <RightSidebar products={products} />
     </div>
   );
 }
