@@ -20,6 +20,15 @@ interface EventItem {
   active: boolean;
 }
 
+interface AttendanceBoard {
+  eventId: number | null;
+  eventName: string | null;
+  today: string; // YYYY-MM-DD
+  todayClaimed: boolean;
+  claimedDates: string[];
+  claimable: boolean;
+}
+
 const TYPE_EMOJI: Record<EventItem["type"], string> = {
   ATTENDANCE: "📅",
   INVITE: "👥",
@@ -38,6 +47,7 @@ export default function EventPage() {
   const { toast } = useToast();
 
   const [events, setEvents] = useState<EventItem[]>([]);
+  const [board, setBoard] = useState<AttendanceBoard | null>(null);
   const [loading, setLoading] = useState(true);
   const [code, setCode] = useState("");
   const [redeeming, setRedeeming] = useState(false);
@@ -54,11 +64,24 @@ export default function EventPage() {
     }
   }, [toast]);
 
+  const loadBoard = useCallback(async () => {
+    try {
+      setBoard(await api.get<AttendanceBoard>("/api/events/attendance"));
+    } catch {
+      setBoard(null);
+    }
+  }, []);
+
   useEffect(() => {
     // 데이터 로딩 시작 시의 setLoading 은 의도된 동작이다.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadEvents();
   }, [loadEvents]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (status === "authenticated") void loadBoard();
+  }, [status, loadBoard]);
 
   const requireLogin = () => {
     toast({ title: "로그인이 필요합니다", variant: "warning" });
@@ -75,6 +98,7 @@ export default function EventPage() {
         description: "인게임 우편함으로 보상이 발송되었습니다.",
         variant: "success",
       });
+      if (event.type === "ATTENDANCE") await loadBoard();
     } catch (error) {
       const message = error instanceof ApiError ? error.message : "수령에 실패했습니다.";
       toast({ title: "수령 실패", description: message, variant: "error" });
@@ -138,7 +162,14 @@ export default function EventPage() {
               </Badge>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            {/* 출석 달력 보드 */}
+            {status === "authenticated" && board?.eventId ? (
+              <AttendanceCalendar today={board.today} claimedDates={board.claimedDates} />
+            ) : status !== "authenticated" ? (
+              <p className="text-sm text-white/40 py-4">로그인하면 출석 보드를 확인할 수 있어요.</p>
+            ) : null}
+
+            <div className="mt-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <ItemIcon emoji="🎁" color="bg-red-500/15" size="md" />
                 <div>
@@ -150,16 +181,18 @@ export default function EventPage() {
               </div>
               <Button
                 onClick={() => attendanceEvent && onClaim(attendanceEvent)}
-                disabled={!attendanceEvent || claimingId === attendanceEvent?.id}
+                disabled={!attendanceEvent || board?.todayClaimed || claimingId === attendanceEvent?.id}
                 leftIcon={
                   claimingId === attendanceEvent?.id ? (
                     <Loader2 className="animate-spin" size={16} />
+                  ) : board?.todayClaimed ? (
+                    <Check size={16} />
                   ) : (
                     <Sparkles size={16} />
                   )
                 }
               >
-                출석하기
+                {board?.todayClaimed ? "오늘 출석 완료" : "출석하기"}
               </Button>
             </div>
           </Card>
@@ -246,5 +279,43 @@ export default function EventPage() {
       </main>
       <Footer />
     </>
+  );
+}
+
+function AttendanceCalendar({ today, claimedDates }: { today: string; claimedDates: string[] }) {
+  const [y, m] = today.split("-").map(Number);
+  const daysInMonth = new Date(y, m, 0).getDate();
+  const claimed = new Set(claimedDates);
+  const pad = (n: number) => String(n).padStart(2, "0");
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-sm font-medium text-white/70">{y}년 {m}월 출석 현황</p>
+        <p className="text-xs text-white/40">이번 달 {claimedDates.length}일 출석</p>
+      </div>
+      <div className="grid grid-cols-7 sm:grid-cols-10 gap-1.5">
+        {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => {
+          const dateStr = `${y}-${pad(m)}-${pad(d)}`;
+          const isChecked = claimed.has(dateStr);
+          const isToday = dateStr === today;
+          return (
+            <div
+              key={d}
+              className={`aspect-square rounded-lg flex flex-col items-center justify-center text-xs border ${
+                isToday ? "ring-2 ring-emerald-400/50" : ""
+              } ${
+                isChecked
+                  ? "bg-emerald-500/20 text-emerald-200 border-emerald-500/30"
+                  : "bg-white/3 text-white/30 border-white/5"
+              }`}
+            >
+              <span className="font-semibold">{d}</span>
+              {isChecked && <Check size={11} className="mt-0.5" />}
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
