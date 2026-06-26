@@ -1,4 +1,12 @@
 import Link from "next/link";
+import { siteConfig } from "@/lib/site-config";
+
+const serviceLinks = [
+  { label: "소개", href: "/introduce" },
+  { label: "웹상점", href: "/shop" },
+  { label: "이벤트", href: "/event" },
+  { label: "문의", href: "/contact" },
+];
 
 export default function Footer() {
   return (
@@ -6,11 +14,11 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between gap-8 mb-8">
           <div>
-            <span className="font-bold text-sm text-white/70 uppercase tracking-wide">
-              마리벨 (마이리틀밸리)
+            <span className="font-bold text-sm text-white/70 tracking-wide">
+              {siteConfig.name} ({siteConfig.fullName})
             </span>
             <p className="mt-2 text-xs text-white/30 max-w-xs leading-relaxed">
-              함께 만드는 우리의 마인크래프트 세상
+              {siteConfig.tagline}
             </p>
           </div>
 
@@ -20,10 +28,10 @@ export default function Footer() {
                 서비스
               </p>
               <ul className="flex flex-col gap-2">
-                {["소개", "웹상점", "이벤트", "문의"].map((label) => (
-                  <li key={label}>
-                    <Link href="#" className="text-sm text-white/40 hover:text-white transition-colors">
-                      {label}
+                {serviceLinks.map((item) => (
+                  <li key={item.label}>
+                    <Link href={item.href} className="text-sm text-white/40 hover:text-white transition-colors">
+                      {item.label}
                     </Link>
                   </li>
                 ))}

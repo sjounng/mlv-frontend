@@ -60,10 +60,10 @@ export default function AdminGuard({ children }: { children: ReactNode }) {
           </p>
         </div>
         <Link
-          href="/login"
-          className="px-4 py-2 text-sm bg-white/10 hover:bg-white/20 border border-white/20 rounded-md transition-colors"
+          href="/admin-login"
+          className="px-4 py-2 text-sm bg-emerald-500/90 hover:bg-emerald-500 rounded-md transition-colors font-medium"
         >
-          로그인으로 이동
+          관리자 로그인
         </Link>
       </div>
     );

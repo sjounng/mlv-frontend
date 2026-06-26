@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { Copy, Check, Play, BookOpen } from "lucide-react";
+import { siteConfig } from "@/lib/site-config";
 
-const SERVER_ADDRESS = "mc.example.com";
+const SERVER_ADDRESS = siteConfig.serverAddress;
 const SERVER_MAX = 2000;
 const SERVER_ONLINE = 1234;
 const SERVER_STATUS: "open" | "maintenance" | "closed" = "open";
@@ -264,8 +265,6 @@ function BlockCastle() {
     // Flag
     { x: 3, y: -2, w: 1, h: 4, opacity: 0.7 },
   ];
-
-  const UNIT = 16;
 
   return (
     <svg

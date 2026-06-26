@@ -38,7 +38,7 @@ export default function ShopPage() {
 
   return (
     <div className="flex flex-1 max-w-[1400px] w-full mx-auto px-4 py-6 gap-5">
-      <ShopSidebar activeCategory="all" />
+      <ShopSidebar />
 
       <main className="flex-1 min-w-0 flex flex-col gap-5">
         <HeroBanner />
@@ -51,7 +51,7 @@ export default function ShopPage() {
         )}
       </main>
 
-      <RightSidebar />
+      <RightSidebar products={products} />
     </div>
   );
 }

@@ -17,12 +17,14 @@ import {
 } from "@/components/ui";
 import {
   adminApi,
+  uploadImage,
   type AdminProduct,
   type Category,
   type MailTemplate,
   type ProductUpsert,
 } from "@/lib/admin-api";
 import { ApiError } from "@/lib/api";
+import { ImagePlus, X } from "lucide-react";
 
 type Row = AdminProduct & Record<string, unknown>;
 
@@ -49,6 +51,22 @@ export default function AdminItemsPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<ProductUpsert>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const onPickImage = async (file: File | undefined) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const { url } = await uploadImage(file);
+      setForm((f) => ({ ...f, imageUrl: url }));
+      toast({ title: "이미지를 업로드했습니다", variant: "success" });
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : "업로드에 실패했습니다.";
+      toast({ title: "업로드 실패", description: message, variant: "error" });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -214,7 +232,42 @@ export default function AdminItemsPage() {
             <Select label="카테고리" options={categoryOptions} value={String(form.categoryId)} onChange={(e) => setForm({ ...form, categoryId: Number(e.target.value) })} />
             <Select label="연결 우편 템플릿" options={templateOptions} value={String(form.mailTemplateId)} onChange={(e) => setForm({ ...form, mailTemplateId: Number(e.target.value) })} />
           </div>
-          <Input label="이미지 URL (선택)" value={form.imageUrl ?? ""} onChange={(e) => setForm({ ...form, imageUrl: e.target.value || null })} placeholder="/assets/products/..." />
+          <div>
+            <p className="text-xs font-medium text-white/60 mb-2">상품 이미지</p>
+            <div className="flex items-center gap-3">
+              <div className="w-20 h-20 rounded-lg bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center shrink-0">
+                {form.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={form.imageUrl} alt="미리보기" className="w-full h-full object-cover" />
+                ) : (
+                  <ImagePlus size={22} className="text-white/25" />
+                )}
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-white/15 rounded-md cursor-pointer hover:bg-white/5 transition-colors w-fit">
+                  {uploading ? <Loader2 className="animate-spin" size={14} /> : <ImagePlus size={14} />}
+                  {form.imageUrl ? "이미지 변경" : "이미지 업로드"}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/gif,image/webp"
+                    className="hidden"
+                    disabled={uploading}
+                    onChange={(e) => onPickImage(e.target.files?.[0])}
+                  />
+                </label>
+                {form.imageUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, imageUrl: null })}
+                    className="inline-flex items-center gap-1 text-xs text-white/40 hover:text-red-400 w-fit"
+                  >
+                    <X size={12} /> 이미지 제거
+                  </button>
+                )}
+                <p className="text-[11px] text-white/30">PNG·JPG·GIF·WEBP, 최대 5MB</p>
+              </div>
+            </div>
+          </div>
           <div className="flex flex-wrap items-center gap-5 pt-1">
             <Toggle label="판매중" checked={form.active} onChange={(v) => setForm({ ...form, active: v })} />
             <Toggle label="추천" checked={form.recommended} onChange={(v) => setForm({ ...form, recommended: v })} />
