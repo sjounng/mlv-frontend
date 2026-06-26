@@ -266,8 +266,6 @@ function BlockCastle() {
     { x: 3, y: -2, w: 1, h: 4, opacity: 0.7 },
   ];
 
-  const UNIT = 16;
-
   return (
     <svg
       viewBox="-2 -4 26 28"

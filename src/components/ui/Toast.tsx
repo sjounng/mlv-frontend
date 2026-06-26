@@ -128,7 +128,6 @@ export function useToast(): ToastContextValue {
     return {
       toast: () => {
         if (typeof window !== "undefined") {
-          // eslint-disable-next-line no-console
           console.warn("useToast called outside <ToastProvider>");
         }
       },

@@ -32,10 +32,13 @@ export default function CartPage() {
       return;
     }
     setCheckingOut(true);
+    let purchasedCount = 0;
     try {
       // 백엔드는 단건 구매 API 이므로 항목별로 순차 구매한다.
-      for (const item of items) {
+      for (const item of [...items]) {
         await shopApi.purchase(item.productId, item.quantity);
+        purchasedCount += 1;
+        remove(item.productId);
       }
       toast({ title: "구매 완료!", description: "보상이 인게임 우편함으로 발송됩니다.", variant: "success" });
       clear();
@@ -43,7 +46,11 @@ export default function CartPage() {
       router.push("/mypage");
     } catch (error) {
       const message = error instanceof ApiError ? error.message : "구매 처리 중 문제가 발생했습니다.";
-      toast({ title: "구매 실패", description: `${message} (일부 항목은 이미 처리되었을 수 있어요)`, variant: "error" });
+      const partialMessage =
+        purchasedCount > 0
+          ? "성공한 항목은 장바구니에서 제거했습니다. 남은 항목만 다시 시도해 주세요."
+          : "구매가 처리되지 않았습니다.";
+      toast({ title: "구매 실패", description: `${message} ${partialMessage}`, variant: "error" });
       await refresh();
     } finally {
       setCheckingOut(false);
