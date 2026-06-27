@@ -115,6 +115,8 @@ export const adminApi = {
   retryMail: (id: number) => api.post<AdminMail>(`/api/admin/mails/${id}/retry`),
 
   categories: () => api.get<Category[]>("/api/admin/categories"),
+  createCategory: (body: CategoryUpsert) => api.post<Category>("/api/admin/categories", body),
+  updateCategory: (id: number, body: CategoryUpsert) => api.patch<Category>(`/api/admin/categories/${id}`, body),
   mailTemplates: () => api.get<MailTemplate[]>("/api/admin/mail-templates"),
   createMailTemplate: (body: { mailCode: string; subject: string; content: string; rewardsJson: string }) =>
     api.post<MailTemplate>("/api/admin/mail-templates", body),
@@ -234,8 +236,14 @@ export interface Refund extends Record<string, unknown> {
   createdAt: string;
 }
 
-export interface Category {
+export interface Category extends Record<string, unknown> {
   id: number;
+  name: string;
+  sortOrder: number;
+  active: boolean;
+}
+
+export interface CategoryUpsert {
   name: string;
   sortOrder: number;
   active: boolean;

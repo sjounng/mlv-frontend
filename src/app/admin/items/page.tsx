@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { Loader2, Pencil, Plus } from "lucide-react";
 import {
   Badge,
@@ -189,7 +190,15 @@ export default function AdminItemsPage() {
           <h1 className="text-2xl font-bold">상점 아이템 관리</h1>
           <p className="mt-1.5 text-sm text-white/50">웹상점 상품을 등록·수정합니다.</p>
         </div>
-        <Button leftIcon={<Plus size={16} />} onClick={openCreate} disabled={loading}>상품 등록</Button>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin/categories"
+            className="focus-ring inline-flex items-center justify-center px-4 py-2 text-sm rounded-lg gap-2 border border-white/15 text-white/90 hover:bg-white/5 hover:border-white/25 transition-colors"
+          >
+            카테고리 관리
+          </Link>
+          <Button leftIcon={<Plus size={16} />} onClick={openCreate} disabled={loading}>상품 등록</Button>
+        </div>
       </div>
 
       <Card padding="none">
