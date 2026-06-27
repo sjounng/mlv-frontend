@@ -1,8 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
-import { Loader2, Pencil, Plus } from "lucide-react";
+import { Loader2, Pencil, Plus, Tags } from "lucide-react";
 import {
   Badge,
   Button,
@@ -21,6 +20,7 @@ import {
   uploadImage,
   type AdminProduct,
   type Category,
+  type CategoryUpsert,
   type MailTemplate,
   type ProductUpsert,
 } from "@/lib/admin-api";
@@ -42,6 +42,12 @@ const emptyForm: ProductUpsert = {
   newBadge: false,
 };
 
+const emptyCategoryForm: CategoryUpsert = {
+  name: "",
+  sortOrder: 0,
+  active: true,
+};
+
 export default function AdminItemsPage() {
   const { toast } = useToast();
   const [products, setProducts] = useState<AdminProduct[]>([]);
@@ -51,7 +57,10 @@ export default function AdminItemsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<ProductUpsert>(emptyForm);
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [categoryForm, setCategoryForm] = useState<CategoryUpsert>(emptyCategoryForm);
   const [saving, setSaving] = useState(false);
+  const [savingCategory, setSavingCategory] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const onPickImage = async (file: File | undefined) => {
@@ -103,6 +112,13 @@ export default function AdminItemsPage() {
     setModalOpen(true);
   };
 
+  const openCategoryCreate = () => {
+    const nextSortOrder =
+      categories.length === 0 ? 10 : Math.max(...categories.map((category) => category.sortOrder)) + 10;
+    setCategoryForm({ ...emptyCategoryForm, sortOrder: nextSortOrder });
+    setCategoryOpen(true);
+  };
+
   const openEdit = (p: AdminProduct) => {
     setEditingId(p.id);
     setForm({
@@ -141,6 +157,30 @@ export default function AdminItemsPage() {
       toast({ title: "저장 실패", description: message, variant: "error" });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const onSaveCategory = async () => {
+    const body: CategoryUpsert = {
+      ...categoryForm,
+      name: categoryForm.name.trim(),
+    };
+    if (!body.name) {
+      toast({ title: "카테고리명을 입력해 주세요", variant: "warning" });
+      return;
+    }
+    setSavingCategory(true);
+    try {
+      const created = await adminApi.createCategory(body);
+      toast({ title: "카테고리가 등록되었습니다", variant: "success" });
+      setCategoryOpen(false);
+      await load();
+      setForm((current) => ({ ...current, categoryId: created.id }));
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : "카테고리 저장에 실패했습니다.";
+      toast({ title: "저장 실패", description: message, variant: "error" });
+    } finally {
+      setSavingCategory(false);
     }
   };
 
@@ -191,12 +231,9 @@ export default function AdminItemsPage() {
           <p className="mt-1.5 text-sm text-white/50">웹상점 상품을 등록·수정합니다.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Link
-            href="/admin/categories"
-            className="focus-ring inline-flex items-center justify-center px-4 py-2 text-sm rounded-lg gap-2 border border-white/15 text-white/90 hover:bg-white/5 hover:border-white/25 transition-colors"
-          >
-            카테고리 관리
-          </Link>
+          <Button variant="outline" leftIcon={<Tags size={15} />} onClick={openCategoryCreate} disabled={loading}>
+            카테고리 등록
+          </Button>
           <Button leftIcon={<Plus size={16} />} onClick={openCreate} disabled={loading}>상품 등록</Button>
         </div>
       </div>
@@ -282,6 +319,37 @@ export default function AdminItemsPage() {
             <Toggle label="추천" checked={form.recommended} onChange={(v) => setForm({ ...form, recommended: v })} />
             <Toggle label="신규" checked={form.newBadge} onChange={(v) => setForm({ ...form, newBadge: v })} />
           </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={categoryOpen}
+        onClose={() => !savingCategory && setCategoryOpen(false)}
+        title="카테고리 등록"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setCategoryOpen(false)} disabled={savingCategory}>취소</Button>
+            <Button onClick={onSaveCategory} disabled={savingCategory} leftIcon={savingCategory ? <Loader2 className="animate-spin" size={15} /> : undefined}>
+              등록하기
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <Input
+            label="카테고리명"
+            value={categoryForm.name}
+            onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
+            placeholder="예: 스타터"
+          />
+          <Input
+            label="정렬순서"
+            type="number"
+            value={categoryForm.sortOrder}
+            onChange={(e) => setCategoryForm({ ...categoryForm, sortOrder: Number(e.target.value) })}
+            hint="숫자가 작을수록 상점에서 먼저 표시됩니다."
+          />
+          <Toggle label="상점에 노출" checked={categoryForm.active} onChange={(v) => setCategoryForm({ ...categoryForm, active: v })} />
         </div>
       </Modal>
     </div>
