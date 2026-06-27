@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
 import { api, refreshAccessToken, setAccessToken } from "@/lib/api";
 
 export type UserStatus = "ACTIVE" | "SUSPENDED" | "WITHDRAWN";
@@ -37,6 +38,8 @@ interface AuthState {
 const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const skipUserBootstrap = pathname.startsWith("/admin");
   const [status, setStatus] = useState<AuthStatus>("loading");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [cashBalance, setCashBalance] = useState<number | null>(null);
@@ -52,6 +55,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const bootstrap = useCallback(async () => {
+    if (skipUserBootstrap) {
+      setProfile(null);
+      setCashBalance(null);
+      setStatus("anonymous");
+      return;
+    }
+
     const token = await refreshAccessToken();
     if (!token) {
       setStatus("anonymous");
@@ -65,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setCashBalance(null);
       setStatus("anonymous");
     }
-  }, [loadMe]);
+  }, [loadMe, skipUserBootstrap]);
 
   useEffect(() => {
     // bootstrap 의 setState 는 모두 await(네트워크) 이후 실행되므로 동기 cascading 이 아니다.

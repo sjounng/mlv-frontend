@@ -7,6 +7,7 @@ export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
 let accessToken: string | null = null;
+let refreshPromise: Promise<string | null> | null = null;
 
 export function setAccessToken(token: string | null) {
   accessToken = token;
@@ -63,6 +64,19 @@ async function parseError(response: Response): Promise<ApiError> {
 
 /** refresh token 쿠키로 새 access token 을 발급받는다. 실패 시 null. */
 export async function refreshAccessToken(): Promise<string | null> {
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
+  refreshPromise = refreshAccessTokenOnce();
+  try {
+    return await refreshPromise;
+  } finally {
+    refreshPromise = null;
+  }
+}
+
+async function refreshAccessTokenOnce(): Promise<string | null> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
       method: "POST",
