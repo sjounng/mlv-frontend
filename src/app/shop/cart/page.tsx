@@ -78,7 +78,7 @@ export default function CartPage() {
           <div className="space-y-3">
             {items.map((item) => (
               <Card key={item.productId} padding="md">
-                <div className="flex items-center gap-4">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
                   <div className="w-14 h-14 rounded-lg bg-white/5 flex items-center justify-center shrink-0 overflow-hidden">
                     {item.imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -87,17 +87,17 @@ export default function CartPage() {
                       <Package size={22} className="text-white/25" />
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <Link href={`/shop/product/${item.productId}`} className="text-sm font-medium hover:underline line-clamp-1">
+                  <div className="flex-1 min-w-[120px]">
+                    <Link href={`/shop/product/${item.productId}`} className="focus-ring rounded text-sm font-medium hover:underline line-clamp-1">
                       {item.name}
                     </Link>
-                    <p className="text-xs text-white/45 mt-0.5">{item.price.toLocaleString()} C</p>
+                    <p className="text-xs text-amber-300/80 mt-0.5 tabular-nums">{item.price.toLocaleString()} C</p>
                   </div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <button
                       type="button"
                       onClick={() => setQuantity(item.productId, item.quantity - 1)}
-                      className="w-7 h-7 rounded-md border border-white/10 text-white/70 hover:bg-white/5 flex items-center justify-center"
+                      className="focus-ring w-7 h-7 rounded-md border border-white/10 text-white/70 hover:bg-white/5 flex items-center justify-center transition-colors"
                       aria-label="수량 감소"
                     >
                       <Minus size={12} />
@@ -106,20 +106,20 @@ export default function CartPage() {
                     <button
                       type="button"
                       onClick={() => setQuantity(item.productId, item.quantity + 1)}
-                      className="w-7 h-7 rounded-md border border-white/10 text-white/70 hover:bg-white/5 flex items-center justify-center"
+                      className="focus-ring w-7 h-7 rounded-md border border-white/10 text-white/70 hover:bg-white/5 flex items-center justify-center transition-colors"
                       aria-label="수량 증가"
                     >
                       <Plus size={12} />
                     </button>
                   </div>
-                  <p className="w-24 text-right text-sm font-semibold tabular-nums shrink-0">
+                  <p className="ml-auto w-24 text-right text-sm font-semibold text-amber-300 tabular-nums shrink-0">
                     {(item.price * item.quantity).toLocaleString()} C
                   </p>
                   <button
                     type="button"
                     onClick={() => remove(item.productId)}
-                    className="p-1.5 rounded-md text-white/40 hover:text-red-400 hover:bg-red-500/10"
-                    aria-label="삭제"
+                    className="focus-ring p-1.5 rounded-md text-white/40 hover:text-red-400 hover:bg-red-500/10 transition-colors shrink-0"
+                    aria-label={`${item.name} 삭제`}
                   >
                     <Trash2 size={15} />
                   </button>
@@ -136,12 +136,30 @@ export default function CartPage() {
               <h2 className="text-sm font-semibold mb-4">주문 요약</h2>
               <div className="flex items-center justify-between text-sm mb-2">
                 <span className="text-white/55">상품 수</span>
-                <span>{items.reduce((s, i) => s + i.quantity, 0)}개</span>
+                <span className="tabular-nums">{items.reduce((s, i) => s + i.quantity, 0)}개</span>
               </div>
-              <div className="py-4 border-y border-white/8 flex items-center justify-between">
+              <div className="py-4 border-y border-white/8 flex items-center justify-between gap-3">
                 <span className="text-sm text-white/60">총 결제 캐시</span>
-                <span className="text-xl font-bold">{totalPrice.toLocaleString()} C</span>
+                <span className="text-2xl font-bold text-amber-300 tabular-nums">{totalPrice.toLocaleString()} C</span>
               </div>
+
+              {status === "authenticated" && (
+                <div className="mt-4 p-3 bg-white/[0.03] border border-white/8 rounded-lg space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-white/45">보유 캐시</span>
+                    <CashDisplay amount={balance} size="md" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-white/45">결제 후 잔액</span>
+                    <span className={`text-xs font-medium tabular-nums ${insufficient ? "text-red-300" : "text-white/70"}`}>
+                      {insufficient
+                        ? `${(totalPrice - balance).toLocaleString()} C 부족`
+                        : `${(balance - totalPrice).toLocaleString()} C`}
+                    </span>
+                  </div>
+                </div>
+              )}
+
               <Button
                 className="w-full mt-5"
                 disabled={checkingOut}
@@ -150,15 +168,6 @@ export default function CartPage() {
               >
                 {status === "authenticated" ? "캐시로 결제" : "로그인하고 결제"}
               </Button>
-              {status === "authenticated" && (
-                <div className="mt-4 p-3 bg-white/3 rounded-lg flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-white/40">보유 캐시</p>
-                    <div className="mt-0.5"><CashDisplay amount={balance} size="md" /></div>
-                  </div>
-                  {insufficient && <span className="text-xs text-yellow-300">캐시 부족</span>}
-                </div>
-              )}
             </Card>
           </div>
         </div>

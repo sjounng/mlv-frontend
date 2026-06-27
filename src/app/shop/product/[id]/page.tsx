@@ -75,8 +75,8 @@ export default function ProductDetailPage() {
                 <h1 className="text-2xl font-bold">{product.name}</h1>
                 <p className="mt-3 text-sm text-white/55 leading-relaxed whitespace-pre-wrap">{product.description}</p>
                 <div className="mt-5 flex items-baseline gap-2">
-                  <span className="text-3xl font-bold">{product.price.toLocaleString()}</span>
-                  <span className="text-sm text-white/50">C</span>
+                  <span className="text-3xl font-bold text-amber-300 tabular-nums">{product.price.toLocaleString()}</span>
+                  <span className="text-sm text-amber-300/70">C</span>
                 </div>
               </div>
             </div>

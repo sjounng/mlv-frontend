@@ -1,14 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-  /* Surfaces */
-  --color-surface-1: #0d0d0d;
-  --color-surface-2: #111111;
-  --color-surface-3: #161616;
-  --color-surface-4: #1c1c1c;
+  /* Surfaces — layered near-black with a faint cool cast for depth */
+  --color-surface-1: #0b0c0d;
+  --color-surface-2: #101113;
+  --color-surface-3: #16181b;
+  --color-surface-4: #1d2024;
+
+  /* Hairlines */
+  --color-line: rgba(255, 255, 255, 0.08);
+
+  /* Brand + semantic accents (used sparingly as points) */
+  --color-brand: #10b981;
+  --color-brand-strong: #34d399;
+  --color-cash: #fbbf24;
 
   /* Accents */
-  --color-accent-green: #4ade80;
+  --color-accent-green: #34d399;
   --color-accent-yellow: #fbbf24;
   --color-accent-red: #f87171;
   --color-accent-blue: #60a5fa;
@@ -23,7 +31,7 @@
 }
 
 :root {
-  --background: #0d0d0d;
+  --background: #0b0c0d;
   --foreground: #ededed;
 }
 
@@ -35,9 +43,52 @@
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: 'Pretendard Variable', 'Pretendard', -apple-system, 'Apple SD Gothic Neo', sans-serif;
+  /* Subtle layered glows keep the dark theme from reading as flat black */
+  background-image:
+    radial-gradient(900px 500px at 12% -8%, rgba(16, 185, 129, 0.06), transparent 60%),
+    radial-gradient(800px 600px at 100% 0%, rgba(96, 165, 250, 0.05), transparent 55%);
+  background-attachment: fixed;
+}
+
+::selection {
+  background: rgba(16, 185, 129, 0.28);
+  color: #fff;
+}
+
+/* Tabular figures for prices / counts / ids */
+.tabular-nums,
+.font-mono {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Consistent, accessible keyboard focus across interactive elements */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px rgba(52, 211, 153, 0.55);
+  border-radius: 0.5rem;
+}
+
+/* Refined scrollbars (desktop) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+  background-clip: padding-box;
 }
 
 @keyframes shimmer {
@@ -58,4 +109,14 @@ body {
   );
   background-size: 200% 100%;
   animation: shimmer 1.6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

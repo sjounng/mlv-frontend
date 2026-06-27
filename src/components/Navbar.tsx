@@ -39,15 +39,12 @@ export default function Navbar() {
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#0d0d0d]/85 backdrop-blur-sm border-b border-white/8">
-      <nav className="max-w-7xl mx-auto px-6 flex items-center h-16 gap-8">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-surface-1/80 backdrop-blur-md border-b border-white/8">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center h-16 gap-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
           <BlockLogo />
-          <div className="leading-none">
-            <p className="font-bold text-sm tracking-wide text-white/90">{siteConfig.name}</p>
-            <p className="text-[10px] text-white/35 tracking-wider">{siteConfig.fullName}</p>
-          </div>
+          <p className="font-bold text-sm tracking-wide text-white/90 leading-none">{siteConfig.name}</p>
         </Link>
 
         {/* Desktop Nav */}
@@ -56,8 +53,10 @@ export default function Navbar() {
             <li key={link.href}>
               <Link
                 href={link.href}
-                className={`text-sm transition-colors ${
-                  isActive(link.href) ? "text-white font-medium" : "text-white/60 hover:text-white"
+                className={`relative py-1 text-sm transition-colors after:absolute after:-bottom-0.5 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:transition-colors ${
+                  isActive(link.href)
+                    ? "text-white font-medium after:bg-emerald-400"
+                    : "text-white/60 hover:text-white after:bg-transparent"
                 }`}
               >
                 {link.label}
@@ -104,7 +103,7 @@ export default function Navbar() {
           ) : (
             <Link
               href="/login"
-              className="px-4 py-1.5 text-sm text-white bg-emerald-500/90 hover:bg-emerald-500 rounded-md transition-colors font-medium"
+              className="focus-ring px-4 py-1.5 text-sm text-white bg-emerald-600 hover:bg-emerald-500 rounded-md transition-colors font-medium"
             >
               로그인
             </Link>
@@ -129,7 +128,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-[#111111] border-t border-white/8 px-6 py-4 flex flex-col gap-4">
+        <div className="md:hidden bg-surface-2 border-t border-white/8 px-4 sm:px-6 py-4 flex flex-col gap-4">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -167,7 +166,7 @@ export default function Navbar() {
               <Link
                 href="/login"
                 onClick={() => setMobileOpen(false)}
-                className="flex-1 text-center px-4 py-2 text-sm bg-emerald-500/90 rounded-md font-medium text-white"
+                className="flex-1 text-center px-4 py-2 text-sm bg-emerald-600 hover:bg-emerald-500 rounded-md font-medium text-white transition-colors"
               >
                 로그인
               </Link>

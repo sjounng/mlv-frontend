@@ -29,10 +29,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     id ?? (label ? `input-${label.replace(/\s+/g, "-").toLowerCase()}` : undefined);
 
   const base =
-    "w-full bg-white/5 border rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:bg-white/7 transition-colors";
+    "w-full bg-white/5 border rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:bg-white/[0.07] focus:ring-2 transition-colors";
   const borderState = error
-    ? "border-red-500/40 focus:border-red-500/60"
-    : "border-white/10 focus:border-white/25";
+    ? "border-red-500/40 focus:border-red-500/60 focus:ring-red-500/20"
+    : "border-white/10 focus:border-emerald-400/50 focus:ring-emerald-400/15";
 
   return (
     <div className={containerClassName}>

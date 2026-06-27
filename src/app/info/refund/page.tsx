@@ -1,8 +1,4 @@
-import Link from "next/link";
-import { History, ChevronLeft } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { Button, Card, Badge } from "@/components/ui";
+import PolicyDocument from "@/components/PolicyDocument";
 
 const sections = [
   {
@@ -37,41 +33,12 @@ const sections = [
 
 export default function RefundPage() {
   return (
-    <>
-      <Navbar />
-      <main className="pt-16">
-        <section className="max-w-3xl mx-auto px-6 py-12">
-          <Link
-            href="/info"
-            className="inline-flex items-center gap-1 text-xs text-white/40 hover:text-white/70 mb-4"
-          >
-            <ChevronLeft size={14} /> 서비스 정보로 돌아가기
-          </Link>
-
-          <div className="flex items-start justify-between gap-4 mb-6">
-            <div>
-              <h1 className="text-3xl font-bold">환불 정책</h1>
-              <div className="mt-3 flex items-center gap-2">
-                <Badge variant="info">v1.0</Badge>
-                <span className="text-xs text-white/40">시행일: 2026-05-19</span>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" leftIcon={<History size={14} />}>
-              이전 버전
-            </Button>
-          </div>
-
-          <Card padding="lg" className="space-y-7">
-            {sections.map((s) => (
-              <section key={s.title}>
-                <h2 className="text-base font-semibold text-white mb-2">{s.title}</h2>
-                <p className="text-sm text-white/60 leading-7 whitespace-pre-line">{s.body}</p>
-              </section>
-            ))}
-          </Card>
-        </section>
-      </main>
-      <Footer />
-    </>
+    <PolicyDocument
+      type="REFUND"
+      title="환불 정책"
+      fallbackVersion="v1.0"
+      fallbackDate="2026-05-19"
+      fallbackSections={sections}
+    />
   );
 }

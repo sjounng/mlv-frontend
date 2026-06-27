@@ -15,13 +15,14 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  solid: "bg-white text-black hover:bg-white/90 disabled:bg-white/40",
+  solid:
+    "bg-emerald-600 text-white hover:bg-emerald-500 disabled:bg-emerald-600/40 disabled:text-white/60 shadow-sm shadow-emerald-950/40",
   outline:
-    "border border-white/20 text-white hover:bg-white/5 disabled:opacity-40",
+    "border border-white/15 text-white/90 hover:bg-white/5 hover:border-white/25 disabled:opacity-40",
   ghost:
     "text-white/70 hover:text-white hover:bg-white/5 disabled:opacity-40",
   danger:
-    "bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 disabled:opacity-40",
+    "bg-red-500/15 border border-red-500/30 text-red-300 hover:bg-red-500/25 disabled:opacity-40",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -56,7 +57,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
       ref={ref}
       type={type}
       disabled={disabled || loading}
-      className={`inline-flex items-center justify-center font-medium transition-colors disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`focus-ring inline-flex items-center justify-center font-medium transition-colors disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       {...rest}
     >
       {loading ? (

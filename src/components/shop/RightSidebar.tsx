@@ -15,10 +15,10 @@ export default function RightSidebar({ products }: RightSidebarProps) {
 
   return (
     <aside className="hidden xl:flex w-64 shrink-0 flex-col gap-4">
-      <div className="bg-[#161616] border border-white/8 rounded-xl p-4">
+      <div className="bg-surface-3 border border-white/8 rounded-xl p-4">
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm font-semibold flex items-center gap-1.5">
-            <Sparkles size={14} className="text-emerald-300" /> 추천 상품
+            <Sparkles size={14} className="text-amber-300" /> 추천 상품
           </p>
           <Link href="/shop" className="flex items-center gap-0.5 text-xs text-white/35 hover:text-white/60 transition-colors">
             더보기 <ArrowRight size={11} />
@@ -28,8 +28,8 @@ export default function RightSidebar({ products }: RightSidebarProps) {
         <ol className="flex flex-col gap-2.5">
           {popular.map((item, i) => (
             <li key={item.id}>
-              <Link href={`/shop/product/${item.id}`} className="flex items-center gap-2.5 group">
-                <span className={`w-4 text-xs font-bold shrink-0 ${i < 3 ? "text-white/60" : "text-white/25"}`}>{i + 1}</span>
+              <Link href={`/shop/product/${item.id}`} className="focus-ring rounded-md flex items-center gap-2.5 group">
+                <span className={`w-4 text-xs font-bold shrink-0 tabular-nums ${i < 3 ? "text-amber-300/80" : "text-white/25"}`}>{i + 1}</span>
                 <div className="w-7 h-7 rounded bg-white/5 overflow-hidden flex items-center justify-center shrink-0">
                   {item.imageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -41,7 +41,7 @@ export default function RightSidebar({ products }: RightSidebarProps) {
                 <span className="text-xs text-white/70 group-hover:text-white transition-colors flex-1 leading-tight line-clamp-1">
                   {item.name}
                 </span>
-                <span className="text-xs text-white/50 shrink-0 tabular-nums">{item.price.toLocaleString()} C</span>
+                <span className="text-xs text-amber-300/80 shrink-0 tabular-nums">{item.price.toLocaleString()} C</span>
               </Link>
             </li>
           ))}
@@ -50,7 +50,7 @@ export default function RightSidebar({ products }: RightSidebarProps) {
 
       <Link
         href="/event"
-        className="block bg-[#161616] border border-white/8 hover:border-white/15 rounded-xl p-4 transition-colors"
+        className="focus-ring block bg-linear-to-br from-emerald-500/[0.07] to-transparent bg-surface-3 border border-white/8 hover:border-emerald-400/25 rounded-xl p-4 transition-colors"
       >
         <p className="text-sm font-semibold mb-1">진행 중인 이벤트</p>
         <p className="text-xs text-white/45 leading-relaxed">출석체크·리딤코드로 보상을 받아가세요.</p>

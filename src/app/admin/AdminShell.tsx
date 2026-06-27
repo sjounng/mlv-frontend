@@ -88,13 +88,14 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                aria-current={active ? "page" : undefined}
+                className={`focus-ring relative flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                   active
-                    ? "bg-white/10 text-white"
+                    ? "bg-emerald-500/10 text-white before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:rounded-full before:bg-emerald-400"
                     : "text-white/55 hover:text-white hover:bg-white/5"
                 }`}
               >
-                <Icon size={16} />
+                <Icon size={16} className={active ? "text-emerald-300" : ""} />
                 <span>{item.label}</span>
               </Link>
             );

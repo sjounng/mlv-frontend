@@ -138,7 +138,7 @@ export default function EventPage() {
       <main className="pt-16">
         <section className="max-w-6xl mx-auto px-6 py-12 space-y-10">
           <div>
-            <p className="text-xs text-white/40 uppercase tracking-widest mb-2">Events</p>
+            <p className="text-xs text-emerald-300/70 uppercase tracking-widest font-medium mb-2">Events</p>
             <h1 className="text-3xl md:text-4xl font-bold">이벤트</h1>
             <p className="mt-3 text-sm text-white/50">
               출석체크, 리딤코드 등 다양한 이벤트로 보상을 받아가세요.

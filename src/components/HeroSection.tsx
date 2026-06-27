@@ -5,13 +5,12 @@ import { Copy, Check, Play, BookOpen } from "lucide-react";
 import { siteConfig } from "@/lib/site-config";
 
 const SERVER_ADDRESS = siteConfig.serverAddress;
-const SERVER_MAX = 2000;
-const SERVER_ONLINE = 1234;
-const SERVER_STATUS: "open" | "maintenance" | "closed" = "open";
+const SERVER_EDITION = siteConfig.serverEdition;
+const SERVER_STATUS = siteConfig.serverStatus;
 
 const statusConfig = {
-  open: { color: "bg-green-500", label: "서버 운영 중" },
-  maintenance: { color: "bg-red-500", label: "점검 중" },
+  open: { color: "bg-emerald-400", label: "서버 운영 중" },
+  maintenance: { color: "bg-amber-400", label: "점검 중" },
   closed: { color: "bg-gray-500", label: "서버 닫힘" },
 };
 
@@ -31,7 +30,9 @@ export default function HeroSection() {
     <>
       <section className="relative min-h-screen flex items-center overflow-hidden">
         {/* Gradient background */}
-        <div className="absolute inset-0 bg-linear-to-br from-[#0d0d0d] via-[#111111] to-[#1a1a1a]" />
+        <div className="absolute inset-0 bg-linear-to-br from-[#0b0c0d] via-[#101113] to-[#15171a]" />
+        {/* Brand ambiance */}
+        <div className="absolute -top-24 -left-24 w-[36rem] h-[36rem] rounded-full bg-emerald-500/10 blur-[120px] pointer-events-none" />
 
         {/* Minecraft world illustration placeholder (right side) */}
         <div className="absolute right-0 top-0 w-1/2 h-full opacity-30 pointer-events-none">
@@ -62,7 +63,7 @@ export default function HeroSection() {
         </div>
 
         {/* Moon */}
-        <div className="absolute top-20 right-1/3 w-16 h-16 rounded-full bg-white/80 blur-sm shadow-[0_0_60px_20px_rgba(255,255,255,0.15)]" />
+        <div className="absolute top-20 right-1/3 w-14 h-14 rounded-full bg-white/60 blur-[2px] shadow-[0_0_50px_16px_rgba(255,255,255,0.10)]" />
 
         {/* Stars */}
         <Stars />
@@ -70,88 +71,73 @@ export default function HeroSection() {
         {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-12 w-full">
           <div className="max-w-2xl">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 mb-6">
-              <span className="px-3 py-1 text-xs text-white/70 bg-white/10 border border-white/15 rounded-full">
-                함께 만드는, 우리의 마인크래프트 세상
+            {/* Status pill */}
+            <span className="inline-flex items-center gap-2 mb-6 px-3 py-1 text-xs bg-white/[0.06] border border-white/10 rounded-full">
+              <span className="relative flex w-2 h-2">
+                {SERVER_STATUS === "open" && (
+                  <span className="absolute inline-flex w-full h-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
+                )}
+                <span className={`relative inline-flex w-2 h-2 rounded-full ${status.color}`} />
               </span>
-              {/* Server status dot */}
-              <span className="flex items-center gap-1.5 group relative">
-                <span className={`w-2 h-2 rounded-full ${status.color} shadow-[0_0_6px_2px] ${SERVER_STATUS === "open" ? "shadow-green-500/60" : SERVER_STATUS === "maintenance" ? "shadow-red-500/60" : "shadow-gray-500/60"}`} />
-                <span className="text-xs text-white/40 group-hover:text-white/70 transition-colors">
-                  {status.label}
-                </span>
-              </span>
-            </div>
+              <span className="font-medium text-white/75">{status.label}</span>
+              <span className="text-white/25">·</span>
+              <span className="text-white/45">{SERVER_EDITION}</span>
+            </span>
 
             {/* Headline */}
-            <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-5 tracking-tight">
-              모두가 즐길 수 있는
+            <h1 className="text-[2.7rem] leading-[1.1] sm:text-5xl md:text-6xl font-bold mb-5 tracking-tight">
+              <span className="text-emerald-300">{siteConfig.name}</span>에서 시작하는
               <br />
-              최고의 마인크래프트 서버
+              나만의 마인크래프트
             </h1>
 
             {/* Subtitle */}
-            <p className="text-lg text-white/55 mb-10 leading-relaxed">
-              다양한 콘텐츠와 안정적인 환경,
-              <br />
-              그리고 활발한 커뮤니티가 여러분을 기다립니다.
+            <p className="text-base sm:text-lg text-white/55 mb-9 leading-relaxed max-w-xl">
+              다양한 콘텐츠와 안정적인 환경, 그리고 활발한 커뮤니티가 여러분을 기다립니다.
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-3 mb-10">
+            <div className="flex flex-col sm:flex-row gap-3 mb-10">
               <button
                 onClick={() => setConnectModal(true)}
-                className="flex items-center gap-2 px-7 py-3.5 bg-white/10 hover:bg-white/15 border border-white/20 rounded-lg font-medium text-sm transition-all"
+                className="focus-ring flex items-center justify-center gap-2 px-7 py-3.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-medium text-sm transition-colors shadow-lg shadow-emerald-950/40"
               >
                 <Play size={15} className="fill-white" />
                 서버 접속하기
               </button>
               <a
                 href="/introduce"
-                className="flex items-center gap-2 px-7 py-3.5 border border-white/20 rounded-lg font-medium text-sm hover:bg-white/5 transition-all text-white/80 hover:text-white"
+                className="focus-ring flex items-center justify-center gap-2 px-7 py-3.5 border border-white/20 rounded-lg font-medium text-sm hover:bg-white/5 transition-colors text-white/80 hover:text-white"
               >
                 <BookOpen size={15} />
                 서버 가이드
               </a>
             </div>
 
-            {/* Server Info Card */}
-            <div className="flex flex-wrap gap-px bg-white/10 border border-white/10 rounded-xl overflow-hidden w-fit">
-              {/* Address */}
-              <div className="px-5 py-4 bg-[#111111] flex flex-col gap-1 min-w-[180px]">
-                <span className="text-xs text-white/40 font-medium">접속 주소</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-mono font-medium">{SERVER_ADDRESS}</span>
-                  <button
-                    onClick={handleCopy}
-                    className="text-white/40 hover:text-white transition-colors"
-                    title="주소 복사"
-                  >
-                    {copied ? (
-                      <Check size={14} className="text-green-400" />
-                    ) : (
-                      <Copy size={14} />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="w-px bg-white/10" />
-
-              {/* Player count */}
-              <div className="px-5 py-4 bg-[#111111] flex flex-col gap-1 min-w-[160px]">
-                <span className="text-xs text-white/40 font-medium">현재 접속자</span>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-mono font-medium">
-                    {SERVER_ONLINE.toLocaleString()}{" "}
-                    <span className="text-white/30">/ {SERVER_MAX.toLocaleString()}</span>
-                  </span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                </div>
-              </div>
-            </div>
+            {/* Server address — primary, copyable */}
+            <button
+              onClick={handleCopy}
+              className="focus-ring group flex items-center gap-3 px-4 py-3 bg-surface-2/80 border border-white/10 hover:border-emerald-400/30 rounded-xl transition-colors w-full sm:w-fit"
+              title="주소 복사"
+            >
+              <span className="flex flex-col items-start min-w-0">
+                <span className="text-[11px] text-white/40 font-medium">접속 주소</span>
+                <span className="text-sm sm:text-base font-mono font-semibold text-white truncate">
+                  {SERVER_ADDRESS}
+                </span>
+              </span>
+              <span className="ml-auto flex items-center gap-1.5 text-xs text-white/50 group-hover:text-emerald-300 transition-colors shrink-0">
+                {copied ? (
+                  <>
+                    <Check size={14} className="text-emerald-400" /> 복사됨
+                  </>
+                ) : (
+                  <>
+                    <Copy size={14} /> 복사
+                  </>
+                )}
+              </span>
+            </button>
           </div>
         </div>
       </section>
@@ -163,7 +149,7 @@ export default function HeroSection() {
           onClick={() => setConnectModal(false)}
         >
           <div
-            className="bg-[#181818] border border-white/10 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl"
+            className="bg-surface-3 border border-white/10 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-xl font-bold mb-2">서버에 접속하기</h2>
@@ -173,8 +159,8 @@ export default function HeroSection() {
 
             <div className="bg-white/5 rounded-lg p-4 mb-6 flex items-center justify-between">
               <code className="text-sm font-mono">{SERVER_ADDRESS}</code>
-              <button onClick={handleCopy} className="text-white/40 hover:text-white">
-                {copied ? <Check size={15} className="text-green-400" /> : <Copy size={15} />}
+              <button onClick={handleCopy} className="focus-ring text-white/40 hover:text-white" aria-label="주소 복사">
+                {copied ? <Check size={15} className="text-emerald-400" /> : <Copy size={15} />}
               </button>
             </div>
 

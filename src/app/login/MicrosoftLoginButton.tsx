@@ -43,7 +43,7 @@ export default function MicrosoftLoginButton() {
       type="button"
       onClick={onClick}
       disabled={loading}
-      className="mt-7 w-full flex items-center justify-center gap-3 bg-white text-black hover:bg-white/90 disabled:opacity-60 transition-colors rounded-xl py-3.5 font-medium"
+      className="focus-ring mt-7 w-full flex items-center justify-center gap-3 bg-white text-black hover:bg-white/90 disabled:opacity-60 transition-colors rounded-xl py-3.5 font-medium"
     >
       {loading ? (
         <Loader2 className="animate-spin" size={18} />

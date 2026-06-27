@@ -310,7 +310,7 @@ export default function MyPage() {
             <Button variant="outline" onClick={() => setWithdrawOpen(false)} disabled={withdrawing}>
               취소
             </Button>
-            <Button variant="solid" onClick={onWithdraw} disabled={withdrawing} leftIcon={withdrawing ? <Loader2 className="animate-spin" size={15} /> : undefined}>
+            <Button variant="danger" onClick={onWithdraw} disabled={withdrawing} leftIcon={withdrawing ? <Loader2 className="animate-spin" size={15} /> : undefined}>
               탈퇴하기
             </Button>
           </>

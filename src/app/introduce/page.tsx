@@ -21,6 +21,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button, Card, Badge } from "@/components/ui";
 import ServerStatus from "@/components/minecraft/ServerStatus";
+import { siteConfig } from "@/lib/site-config";
 
 const features = [
   {
@@ -84,7 +85,7 @@ const contents = [
   },
 ];
 
-const SERVER_ADDRESS = "play.maribel.kr";
+const SERVER_ADDRESS = siteConfig.serverAddress;
 
 export default function IntroducePage() {
   const [copied, setCopied] = useState(false);
@@ -108,7 +109,7 @@ export default function IntroducePage() {
           <div className="max-w-7xl mx-auto px-6 py-16 md:py-24 grid md:grid-cols-2 gap-10 items-center">
             <div>
               <div className="inline-flex items-center gap-2 mb-5">
-                <ServerStatus status="open" />
+                <ServerStatus status={siteConfig.serverStatus} />
                 <span className="text-xs text-white/30">v1.20.4</span>
               </div>
               <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight">

@@ -10,9 +10,11 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const variantClasses: Record<CardVariant, string> = {
-  default: "bg-surface-3 border border-white/8 rounded-xl",
-  elevated: "bg-surface-3 border border-white/8 rounded-xl shadow-xl",
-  flat: "bg-white/3 rounded-xl",
+  default:
+    "bg-surface-3 border border-white/8 rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.25)]",
+  elevated:
+    "bg-surface-3 border border-white/10 rounded-xl shadow-xl shadow-black/40",
+  flat: "bg-white/[0.03] border border-white/5 rounded-xl",
 };
 
 const paddingClasses: Record<CardPadding, string> = {
