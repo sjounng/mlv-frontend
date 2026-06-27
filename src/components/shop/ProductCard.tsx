@@ -37,14 +37,14 @@ export default function ProductCard({ product, size = "md" }: ProductCardProps) 
 
   return (
     <div
-      className="group relative flex flex-col bg-[#161616] hover:bg-[#1c1c1c] border border-white/8 hover:border-white/15 rounded-xl overflow-hidden transition-all"
+      className="group relative flex flex-col bg-surface-3 hover:bg-surface-4 border border-white/8 hover:border-white/15 rounded-xl overflow-hidden transition-colors"
     >
       {/* Image area */}
       <div className="relative">
-        <Link href={href} className={`flex items-center justify-center bg-white/5 ${size === "sm" ? "h-24" : "h-32"}`}>
+        <Link href={href} className={`focus-ring flex items-center justify-center bg-white/5 ${size === "sm" ? "h-24" : "h-32"}`}>
           {product.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+            <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
           ) : (
             <Package size={size === "sm" ? 30 : 40} className="text-white/25" />
           )}
@@ -57,20 +57,20 @@ export default function ProductCard({ product, size = "md" }: ProductCardProps) 
         <button
           type="button"
           onClick={onAdd}
-          aria-label="장바구니 담기"
-          className="absolute bottom-2 right-2 w-7 h-7 rounded-lg bg-black/60 hover:bg-emerald-500 text-white opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center"
+          aria-label={`${product.name} 장바구니 담기`}
+          className="focus-ring absolute bottom-2 right-2 w-8 h-8 rounded-lg bg-emerald-600/90 hover:bg-emerald-500 text-white shadow-lg shadow-black/40 flex items-center justify-center transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 md:translate-y-1 md:group-hover:translate-y-0"
         >
-          <Plus size={15} />
+          <Plus size={16} />
         </button>
       </div>
 
       {/* Info */}
-      <Link href={href} className="p-3 flex flex-col gap-1 flex-1">
+      <Link href={href} className="focus-ring p-3 flex flex-col gap-1 flex-1">
         <p className={`font-medium leading-tight line-clamp-1 ${size === "sm" ? "text-xs" : "text-sm"}`}>
           {product.name}
         </p>
         {size === "md" && <p className="text-xs text-white/40 line-clamp-1">{product.desc}</p>}
-        <p className={`font-semibold mt-auto ${size === "sm" ? "text-xs" : "text-sm"}`}>
+        <p className={`font-semibold text-amber-300 tabular-nums mt-auto ${size === "sm" ? "text-xs" : "text-sm"}`}>
           {product.price.toLocaleString()} C
         </p>
       </Link>

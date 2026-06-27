@@ -6,9 +6,9 @@ import MicrosoftLoginButton from "./MicrosoftLoginButton";
 export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-surface-1">
-      <Link href="/" className="flex items-center gap-2.5 mb-8">
-        <div className="w-9 h-9 border-2 border-white/80 rounded flex items-center justify-center">
-          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
+      <Link href="/" className="focus-ring flex items-center gap-2.5 mb-8 rounded-lg">
+        <div className="w-9 h-9 rounded-md bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center">
+          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-emerald-300">
             <rect x="3" y="3" width="7" height="7" />
             <rect x="14" y="3" width="7" height="7" />
             <rect x="3" y="14" width="7" height="7" />

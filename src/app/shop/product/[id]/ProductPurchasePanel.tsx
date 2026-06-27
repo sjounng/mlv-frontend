@@ -62,8 +62,8 @@ export default function ProductPurchasePanel({ productId, price, productName, im
     <Card padding="lg">
       <p className="text-xs text-white/40">단가</p>
       <div className="flex items-baseline gap-1.5 mt-1">
-        <span className="text-2xl font-bold">{price.toLocaleString()}</span>
-        <span className="text-sm text-white/50">C</span>
+        <span className="text-2xl font-bold text-amber-300 tabular-nums">{price.toLocaleString()}</span>
+        <span className="text-sm text-amber-300/70">C</span>
       </div>
 
       <div className="mt-5">
@@ -72,7 +72,7 @@ export default function ProductPurchasePanel({ productId, price, productName, im
           <button
             type="button"
             onClick={() => setQty(Math.max(1, qty - 1))}
-            className="w-9 h-9 rounded-lg border border-white/10 text-white/70 hover:bg-white/5 flex items-center justify-center transition-colors"
+            className="focus-ring w-9 h-9 rounded-lg border border-white/10 text-white/70 hover:bg-white/5 flex items-center justify-center transition-colors"
             aria-label="수량 감소"
           >
             <Minus size={14} />
@@ -82,13 +82,14 @@ export default function ProductPurchasePanel({ productId, price, productName, im
             min={1}
             max={maxQty}
             value={qty}
+            aria-label="수량"
             onChange={(e) => setQty(Math.max(1, Math.min(maxQty, Number(e.target.value) || 1)))}
-            className="flex-1 bg-white/5 border border-white/10 rounded-lg text-center py-2 text-sm focus:outline-none focus:border-white/25"
+            className="flex-1 bg-white/5 border border-white/10 rounded-lg text-center py-2 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-emerald-400/15 focus:border-emerald-400/50 transition-colors"
           />
           <button
             type="button"
             onClick={() => setQty(Math.min(maxQty, qty + 1))}
-            className="w-9 h-9 rounded-lg border border-white/10 text-white/70 hover:bg-white/5 flex items-center justify-center transition-colors"
+            className="focus-ring w-9 h-9 rounded-lg border border-white/10 text-white/70 hover:bg-white/5 flex items-center justify-center transition-colors"
             aria-label="수량 증가"
           >
             <Plus size={14} />
@@ -99,9 +100,9 @@ export default function ProductPurchasePanel({ productId, price, productName, im
         )}
       </div>
 
-      <div className="mt-5 py-4 border-y border-white/8 flex items-center justify-between">
+      <div className="mt-5 py-4 border-y border-white/8 flex items-center justify-between gap-3">
         <span className="text-sm text-white/60">총 결제 캐시</span>
-        <span className="text-xl font-bold">{total.toLocaleString()} C</span>
+        <span className="text-xl font-bold text-amber-300 tabular-nums">{total.toLocaleString()} C</span>
       </div>
 
       <div className="mt-5 flex flex-col gap-2">
@@ -134,7 +135,7 @@ export default function ProductPurchasePanel({ productId, price, productName, im
               <CashDisplay amount={balance} size="md" />
             </div>
           </div>
-          {insufficient && <span className="text-xs text-yellow-300">캐시 부족</span>}
+          {insufficient && <span className="text-xs font-medium text-red-300">캐시 부족</span>}
         </div>
       )}
     </Card>

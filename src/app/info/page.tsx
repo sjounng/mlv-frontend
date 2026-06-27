@@ -10,6 +10,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui";
+import { businessInfo } from "@/lib/site-config";
 
 const links = [
   {
@@ -90,19 +91,10 @@ export default function InfoHubPage() {
 
             <Card padding="lg">
               <dl className="grid sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
-                {[
-                  ["상호", "마이리틀밸리"],
-                  ["대표자", "김민수"],
-                  ["사업자 등록번호", "123-45-67890"],
-                  ["통신판매업 신고번호", "제 2026-서울강남-0123 호"],
-                  ["주소", "서울특별시 강남구 테헤란로 152, 5층"],
-                  ["호스팅 제공", "Stella IT, Inc."],
-                  ["고객센터", "support@maribel.kr · 1577-0000"],
-                  ["운영 시간", "평일 10:00 - 18:00 (점심 12:00 - 13:00)"],
-                ].map(([k, v]) => (
-                  <div key={k} className="flex flex-col gap-1">
-                    <dt className="text-xs text-white/40">{k}</dt>
-                    <dd className="text-white/85">{v}</dd>
+                {businessInfo.map(({ label, value }) => (
+                  <div key={label} className="flex flex-col gap-1">
+                    <dt className="text-xs text-white/40">{label}</dt>
+                    <dd className="text-white/85 break-keep">{value}</dd>
                   </div>
                 ))}
               </dl>

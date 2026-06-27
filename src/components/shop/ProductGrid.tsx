@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LayoutGrid, List, Package } from "lucide-react";
+import { LayoutGrid, List, Package, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { EmptyState } from "@/components/ui";
 import ProductCard, { type Product } from "./ProductCard";
@@ -40,7 +40,9 @@ export default function ProductGrid({ products, categories }: ProductGridProps) 
     <div className="flex flex-col gap-8">
       {featured.length > 0 && (
         <section>
-          <h2 className="text-sm font-semibold mb-4">추천 상품</h2>
+          <h2 className="text-sm font-semibold mb-4 flex items-center gap-1.5">
+            <Sparkles size={15} className="text-amber-300" /> 추천 상품
+          </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {featured.map((p) => (
               <ProductCard key={p.id} product={p} />
@@ -60,8 +62,10 @@ export default function ProductGrid({ products, categories }: ProductGridProps) 
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  activeTab === tab.id ? "bg-white text-black" : "text-white/50 hover:text-white/80 hover:bg-white/5"
+                className={`focus-ring px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  activeTab === tab.id
+                    ? "bg-emerald-600 text-white"
+                    : "text-white/50 hover:text-white/80 hover:bg-white/5"
                 }`}
               >
                 {tab.label}
@@ -72,18 +76,19 @@ export default function ProductGrid({ products, categories }: ProductGridProps) 
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
-            className="bg-white/3 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white/60 focus:outline-none"
+            aria-label="정렬"
+            className="focus-ring bg-white/[0.04] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white/70 cursor-pointer hover:bg-white/[0.07] transition-colors"
           >
             {sortOptions.map((opt) => (
-              <option key={opt} value={opt}>{opt}</option>
+              <option key={opt} value={opt} className="bg-surface-4 text-white">{opt}</option>
             ))}
           </select>
 
           <div className="flex border border-white/10 rounded-lg overflow-hidden">
-            <button onClick={() => setViewMode("grid")} className={`p-1.5 transition-colors ${viewMode === "grid" ? "bg-white/10 text-white" : "text-white/30 hover:text-white/60"}`}>
+            <button onClick={() => setViewMode("grid")} aria-label="그리드 보기" aria-pressed={viewMode === "grid"} className={`focus-ring p-1.5 transition-colors ${viewMode === "grid" ? "bg-white/10 text-white" : "text-white/30 hover:text-white/60"}`}>
               <LayoutGrid size={14} />
             </button>
-            <button onClick={() => setViewMode("list")} className={`p-1.5 transition-colors ${viewMode === "list" ? "bg-white/10 text-white" : "text-white/30 hover:text-white/60"}`}>
+            <button onClick={() => setViewMode("list")} aria-label="리스트 보기" aria-pressed={viewMode === "list"} className={`focus-ring p-1.5 transition-colors ${viewMode === "list" ? "bg-white/10 text-white" : "text-white/30 hover:text-white/60"}`}>
               <List size={14} />
             </button>
           </div>
@@ -103,7 +108,7 @@ export default function ProductGrid({ products, categories }: ProductGridProps) 
               <Link
                 key={p.id}
                 href={`/shop/product/${p.id}`}
-                className="flex items-center gap-4 p-3 bg-[#161616] hover:bg-[#1c1c1c] border border-white/8 hover:border-white/15 rounded-xl transition-all"
+                className="focus-ring flex items-center gap-4 p-3 bg-surface-3 hover:bg-surface-4 border border-white/8 hover:border-white/15 rounded-xl transition-colors"
               >
                 <div className="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center shrink-0 overflow-hidden">
                   {p.imageUrl ? (
@@ -117,7 +122,7 @@ export default function ProductGrid({ products, categories }: ProductGridProps) 
                   <p className="text-sm font-medium line-clamp-1">{p.name}</p>
                   <p className="text-xs text-white/40 mt-0.5 line-clamp-1">{p.desc}</p>
                 </div>
-                <p className="text-sm font-semibold shrink-0 tabular-nums">{p.price.toLocaleString()} C</p>
+                <p className="text-sm font-semibold text-amber-300 shrink-0 tabular-nums">{p.price.toLocaleString()} C</p>
               </Link>
             ))}
           </div>

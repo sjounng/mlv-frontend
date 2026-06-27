@@ -38,9 +38,9 @@ export function Tabs({
               key={tab.id}
               type="button"
               onClick={() => onChange(tab.id)}
-              className={`relative inline-flex items-center gap-2 px-4 py-2.5 text-sm transition-colors ${
+              className={`focus-ring relative inline-flex items-center gap-2 px-4 py-2.5 text-sm transition-colors ${
                 active
-                  ? "text-white font-medium after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-white"
+                  ? "text-white font-medium after:absolute after:-bottom-px after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-emerald-400"
                   : "text-white/50 hover:text-white/80"
               }`}
             >
@@ -64,9 +64,9 @@ export function Tabs({
             key={tab.id}
             type="button"
             onClick={() => onChange(tab.id)}
-            className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors ${
+            className={`focus-ring inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors ${
               active
-                ? "bg-white/10 text-white"
+                ? "bg-white/10 text-white shadow-sm"
                 : "text-white/50 hover:text-white/80"
             }`}
           >

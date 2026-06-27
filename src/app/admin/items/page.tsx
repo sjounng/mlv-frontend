@@ -151,7 +151,7 @@ export default function AdminItemsPage() {
       width: "120px",
       render: (r) => <Badge variant="default" size="sm">{r.category.name}</Badge>,
     },
-    { key: "price", label: "가격", align: "right", width: "110px", render: (r) => `${r.price.toLocaleString()} C` },
+    { key: "price", label: "가격", align: "right", width: "110px", render: (r) => <span className="text-amber-300 tabular-nums">{r.price.toLocaleString()} C</span> },
     {
       key: "stockQuantity",
       label: "재고",
@@ -172,7 +172,7 @@ export default function AdminItemsPage() {
       label: "관리",
       width: "80px",
       render: (r) => (
-        <button type="button" onClick={() => openEdit(r)} className="p-1.5 rounded-md text-white/50 hover:text-white hover:bg-white/5">
+        <button type="button" onClick={() => openEdit(r)} aria-label={`${r.name} 수정`} className="focus-ring p-1.5 rounded-md text-white/50 hover:text-white hover:bg-white/5 transition-colors">
           <Pencil size={14} />
         </button>
       ),

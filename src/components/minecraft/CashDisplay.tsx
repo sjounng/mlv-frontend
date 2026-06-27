@@ -24,9 +24,9 @@ export default function CashDisplay({
   const s = sizeClasses[size];
   return (
     <span
-      className={`inline-flex items-center gap-1.5 font-semibold text-yellow-300 ${s.text} ${className}`}
+      className={`inline-flex items-center gap-1.5 font-semibold text-amber-300 tabular-nums ${s.text} ${className}`}
     >
-      {showIcon && <Coins size={s.icon} className="text-yellow-400" />}
+      {showIcon && <Coins size={s.icon} className="text-amber-400" />}
       <span>{amount.toLocaleString()} C</span>
     </span>
   );

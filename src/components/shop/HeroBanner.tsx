@@ -42,7 +42,7 @@ export default function HeroBanner() {
   );
 
   return (
-    <div className="relative h-48 rounded-xl overflow-hidden bg-[#161616] border border-white/8">
+    <div className="relative h-40 sm:h-48 rounded-xl overflow-hidden bg-surface-3 border border-white/8">
       {slide.linkUrl ? (
         <a href={slide.linkUrl} className="block w-full h-full">{Inner}</a>
       ) : (
