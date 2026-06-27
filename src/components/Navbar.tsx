@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, LogOut, ShoppingCart } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useCart } from "@/lib/cart";
-import { siteConfig } from "@/lib/site-config";
 import MinecraftHead from "@/components/minecraft/MinecraftHead";
 
 const navLinks = [
@@ -16,19 +16,6 @@ const navLinks = [
   { label: "이벤트", href: "/event" },
   { label: "문의", href: "/contact" },
 ];
-
-function BlockLogo() {
-  return (
-    <div className="w-8 h-8 rounded-md bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center">
-      <svg viewBox="0 0 24 24" className="w-4 h-4 fill-emerald-300">
-        <rect x="3" y="3" width="7" height="7" />
-        <rect x="14" y="3" width="7" height="7" />
-        <rect x="3" y="14" width="7" height="7" />
-        <rect x="14" y="14" width="7" height="7" />
-      </svg>
-    </div>
-  );
-}
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -42,9 +29,15 @@ export default function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-surface-1/80 backdrop-blur-md border-b border-white/8">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center h-16 gap-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <BlockLogo />
-          <p className="font-bold text-sm tracking-wide text-white/90 leading-none">{siteConfig.name}</p>
+        <Link href="/" className="flex items-center shrink-0" aria-label="마리벨 홈">
+          <Image
+            src="/assets/brand/maribel-logo.png"
+            alt="마리벨"
+            width={600}
+            height={214}
+            priority
+            className="h-8 w-auto sm:h-9"
+          />
         </Link>
 
         {/* Desktop Nav */}

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { LayoutGrid, List, Package, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { EmptyState } from "@/components/ui";
+import { EmptyState, Select } from "@/components/ui";
 import ProductCard, { type Product } from "./ProductCard";
 
 interface CategoryTab {
@@ -17,6 +17,7 @@ interface ProductGridProps {
 }
 
 const sortOptions = ["추천순", "가격 낮은순", "가격 높은순", "이름순"] as const;
+const sortSelectOptions = sortOptions.map((option) => ({ value: option, label: option }));
 type SortKey = (typeof sortOptions)[number];
 
 export default function ProductGrid({ products, categories }: ProductGridProps) {
@@ -73,16 +74,14 @@ export default function ProductGrid({ products, categories }: ProductGridProps) 
             ))}
           </div>
 
-          <select
+          <Select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
             aria-label="정렬"
-            className="focus-ring bg-white/[0.04] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white/70 cursor-pointer hover:bg-white/[0.07] transition-colors"
-          >
-            {sortOptions.map((opt) => (
-              <option key={opt} value={opt} className="bg-surface-4 text-white">{opt}</option>
-            ))}
-          </select>
+            options={sortSelectOptions}
+            containerClassName="w-36"
+            className="py-1.5 text-xs"
+          />
 
           <div className="flex border border-white/10 rounded-lg overflow-hidden">
             <button onClick={() => setViewMode("grid")} aria-label="그리드 보기" aria-pressed={viewMode === "grid"} className={`focus-ring p-1.5 transition-colors ${viewMode === "grid" ? "bg-white/10 text-white" : "text-white/30 hover:text-white/60"}`}>
