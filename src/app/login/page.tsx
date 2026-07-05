@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 import { Card, Separator } from "@/components/ui";
 import MicrosoftLoginButton from "./MicrosoftLoginButton";
+
+export const metadata: Metadata = {
+  title: "로그인",
+  description: "마인크래프트 정품 계정으로 로그인하세요.",
+};
 
 export default function LoginPage() {
   return (

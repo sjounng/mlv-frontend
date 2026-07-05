@@ -35,9 +35,20 @@ export function toUiProduct(p: ShopProductResponse): Product {
   };
 }
 
+export interface ShopPage<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  hasNext: boolean;
+}
+
 export const shopApi = {
   categories: () => api.get<ShopCategory[]>("/api/shop/categories"),
-  products: () => api.get<ShopProductResponse[]>("/api/shop/products"),
+  // 서버가 페이지네이션 응답으로 바뀌었다. UI 페이저가 생기기 전까지는 최대 크기로 한 번에 가져온다.
+  products: (page = 0, size = 100) =>
+    api.get<ShopPage<ShopProductResponse>>(`/api/shop/products?page=${page}&size=${size}`),
   product: (id: string) => api.get<ShopProductResponse>(`/api/shop/products/${id}`),
   purchase: (productId: number, quantity: number) =>
     api.post<{ orderNumber: string }>("/api/shop/purchases", { productId, quantity }),

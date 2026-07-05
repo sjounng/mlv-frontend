@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import { Loader2, Pencil, Plus, Tags } from "lucide-react";
 import {
   Badge,
@@ -281,10 +282,9 @@ export default function AdminItemsPage() {
           <div>
             <p className="text-xs font-medium text-white/60 mb-2">상품 이미지</p>
             <div className="flex items-center gap-3">
-              <div className="w-20 h-20 rounded-lg bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center shrink-0">
+              <div className="relative w-20 h-20 rounded-lg bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center shrink-0">
                 {form.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={form.imageUrl} alt="미리보기" className="w-full h-full object-cover" />
+                  <Image src={form.imageUrl} alt="미리보기" fill sizes="80px" className="object-cover" />
                 ) : (
                   <ImagePlus size={22} className="text-white/25" />
                 )}

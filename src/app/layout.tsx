@@ -4,6 +4,7 @@ import "./globals.css";
 import { ToastProvider } from "@/components/ui";
 import { AuthProvider } from "@/lib/auth";
 import { CartProvider } from "@/lib/cart";
+import { siteConfig } from "@/lib/site-config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,9 +16,24 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteTitle = `${siteConfig.name} — ${siteConfig.fullName} 공식 사이트`;
+const siteDescription = "다양한 콘텐츠와 안정적인 환경, 그리고 활발한 커뮤니티가 여러분을 기다립니다.";
+
 export const metadata: Metadata = {
-  title: "마리벨 — 마이리틀밸리 공식 사이트",
-  description: "다양한 콘텐츠와 안정적인 환경, 그리고 활발한 커뮤니티가 여러분을 기다립니다.",
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: siteTitle,
+    template: `%s — ${siteConfig.name}`,
+  },
+  description: siteDescription,
+  openGraph: {
+    title: siteTitle,
+    description: siteDescription,
+    url: "/",
+    siteName: siteConfig.name,
+    locale: "ko_KR",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

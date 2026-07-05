@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Package, Sparkles } from "lucide-react";
 import type { Product } from "./ProductCard";
 
@@ -30,10 +31,9 @@ export default function RightSidebar({ products }: RightSidebarProps) {
             <li key={item.id}>
               <Link href={`/shop/product/${item.id}`} className="focus-ring rounded-md flex items-center gap-2.5 group">
                 <span className={`w-4 text-xs font-bold shrink-0 tabular-nums ${i < 3 ? "text-amber-300/80" : "text-white/25"}`}>{i + 1}</span>
-                <div className="w-7 h-7 rounded bg-white/5 overflow-hidden flex items-center justify-center shrink-0">
+                <div className="relative w-7 h-7 rounded bg-white/5 overflow-hidden flex items-center justify-center shrink-0">
                   {item.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                    <Image src={item.imageUrl} alt={item.name} fill sizes="28px" className="object-cover" />
                   ) : (
                     <Package size={13} className="text-white/30" />
                   )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { api } from "@/lib/api";
 
@@ -37,8 +38,7 @@ export default function HeroBanner() {
   const next = () => setCurrent((c) => (c + 1) % slides.length);
 
   const Inner = (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={slide.imageUrl} alt="배너" className="w-full h-full object-cover" />
+    <Image src={slide.imageUrl} alt="배너" fill sizes="(min-width: 1400px) 920px, 100vw" className="object-cover" />
   );
 
   return (

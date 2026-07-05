@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   FileText,
@@ -7,6 +8,11 @@ import {
   HelpCircle,
   ArrowRight,
 } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "이용안내",
+  description: "이용약관, 개인정보처리방침, 환불정책과 사업자 정보를 안내합니다.",
+};
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui";

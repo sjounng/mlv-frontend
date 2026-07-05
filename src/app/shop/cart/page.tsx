@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Loader2, Minus, Package, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import { Button, Card, EmptyState, useToast } from "@/components/ui";
 import CashDisplay from "@/components/minecraft/CashDisplay";
@@ -79,10 +80,9 @@ export default function CartPage() {
             {items.map((item) => (
               <Card key={item.productId} padding="md">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-                  <div className="w-14 h-14 rounded-lg bg-white/5 flex items-center justify-center shrink-0 overflow-hidden">
+                  <div className="relative w-14 h-14 rounded-lg bg-white/5 flex items-center justify-center shrink-0 overflow-hidden">
                     {item.imageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                      <Image src={item.imageUrl} alt={item.name} fill sizes="56px" className="object-cover" />
                     ) : (
                       <Package size={22} className="text-white/25" />
                     )}

@@ -21,7 +21,7 @@ export default function ShopPage() {
     setLoading(true);
     try {
       const [p, c] = await Promise.all([shopApi.products(), shopApi.categories()]);
-      setProducts(p.map(toUiProduct));
+      setProducts(p.content.map(toUiProduct));
       setCategories(c);
     } catch (error) {
       const message = error instanceof ApiError ? error.message : "상품을 불러오지 못했습니다.";

@@ -2,6 +2,8 @@
 export type ServerStatus = "open" | "maintenance" | "closed";
 
 export const siteConfig = {
+  /** 공개 사이트 주소 (SEO metadataBase/robots/sitemap 에 사용) */
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://mlv.town",
   /** 서비스 명 (짧게) */
   name: process.env.NEXT_PUBLIC_SITE_NAME ?? "마리벨",
   /** 정식 명칭 */

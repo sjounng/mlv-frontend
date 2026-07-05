@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import { Image as ImageIcon, Loader2, Pencil, Plus } from "lucide-react";
 import {
   Badge,
@@ -110,9 +111,8 @@ export default function AdminBannersPage() {
       label: "이미지",
       width: "80px",
       render: (r) => (
-        <div className="w-12 h-9 rounded bg-white/5 overflow-hidden flex items-center justify-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={r.imageUrl} alt="popup" className="w-full h-full object-cover" />
+        <div className="relative w-12 h-9 rounded bg-white/5 overflow-hidden flex items-center justify-center">
+          <Image src={r.imageUrl} alt="popup" fill sizes="48px" className="object-cover" />
         </div>
       ),
     },
