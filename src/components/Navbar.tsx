@@ -9,6 +9,8 @@ import { useAuth } from "@/lib/auth";
 import { useCart } from "@/lib/cart";
 import MinecraftHead from "@/components/minecraft/MinecraftHead";
 import MailDropdown from "@/components/MailDropdown";
+import ProfileMenu from "@/components/ProfileMenu";
+import DownloadButton from "@/components/DownloadButton";
 
 const navLinks = [
   { label: "소개", href: "/introduce" },
@@ -84,37 +86,28 @@ export default function Navbar() {
             <div className="flex items-center gap-2">
               {/* 우편함 (운영진 알림/결제 안내) */}
               <MailDropdown />
-              {/* 프로필: 박스 없이, 스킨 아바타 + 닉네임 (호버 시 #39B29E) */}
-              <Link
-                href="/mypage"
-                className="group flex items-center gap-2 px-2 py-1.5 text-sm text-white/80 transition-colors"
-              >
-                <MinecraftHead username={profile.minecraftUsername} uuid={profile.minecraftUuid} size="sm" />
-                <span className="max-w-[120px] truncate transition-colors group-hover:text-[#39B29E]">
-                  {profile.minecraftUsername}
-                </span>
-              </Link>
-              <button
-                type="button"
-                onClick={() => void logout()}
-                className="p-2 text-white/50 hover:text-[#e23a3a] transition-colors"
-                aria-label="로그아웃"
-              >
-                <LogOut size={16} />
-              </button>
+              {/* 프로필: 클릭 시 닉네임/이메일/로그아웃 패널 */}
+              <ProfileMenu />
+              {/* 다운로드 버튼 (프로필 우측) */}
+              <DownloadButton />
             </div>
           ) : (
-            <Link
-              href="/login"
-              className="focus-ring px-4 py-1.5 text-sm text-white bg-emerald-600 hover:bg-emerald-500 rounded-md transition-colors font-medium"
-            >
-              로그인
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/login"
+                className="focus-ring px-4 py-1.5 text-sm text-white bg-white/10 hover:bg-white/15 border border-white/15 rounded-md transition-colors font-medium"
+              >
+                로그인
+              </Link>
+              <DownloadButton />
+            </div>
           )}
         </div>
 
-        {/* Mobile right: cart + hamburger */}
+        {/* Mobile right: download + cart + hamburger */}
         <div className="md:hidden ml-auto flex items-center gap-1">
+          <DownloadButton compact />
+          {status === "authenticated" && <MailDropdown />}
           {showCart && (
             <Link href="/shop/cart" className="relative p-2 text-white/70" aria-label="장바구니">
               <ShoppingCart size={19} />
