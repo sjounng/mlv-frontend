@@ -1,10 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { HelpCircle, Loader2, Send } from "lucide-react";
+import Link from "next/link";
+// useRouter 제거: 익명 사용자도 FAQ 를 볼 수 있어 로그인 리다이렉트가 필요 없어짐
+import { HelpCircle, LifeBuoy, Loader2, MessageSquare, Send } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import FaqSection from "@/components/support/FaqSection";
 import {
   Badge,
   Button,
@@ -53,7 +55,6 @@ const STATUS_LABEL: Record<ContactStatus, string> = {
 };
 
 export default function ContactPage() {
-  const router = useRouter();
   const { status } = useAuth();
   const { toast } = useToast();
 
@@ -64,10 +65,6 @@ export default function ContactPage() {
 
   const [items, setItems] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (status === "anonymous") router.replace("/login");
-  }, [status, router]);
 
   const loadMine = useCallback(async () => {
     setLoading(true);
@@ -129,60 +126,81 @@ export default function ContactPage() {
     },
   ];
 
-  if (status !== "authenticated") {
-    return (
-      <>
-        <Navbar />
-        <main className="pt-16 min-h-screen flex items-center justify-center text-white/50">
-          <Loader2 className="animate-spin" size={26} />
-        </main>
-        <Footer />
-      </>
-    );
-  }
-
   return (
     <>
       <Navbar />
       <main className="pt-16">
-        <section className="max-w-4xl mx-auto px-6 py-12 space-y-8">
+        <section className="max-w-4xl mx-auto px-6 py-12 space-y-12">
+          {/* 헤더 */}
           <div>
-            <p className="text-xs text-white/40 uppercase tracking-widest mb-2">Contact</p>
-            <h1 className="text-3xl md:text-4xl font-bold">문의하기</h1>
-            <p className="mt-3 text-sm text-white/50">결제, 계정, 이벤트 등 궁금한 점을 남겨주세요.</p>
+            <p className="text-xs text-emerald-300/70 uppercase tracking-widest mb-2 flex items-center gap-2">
+              <LifeBuoy size={14} /> Support
+            </p>
+            <h1 className="text-3xl md:text-4xl font-bold">고객지원</h1>
+            <p className="mt-3 text-sm text-white/50">
+              먼저 자주 묻는 질문에서 답을 찾아보세요. 해결되지 않으면 아래에서 직접 문의할 수 있어요.
+            </p>
           </div>
 
-          <Card padding="lg">
-            <div className="space-y-4">
-              <div className="grid sm:grid-cols-[200px_1fr] gap-4">
-                <Select
-                  label="분류"
-                  options={categories.map((c) => ({ value: c.value, label: c.label }))}
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value as ContactCategory)}
-                />
-                <Input label="제목" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="문의 제목" />
-              </div>
-              <Textarea label="내용" rows={6} value={content} onChange={(e) => setContent(e.target.value)} placeholder="문의 내용을 자세히 적어주세요" />
-              <div className="flex justify-end">
-                <Button onClick={onSubmit} disabled={submitting} leftIcon={submitting ? <Loader2 className="animate-spin" size={16} /> : <Send size={16} />}>
-                  문의 접수
-                </Button>
-              </div>
-            </div>
-          </Card>
-
+          {/* 1) FAQ — 초기 화면 (로그인 불필요) */}
           <div>
-            <h2 className="text-lg font-semibold mb-4">내 문의 내역</h2>
-            <Card padding="none">
-              {loading ? (
-                <div className="flex items-center justify-center py-12 text-white/40"><Loader2 className="animate-spin" size={22} /></div>
-              ) : items.length === 0 ? (
-                <EmptyState icon={HelpCircle} title="문의 내역이 없습니다" />
-              ) : (
-                <Table columns={columns} data={items} />
-              )}
-            </Card>
+            <h2 className="text-lg font-semibold mb-4">자주 묻는 질문</h2>
+            <FaqSection />
+          </div>
+
+          {/* 2) 직접 문의하기 (로그인 필요) */}
+          <div className="pt-4 border-t border-white/8">
+            <div className="flex items-center gap-2 mb-1.5">
+              <MessageSquare size={18} className="text-white/60" />
+              <h2 className="text-lg font-semibold">직접 문의하기</h2>
+            </div>
+            <p className="text-sm text-white/45 mb-5">원하는 답변이 없다면 직접 문의를 남겨주세요.</p>
+
+            {status !== "authenticated" ? (
+              <Card padding="lg">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <p className="text-sm text-white/55">문의를 남기려면 로그인이 필요합니다.</p>
+                  <Link href="/login">
+                    <Button>로그인하고 문의하기</Button>
+                  </Link>
+                </div>
+              </Card>
+            ) : (
+              <div className="space-y-8">
+                <Card padding="lg">
+                  <div className="space-y-4">
+                    <div className="grid sm:grid-cols-[200px_1fr] gap-4">
+                      <Select
+                        label="분류"
+                        options={categories.map((c) => ({ value: c.value, label: c.label }))}
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value as ContactCategory)}
+                      />
+                      <Input label="제목" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="문의 제목" />
+                    </div>
+                    <Textarea label="내용" rows={6} value={content} onChange={(e) => setContent(e.target.value)} placeholder="문의 내용을 자세히 적어주세요" />
+                    <div className="flex justify-end">
+                      <Button onClick={onSubmit} disabled={submitting} leftIcon={submitting ? <Loader2 className="animate-spin" size={16} /> : <Send size={16} />}>
+                        문의 접수
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+
+                <div>
+                  <h3 className="text-base font-semibold mb-4">내 문의 내역</h3>
+                  <Card padding="none">
+                    {loading ? (
+                      <div className="flex items-center justify-center py-12 text-white/40"><Loader2 className="animate-spin" size={22} /></div>
+                    ) : items.length === 0 ? (
+                      <EmptyState icon={HelpCircle} title="문의 내역이 없습니다" />
+                    ) : (
+                      <Table columns={columns} data={items} />
+                    )}
+                  </Card>
+                </div>
+              </div>
+            )}
           </div>
         </section>
       </main>

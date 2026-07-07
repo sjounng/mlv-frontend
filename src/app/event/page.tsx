@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Gift, Ticket, Calendar, Sparkles, Loader2, Check } from "lucide-react";
+import { Gift, Calendar, Sparkles, Loader2, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Button, Card, Badge, Input, EmptyState, useToast } from "@/components/ui";
+import { Button, Card, Badge, EmptyState, useToast } from "@/components/ui";
 import ItemIcon from "@/components/minecraft/ItemIcon";
 import { api, ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
@@ -49,8 +49,6 @@ export default function EventPage() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [board, setBoard] = useState<AttendanceBoard | null>(null);
   const [loading, setLoading] = useState(true);
-  const [code, setCode] = useState("");
-  const [redeeming, setRedeeming] = useState(false);
   const [claimingId, setClaimingId] = useState<number | null>(null);
 
   const loadEvents = useCallback(async () => {
@@ -104,29 +102,6 @@ export default function EventPage() {
       toast({ title: "수령 실패", description: message, variant: "error" });
     } finally {
       setClaimingId(null);
-    }
-  };
-
-  const onRedeem = async () => {
-    if (!code.trim()) {
-      toast({ title: "코드를 입력해 주세요", variant: "warning" });
-      return;
-    }
-    if (status !== "authenticated") return requireLogin();
-    setRedeeming(true);
-    try {
-      await api.post("/api/redeem-codes/use", { code: code.trim() });
-      toast({
-        title: "리딤코드를 사용했어요!",
-        description: "보상이 인게임 우편함으로 발송되었습니다.",
-        variant: "success",
-      });
-      setCode("");
-    } catch (error) {
-      const message = error instanceof ApiError ? error.message : "코드 사용에 실패했습니다.";
-      toast({ title: "리딤코드 오류", description: message, variant: "error" });
-    } finally {
-      setRedeeming(false);
     }
   };
 
@@ -197,37 +172,7 @@ export default function EventPage() {
             </div>
           </Card>
 
-          {/* Redeem code */}
-          <Card padding="lg">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-lg bg-purple-500/15 text-purple-300 flex items-center justify-center">
-                <Ticket size={18} />
-              </div>
-              <div>
-                <h2 className="text-base font-semibold">리딤코드</h2>
-                <p className="text-xs text-white/40">받은 코드를 입력하고 보상을 수령하세요</p>
-              </div>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Input
-                placeholder="예: MARIBEL-XXXX-XXXX"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                containerClassName="flex-1"
-                disabled={redeeming}
-              />
-              <Button
-                onClick={onRedeem}
-                disabled={redeeming}
-                leftIcon={redeeming ? <Loader2 className="animate-spin" size={16} /> : <Gift size={16} />}
-              >
-                코드 입력
-              </Button>
-            </div>
-            <p className="mt-3 text-xs text-white/35">
-              유튜브, 디스코드, 이벤트 등에서 발급된 리딤코드를 사용할 수 있습니다.
-            </p>
-          </Card>
+          {/* 리딤코드 입력은 마이페이지 > 리딤코드 로 이동함 */}
 
           {/* Event list */}
           <div>

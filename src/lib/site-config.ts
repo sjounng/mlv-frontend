@@ -16,6 +16,11 @@ export const siteConfig = {
   guideUrl: process.env.NEXT_PUBLIC_GUIDE_URL ?? "",
   /** 메인 트레일러 영상 — 유튜브 embed 주소 또는 mp4 경로. 준비되면 채워주세요 */
   trailerUrl: process.env.NEXT_PUBLIC_TRAILER_URL ?? "",
+  /**
+   * 웹상점 오픈 여부. 기능 준비 전까지 false 로 두면 상점 진입 시 "준비 중" 팝업으로 막는다.
+   * 오픈할 때 true 로 바꾸거나 NEXT_PUBLIC_SHOP_ENABLED=true 로 설정.
+   */
+  shopEnabled: process.env.NEXT_PUBLIC_SHOP_ENABLED === "true",
   /** 공식 SNS 링크 */
   sns: {
     discord: "https://discord.gg/25gh7nza5X",

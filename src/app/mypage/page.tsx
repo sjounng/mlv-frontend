@@ -11,6 +11,7 @@ import {
   Mail,
   Receipt,
   ShoppingBag,
+  Ticket,
   User,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -20,6 +21,7 @@ import {
   Button,
   Card,
   EmptyState,
+  Input,
   Modal,
   Tabs,
   Table,
@@ -70,7 +72,8 @@ interface MailHistory extends Record<string, unknown> {
 }
 
 const tabs = [
-  { id: "profile", label: "프로필", icon: User },
+  { id: "profile", label: "내 정보", icon: User },
+  { id: "redeem", label: "리딤코드", icon: Ticket },
   { id: "cash", label: "캐시 내역", icon: Coins },
   { id: "payments", label: "결제 내역", icon: CreditCard },
   { id: "rewards", label: "보상 내역", icon: Gift },
@@ -108,6 +111,27 @@ export default function MyPage() {
   const [mails, setMails] = useState<MailHistory[]>([]);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [withdrawing, setWithdrawing] = useState(false);
+  const [code, setCode] = useState("");
+  const [redeeming, setRedeeming] = useState(false);
+
+  const onRedeem = async () => {
+    if (!code.trim()) {
+      toast({ title: "코드를 입력해 주세요", variant: "warning" });
+      return;
+    }
+    setRedeeming(true);
+    try {
+      await api.post("/api/redeem-codes/use", { code: code.trim() });
+      toast({ title: "리딤코드를 사용했어요!", description: "보상은 인게임 우편함으로 지급됩니다.", variant: "success" });
+      setCode("");
+      await loadData();
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : "코드 사용에 실패했습니다.";
+      toast({ title: "리딤코드 오류", description: message, variant: "error" });
+    } finally {
+      setRedeeming(false);
+    }
+  };
 
   useEffect(() => {
     if (status === "anonymous") {
@@ -139,8 +163,6 @@ export default function MyPage() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      // 데이터 로딩 시작 시의 setLoading 은 의도된 동작이다.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       void loadData();
     }
   }, [status, loadData]);
@@ -222,6 +244,41 @@ export default function MyPage() {
                       탈퇴하기
                     </Button>
                   </div>
+                </Card>
+              </div>
+            )}
+
+            {active === "redeem" && (
+              <div className="mt-6">
+                <Card padding="lg">
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="w-10 h-10 rounded-lg bg-purple-500/15 text-purple-300 flex items-center justify-center">
+                      <Ticket size={18} />
+                    </div>
+                    <div>
+                      <h2 className="text-base font-semibold">리딤코드</h2>
+                      <p className="text-xs text-white/40">받은 코드를 입력하고 보상을 수령하세요</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Input
+                      placeholder="예: MARIBEL-XXXX-XXXX"
+                      value={code}
+                      onChange={(e) => setCode(e.target.value)}
+                      containerClassName="flex-1"
+                      disabled={redeeming}
+                    />
+                    <Button
+                      onClick={onRedeem}
+                      disabled={redeeming}
+                      leftIcon={redeeming ? <Loader2 className="animate-spin" size={16} /> : <Gift size={16} />}
+                    >
+                      코드 입력
+                    </Button>
+                  </div>
+                  <p className="mt-3 text-xs text-white/35">
+                    유튜브, 디스코드, 이벤트 등에서 발급된 리딤코드를 사용할 수 있습니다. 보상은 인게임 우편함으로 지급됩니다.
+                  </p>
                 </Card>
               </div>
             )}
