@@ -40,8 +40,8 @@ export default function HeroSection() {
 
       {/* 중앙 정렬 콘텐츠 */}
       <div className="relative z-10 max-w-4xl mx-auto px-6 pt-24 pb-16 w-full flex flex-col items-center text-center">
-        {/* 콜아웃 */}
-        <p className="text-sm text-white/45 mb-4">힐링 판타지 마인크래프트 서버 마이리틀밸리</p>
+        {/* 콜아웃 (브랜드 노출: 마리벨 · 마이리틀밸리 · MLV) */}
+        <p className="text-sm text-white/45 mb-4">힐링 판타지 마인크래프트 서버 · 마리벨(마이리틀밸리)</p>
 
         {/* Headline */}
         <h1 className="text-[2.7rem] leading-[1.1] sm:text-5xl md:text-6xl mb-7 tracking-tight">

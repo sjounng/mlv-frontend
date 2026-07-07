@@ -21,6 +21,9 @@ export const siteConfig = {
    * 오픈할 때 true 로 바꾸거나 NEXT_PUBLIC_SHOP_ENABLED=true 로 설정.
    */
   shopEnabled: process.env.NEXT_PUBLIC_SHOP_ENABLED === "true",
+  /** 검색엔진 소유확인 코드 (Search Console / 네이버 웹마스터). 발급받아 환경변수로 넣으면 <meta> 로 출력됨 */
+  googleSiteVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "",
+  naverSiteVerification: process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION ?? "",
   /** 공식 SNS 링크 */
   sns: {
     discord: "https://discord.gg/25gh7nza5X",
