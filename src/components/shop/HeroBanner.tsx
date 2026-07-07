@@ -38,7 +38,7 @@ export default function HeroBanner() {
   const next = () => setCurrent((c) => (c + 1) % slides.length);
 
   const Inner = (
-    <Image src={slide.imageUrl} alt="배너" fill sizes="(min-width: 1400px) 920px, 100vw" className="object-cover" />
+    <Image src={slide.imageUrl} alt="배너" fill sizes="(min-width: 1400px) 920px, 100vw" className="object-cover" unoptimized />
   );
 
   return (

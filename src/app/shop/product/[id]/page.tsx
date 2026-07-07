@@ -61,7 +61,7 @@ export default function ProductDetailPage() {
             <div className="flex flex-col sm:flex-row gap-6">
               <div className="relative flex items-center justify-center rounded-xl w-full sm:w-56 h-56 bg-white/5 shrink-0 overflow-hidden">
                 {product.imageUrl ? (
-                  <Image src={product.imageUrl} alt={product.name} fill sizes="(min-width: 640px) 224px, 100vw" className="object-cover" />
+                  <Image src={product.imageUrl} alt={product.name} fill sizes="(min-width: 640px) 224px, 100vw" className="object-cover" unoptimized />
                 ) : (
                   <Package size={64} className="text-white/20" />
                 )}

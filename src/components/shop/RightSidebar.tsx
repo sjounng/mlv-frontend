@@ -33,7 +33,7 @@ export default function RightSidebar({ products }: RightSidebarProps) {
                 <span className={`w-4 text-xs font-bold shrink-0 tabular-nums ${i < 3 ? "text-amber-300/80" : "text-white/25"}`}>{i + 1}</span>
                 <div className="relative w-7 h-7 rounded bg-white/5 overflow-hidden flex items-center justify-center shrink-0">
                   {item.imageUrl ? (
-                    <Image src={item.imageUrl} alt={item.name} fill sizes="28px" className="object-cover" />
+                    <Image src={item.imageUrl} alt={item.name} fill sizes="28px" className="object-cover" unoptimized />
                   ) : (
                     <Package size={13} className="text-white/30" />
                   )}

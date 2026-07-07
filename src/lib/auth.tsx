@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { api, refreshAccessToken, setAccessToken } from "@/lib/api";
 
 export type UserStatus = "ACTIVE" | "SUSPENDED" | "WITHDRAWN";
@@ -39,6 +39,7 @@ const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const skipUserBootstrap = pathname.startsWith("/admin");
   const [status, setStatus] = useState<AuthStatus>("loading");
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -82,6 +83,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void bootstrap();
   }, [bootstrap]);
+
+  // 신규 가입자(약관 미동의)는 어느 페이지에 있든 동의 페이지로 보낸다.
+  useEffect(() => {
+    if (
+      status === "authenticated" &&
+      profile &&
+      !profile.agreedTermsAt &&
+      !pathname.startsWith("/signup/terms")
+    ) {
+      router.replace("/signup/terms");
+    }
+  }, [status, profile, pathname, router]);
 
   const refresh = useCallback(async () => {
     if (status !== "authenticated") return;

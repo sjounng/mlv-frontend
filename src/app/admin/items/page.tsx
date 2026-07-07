@@ -284,7 +284,7 @@ export default function AdminItemsPage() {
             <div className="flex items-center gap-3">
               <div className="relative w-20 h-20 rounded-lg bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center shrink-0">
                 {form.imageUrl ? (
-                  <Image src={form.imageUrl} alt="미리보기" fill sizes="80px" className="object-cover" />
+                  <Image src={form.imageUrl} alt="미리보기" fill sizes="80px" className="object-cover" unoptimized />
                 ) : (
                   <ImagePlus size={22} className="text-white/25" />
                 )}

@@ -27,8 +27,8 @@ const variantClasses: Record<BadgeVariant, string> = {
 };
 
 const sizeClasses: Record<BadgeSize, string> = {
-  sm: "text-[10px] px-1.5 py-0.5 rounded",
-  md: "text-xs px-2 py-0.5 rounded-md",
+  sm: "text-[10px] px-1.5 py-0.5 rounded-sm",
+  md: "text-xs px-2 py-0.5 rounded-sm",
 };
 
 export default function Badge({

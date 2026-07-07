@@ -1,14 +1,25 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, IBM_Plex_Sans_KR, Jua } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui";
 import { AuthProvider } from "@/lib/auth";
 import { CartProvider } from "@/lib/cart";
 import { siteConfig } from "@/lib/site-config";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// 본문: 담백하지만 기계적이지 않은 한글 산세리프
+const bodyFont = IBM_Plex_Sans_KR({
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
+  variable: "--font-plex",
+  display: "swap",
+});
+
+// 제목: 둥글둥글한 디스플레이체 — "마이리틀밸리"의 아기자기한 인상을 만든다
+const displayFont = Jua({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-jua",
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -44,7 +55,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${bodyFont.variable} ${displayFont.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-surface-1 text-white">
         <ToastProvider>

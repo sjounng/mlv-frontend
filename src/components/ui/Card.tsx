@@ -9,12 +9,13 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children?: ReactNode;
 }
 
+// 흐릿한 글로우 대신 아래로 딱 떨어지는 오프셋 섀도 — 블록을 쌓은 듯한 인상
 const variantClasses: Record<CardVariant, string> = {
   default:
-    "bg-surface-3 border border-white/8 rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.25)]",
+    "bg-surface-3 border border-white/8 rounded-lg shadow-[0_2px_0_rgba(0,0,0,0.35)]",
   elevated:
-    "bg-surface-3 border border-white/10 rounded-xl shadow-xl shadow-black/40",
-  flat: "bg-white/[0.03] border border-white/5 rounded-xl",
+    "bg-surface-3 border border-white/10 rounded-lg shadow-[0_4px_0_rgba(0,0,0,0.4)]",
+  flat: "bg-white/[0.03] border border-white/5 rounded-lg",
 };
 
 const paddingClasses: Record<CardPadding, string> = {

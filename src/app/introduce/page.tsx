@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import {
   Play,
@@ -10,12 +9,14 @@ import {
   Gamepad2,
   Users,
   Sparkles,
-  Copy,
-  Check,
   Download,
   LogIn,
   Server,
   ArrowRight,
+  Castle,
+  Swords,
+  Wheat,
+  Palette,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -23,82 +24,84 @@ import { Button, Card, Badge } from "@/components/ui";
 import ServerStatus from "@/components/minecraft/ServerStatus";
 import { siteConfig } from "@/lib/site-config";
 
-const features = [
-  {
-    icon: Sword,
-    title: "생존 서버",
-    desc: "안정적인 바닐라 기반의 생존 환경에서 자유롭게 모험하고 건축하세요.",
-    color: "text-emerald-300 bg-emerald-500/10",
+// ─────────────────────────────────────────────────────────────
+// ✏️ 기획자 편집 영역
+//    아래 문구만 수정하면 페이지에 그대로 반영됩니다.
+//    디자인/구조를 바꿀 일이 없으면 이 블록 밖은 건드리지 않아도 됩니다.
+// ─────────────────────────────────────────────────────────────
+const copy = {
+  hero: {
+    versionLabel: "버전 표기 1", // 예: v1.21.4
+    title1: "제목 1",
+    title2: "제목 2", // 제목 둘째 줄
+    body: "내용 1",
+    primaryCta: "버튼 1",
+    secondaryCta: "버튼 2",
+    stats: [
+      { value: "수치 1", label: "라벨 1" },
+      { value: "수치 2", label: "라벨 2" },
+      { value: "수치 3", label: "라벨 3" },
+    ],
+    videoBadge: "영상 라벨 1", // 예: 서버 트레일러 · 2:14
   },
-  {
-    icon: Atom,
-    title: "마공학",
-    desc: "독자적인 마공학 콘텐츠로 색다른 자동화와 마법을 경험할 수 있습니다.",
-    color: "text-purple-300 bg-purple-500/10",
+  features: {
+    eyebrow: "섹션 소문구 1", // 영문 소문구. 예: Server Features
+    heading: "섹션 제목 1",
+    items: [
+      { title: "콘텐츠 1", desc: "내용 1" },
+      { title: "콘텐츠 2", desc: "내용 2" },
+      { title: "콘텐츠 3", desc: "내용 3" },
+      { title: "콘텐츠 4", desc: "내용 4" },
+      { title: "콘텐츠 5", desc: "내용 5" },
+      { title: "콘텐츠 6", desc: "내용 6" },
+    ],
   },
-  {
-    icon: Cloud,
-    title: "스카이블럭",
-    desc: "한정된 공간에서 무한한 가능성을 펼치는 스카이블럭 모드를 제공합니다.",
-    color: "text-cyan-300 bg-cyan-500/10",
+  connect: {
+    eyebrow: "섹션 소문구 2", // 예: How to Connect
+    heading: "섹션 제목 2",
+    sub: "내용 1",
+    steps: [
+      { title: "단계 제목 1", desc: "단계 내용 1" },
+      { title: "단계 제목 2", desc: "단계 내용 2" },
+      { title: "단계 제목 3", desc: "단계 내용 3" },
+    ],
+    downloadNote: "다운로드 부가 설명 1", // 예: Windows 지원 · 정품 계정 필요
   },
-  {
-    icon: Gamepad2,
-    title: "미니게임",
-    desc: "PvP, 술래잡기, 베드워즈 등 다양한 미니게임이 매일 열립니다.",
-    color: "text-yellow-300 bg-yellow-500/10",
+  showcase: {
+    eyebrow: "섹션 소문구 3", // 예: Content Showcase
+    heading: "섹션 제목 3",
+    items: [
+      { title: "콘텐츠 1", desc: "내용 1" },
+      { title: "콘텐츠 2", desc: "내용 2" },
+      { title: "콘텐츠 3", desc: "내용 3" },
+      { title: "콘텐츠 4", desc: "내용 4" },
+    ],
   },
-  {
-    icon: Users,
-    title: "커뮤니티",
-    desc: "디스코드와 인게임 채팅에서 활발히 교류하는 따뜻한 커뮤니티가 있습니다.",
-    color: "text-blue-300 bg-blue-500/10",
+  cta: {
+    heading: "마무리 제목 1",
+    body: "마무리 내용 1",
+    primaryCta: "버튼 1",
+    secondaryCta: "버튼 2",
   },
-  {
-    icon: Sparkles,
-    title: "업데이트",
-    desc: "매월 새로운 시즌 콘텐츠와 이벤트가 제공되어 지루할 틈이 없습니다.",
-    color: "text-pink-300 bg-pink-500/10",
-  },
+};
+// ───────────────────────── 편집 영역 끝 ─────────────────────────
+
+// 카드에 붙는 아이콘/색 (디자인 요소 — 기획 문구와 분리)
+const featureVisuals = [
+  { icon: Sword, color: "text-emerald-300 bg-emerald-500/10" },
+  { icon: Atom, color: "text-purple-300 bg-purple-500/10" },
+  { icon: Cloud, color: "text-cyan-300 bg-cyan-500/10" },
+  { icon: Gamepad2, color: "text-yellow-300 bg-yellow-500/10" },
+  { icon: Users, color: "text-blue-300 bg-blue-500/10" },
+  { icon: Sparkles, color: "text-pink-300 bg-pink-500/10" },
 ];
 
-const contents = [
-  {
-    emoji: "🏰",
-    title: "왕국 건설",
-    desc: "친구들과 함께 광활한 왕국을 세우고 영토를 확장해 보세요.",
-  },
-  {
-    emoji: "⚔️",
-    title: "던전 탐험",
-    desc: "맞춤 제작된 던전에서 보스를 격파하고 희귀 아이템을 획득하세요.",
-  },
-  {
-    emoji: "🌾",
-    title: "농업과 무역",
-    desc: "농사와 거래 시스템으로 서버 경제의 한 축을 담당해 보세요.",
-  },
-  {
-    emoji: "🎨",
-    title: "치장과 스킨",
-    desc: "전용 치장품과 펫으로 나만의 개성을 표현해 보세요.",
-  },
-];
+const showcaseIcons = [Castle, Swords, Wheat, Palette];
+const stepIcons = [Download, Server, LogIn];
 
-const SERVER_ADDRESS = siteConfig.serverAddress;
+const CLIENT_DOWNLOAD_URL = siteConfig.clientDownloadUrl;
 
 export default function IntroducePage() {
-  const [copied, setCopied] = useState(false);
-
-  const copyAddress = async () => {
-    try {
-      await navigator.clipboard.writeText(SERVER_ADDRESS);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      // ignore
-    }
-  };
 
   return (
     <>
@@ -110,44 +113,38 @@ export default function IntroducePage() {
             <div>
               <div className="inline-flex items-center gap-2 mb-5">
                 <ServerStatus status={siteConfig.serverStatus} />
-                <span className="text-xs text-white/30">v1.20.4</span>
+                <span className="text-xs text-white/30">{copy.hero.versionLabel}</span>
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight">
-                마리벨에 오신 것을<br />환영합니다
+              <h1 className="text-4xl md:text-5xl leading-tight tracking-tight">
+                {copy.hero.title1}
+                <br />
+                {copy.hero.title2}
               </h1>
-              <p className="mt-5 text-base text-white/55 leading-relaxed max-w-lg">
-                마이리틀밸리(마리벨)는 5년차 마인크래프트 한국 커뮤니티 서버입니다.
-                생존부터 마공학, 스카이블럭, 미니게임까지 다양한 콘텐츠를 한 곳에서 만나보세요.
-              </p>
+              <p className="mt-5 text-base text-white/55 leading-relaxed max-w-lg">{copy.hero.body}</p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link href="/login">
-                  <Button size="lg" rightIcon={<ArrowRight size={16} />}>지금 시작하기</Button>
+                  <Button size="lg" rightIcon={<ArrowRight size={16} />}>{copy.hero.primaryCta}</Button>
                 </Link>
                 <Link href="/shop">
-                  <Button size="lg" variant="outline">웹상점 둘러보기</Button>
+                  <Button size="lg" variant="outline">{copy.hero.secondaryCta}</Button>
                 </Link>
               </div>
               <div className="mt-8 flex items-center gap-6 text-xs text-white/35">
-                <div>
-                  <p className="text-xl font-semibold text-white">12,400+</p>
-                  <p>가입 회원</p>
-                </div>
-                <div className="w-px h-8 bg-white/10" />
-                <div>
-                  <p className="text-xl font-semibold text-white">320+</p>
-                  <p>평균 동시 접속</p>
-                </div>
-                <div className="w-px h-8 bg-white/10" />
-                <div>
-                  <p className="text-xl font-semibold text-white">5년차</p>
-                  <p>운영 경험</p>
-                </div>
+                {copy.hero.stats.map((s, i) => (
+                  <div key={s.label} className="flex items-center gap-6">
+                    {i > 0 && <div className="w-px h-8 bg-white/10" />}
+                    <div>
+                      <p className="text-xl font-semibold text-white">{s.value}</p>
+                      <p>{s.label}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
             {/* Video showcase placeholder */}
-            <div className="relative aspect-video rounded-2xl overflow-hidden border border-white/10 bg-linear-to-br from-surface-3 via-surface-4 to-black">
-              <div className="absolute inset-0 bg-linear-to-tr from-purple-500/10 via-transparent to-cyan-500/10" />
+            <div className="relative aspect-video rounded-lg overflow-hidden border border-white/10 bg-linear-to-br from-surface-3 via-surface-4 to-black">
+              <div className="absolute inset-0 bg-linear-to-tr from-emerald-500/10 via-transparent to-cyan-500/10" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <button
                   type="button"
@@ -158,7 +155,7 @@ export default function IntroducePage() {
                 </button>
               </div>
               <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                <Badge variant="default">서버 트레일러 · 2:14</Badge>
+                <Badge variant="default">{copy.hero.videoBadge}</Badge>
                 <Badge variant="info">NEW</Badge>
               </div>
             </div>
@@ -169,15 +166,16 @@ export default function IntroducePage() {
         <section className="py-16 border-t border-white/5">
           <div className="max-w-7xl mx-auto px-6">
             <div className="mb-10">
-              <p className="text-xs text-white/40 uppercase tracking-widest mb-2">Server Features</p>
-              <h2 className="text-2xl md:text-3xl font-bold">콘텐츠 한눈에 보기</h2>
+              <p className="text-xs text-white/40 uppercase tracking-widest mb-2">{copy.features.eyebrow}</p>
+              <h2 className="text-2xl md:text-3xl">{copy.features.heading}</h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {features.map((f) => {
-                const Icon = f.icon;
+              {copy.features.items.map((f, i) => {
+                const visual = featureVisuals[i % featureVisuals.length];
+                const Icon = visual.icon;
                 return (
                   <Card key={f.title} padding="lg" className="hover:border-white/15 transition-colors">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${f.color}`}>
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${visual.color}`}>
                       <Icon size={20} />
                     </div>
                     <h3 className="mt-4 text-base font-semibold">{f.title}</h3>
@@ -193,22 +191,18 @@ export default function IntroducePage() {
         <section className="py-16 border-t border-white/5 bg-surface-2/40">
           <div className="max-w-7xl mx-auto px-6">
             <div className="mb-10 text-center">
-              <p className="text-xs text-white/40 uppercase tracking-widest mb-2">How to Connect</p>
-              <h2 className="text-2xl md:text-3xl font-bold">3단계로 시작하기</h2>
-              <p className="mt-3 text-sm text-white/40">처음이신가요? 아래 순서대로 따라하시면 됩니다.</p>
+              <p className="text-xs text-white/40 uppercase tracking-widest mb-2">{copy.connect.eyebrow}</p>
+              <h2 className="text-2xl md:text-3xl">{copy.connect.heading}</h2>
+              <p className="mt-3 text-sm text-white/40">{copy.connect.sub}</p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-4 mb-8">
-              {[
-                { icon: Download, step: "01", title: "마인크래프트 설치", desc: "마인크래프트 자바 에디션 정품 클라이언트를 설치합니다." },
-                { icon: Server, step: "02", title: "서버 주소 입력", desc: "멀티 플레이 → 서버 추가에 아래 주소를 입력해 주세요." },
-                { icon: LogIn, step: "03", title: "플레이 시작", desc: "서버에 접속해 자유롭게 마리벨의 세상을 즐기세요." },
-              ].map((s) => {
-                const Icon = s.icon;
+              {copy.connect.steps.map((s, i) => {
+                const Icon = stepIcons[i % stepIcons.length];
                 return (
-                  <Card key={s.step} padding="lg">
+                  <Card key={s.title} padding="lg">
                     <div className="flex items-center gap-3 mb-3">
-                      <span className="text-xs font-bold text-white/30">STEP {s.step}</span>
+                      <span className="text-xs font-bold text-white/30">STEP 0{i + 1}</span>
                     </div>
                     <div className="w-11 h-11 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4">
                       <Icon size={20} className="text-white/80" />
@@ -223,17 +217,17 @@ export default function IntroducePage() {
             <Card padding="lg" variant="elevated">
               <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between">
                 <div>
-                  <p className="text-xs text-white/40 mb-1">서버 주소</p>
-                  <p className="text-xl font-mono font-semibold text-white">{SERVER_ADDRESS}</p>
-                  <p className="text-xs text-white/35 mt-1">버전: 1.20.4 · Java Edition · 한국 서버</p>
+                  <p className="text-xs text-white/40 mb-1">전용 클라이언트</p>
+                  <p className="text-lg font-semibold text-white">클라이언트를 내려받아 접속하세요</p>
+                  <p className="text-xs text-white/35 mt-1">{copy.connect.downloadNote}</p>
                 </div>
-                <Button
-                  onClick={copyAddress}
-                  variant={copied ? "outline" : "solid"}
-                  leftIcon={copied ? <Check size={16} /> : <Copy size={16} />}
-                >
-                  {copied ? "복사됨" : "주소 복사"}
-                </Button>
+                {CLIENT_DOWNLOAD_URL ? (
+                  <a href={CLIENT_DOWNLOAD_URL}>
+                    <Button leftIcon={<Download size={16} />}>클라이언트 다운로드</Button>
+                  </a>
+                ) : (
+                  <Button disabled leftIcon={<Download size={16} />}>다운로드 준비 중</Button>
+                )}
               </div>
             </Card>
           </div>
@@ -243,19 +237,22 @@ export default function IntroducePage() {
         <section className="py-16 border-t border-white/5">
           <div className="max-w-7xl mx-auto px-6">
             <div className="mb-10">
-              <p className="text-xs text-white/40 uppercase tracking-widest mb-2">Content Showcase</p>
-              <h2 className="text-2xl md:text-3xl font-bold">무엇을 즐길 수 있나요?</h2>
+              <p className="text-xs text-white/40 uppercase tracking-widest mb-2">{copy.showcase.eyebrow}</p>
+              <h2 className="text-2xl md:text-3xl">{copy.showcase.heading}</h2>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {contents.map((c) => (
-                <Card key={c.title} padding="lg" className="hover:border-white/15 transition-colors">
-                  <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-3xl mb-4">
-                    {c.emoji}
-                  </div>
-                  <h3 className="text-base font-semibold">{c.title}</h3>
-                  <p className="mt-2 text-sm text-white/50 leading-relaxed">{c.desc}</p>
-                </Card>
-              ))}
+              {copy.showcase.items.map((c, i) => {
+                const Icon = showcaseIcons[i % showcaseIcons.length];
+                return (
+                  <Card key={c.title} padding="lg" className="hover:border-white/15 transition-colors">
+                    <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4">
+                      <Icon size={22} className="text-emerald-300/80" />
+                    </div>
+                    <h3 className="text-base font-semibold">{c.title}</h3>
+                    <p className="mt-2 text-sm text-white/50 leading-relaxed">{c.desc}</p>
+                  </Card>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -264,18 +261,18 @@ export default function IntroducePage() {
         <section className="py-16 border-t border-white/5">
           <div className="max-w-7xl mx-auto px-6">
             <Card padding="lg" className="relative overflow-hidden">
-              <div className="absolute inset-0 bg-linear-to-br from-purple-500/10 via-transparent to-cyan-500/10 pointer-events-none" />
+              <div className="absolute inset-0 bg-linear-to-br from-emerald-500/10 via-transparent to-cyan-500/10 pointer-events-none" />
               <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-6 p-4">
                 <div>
-                  <h3 className="text-2xl md:text-3xl font-bold">지금 바로 시작하세요</h3>
-                  <p className="mt-2 text-sm text-white/55">로그인 한 번이면 마리벨의 모든 콘텐츠를 즐길 수 있어요.</p>
+                  <h3 className="font-display text-2xl md:text-3xl">{copy.cta.heading}</h3>
+                  <p className="mt-2 text-sm text-white/55">{copy.cta.body}</p>
                 </div>
                 <div className="flex flex-wrap gap-3">
                   <Link href="/login">
-                    <Button size="lg">로그인하고 시작</Button>
+                    <Button size="lg">{copy.cta.primaryCta}</Button>
                   </Link>
                   <Link href="/info/faq">
-                    <Button size="lg" variant="outline">자주 묻는 질문</Button>
+                    <Button size="lg" variant="outline">{copy.cta.secondaryCta}</Button>
                   </Link>
                 </div>
               </div>

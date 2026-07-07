@@ -44,7 +44,7 @@ export default function ProductCard({ product, size = "md" }: ProductCardProps) 
       <div className="relative">
         <Link href={href} className={`focus-ring relative flex items-center justify-center bg-white/5 ${size === "sm" ? "h-24" : "h-32"}`}>
           {product.imageUrl ? (
-            <Image src={product.imageUrl} alt={product.name} fill sizes="(min-width: 1024px) 240px, 50vw" className="object-cover transition-transform duration-300 group-hover:scale-105" />
+            <Image src={product.imageUrl} alt={product.name} fill sizes="(min-width: 1024px) 240px, 50vw" className="object-cover transition-transform duration-300 group-hover:scale-105" unoptimized />
           ) : (
             <Package size={size === "sm" ? 30 : 40} className="text-white/25" />
           )}

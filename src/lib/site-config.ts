@@ -10,8 +10,19 @@ export const siteConfig = {
   fullName: process.env.NEXT_PUBLIC_SITE_FULL_NAME ?? "마이리틀밸리",
   /** 한 줄 소개 */
   tagline: process.env.NEXT_PUBLIC_SITE_TAGLINE ?? "함께 만드는 우리의 마인크래프트 세상",
-  /** 인게임 서버 접속 주소 */
-  serverAddress: process.env.NEXT_PUBLIC_SERVER_ADDRESS ?? "play.maribel.kr",
+  /** 전용 클라이언트(런처) 다운로드 링크 — 준비되면 채워주세요 */
+  clientDownloadUrl: process.env.NEXT_PUBLIC_CLIENT_DOWNLOAD_URL ?? "",
+  /** 접속(플레이) 가이드 링크 — 모달의 "가이드 보기"가 새 창으로 엽니다. 준비되면 채워주세요 */
+  guideUrl: process.env.NEXT_PUBLIC_GUIDE_URL ?? "",
+  /** 메인 트레일러 영상 — 유튜브 embed 주소 또는 mp4 경로. 준비되면 채워주세요 */
+  trailerUrl: process.env.NEXT_PUBLIC_TRAILER_URL ?? "",
+  /** 공식 SNS 링크 */
+  sns: {
+    discord: "https://discord.gg/25gh7nza5X",
+    naver: "https://cafe.naver.com/mylittlevalley",
+    x: "https://x.com/mylittlevalley",
+    instagram: "https://www.instagram.com/mylittlevalley.official/",
+  },
   /** 서버 에디션/버전 표기 (실시간 상태 API 부재 → 운영자가 관리) */
   serverEdition: process.env.NEXT_PUBLIC_SERVER_EDITION ?? "Java Edition · 1.21+",
   /** 서버 운영 상태 (실시간 API 없음 → 환경변수로 운영) */

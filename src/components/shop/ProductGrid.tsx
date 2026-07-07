@@ -112,7 +112,7 @@ export default function ProductGrid({ products, categories }: ProductGridProps) 
               >
                 <div className="relative w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center shrink-0 overflow-hidden">
                   {p.imageUrl ? (
-                    <Image src={p.imageUrl} alt={p.name} fill sizes="48px" className="object-cover" />
+                    <Image src={p.imageUrl} alt={p.name} fill sizes="48px" className="object-cover" unoptimized />
                   ) : (
                     <Package size={20} className="text-white/25" />
                   )}

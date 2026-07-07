@@ -5,6 +5,8 @@ export type MinecraftHeadSize = "sm" | "md" | "lg";
 export interface MinecraftHeadProps {
   username: string;
   size?: MinecraftHeadSize;
+  /** 마인크래프트 UUID — 주면 cravatar.eu 스킨 아바타를 자동으로 사용한다 */
+  uuid?: string;
   src?: string;
   className?: string;
 }
@@ -38,18 +40,21 @@ function colorForUsername(username: string): string {
 export default function MinecraftHead({
   username,
   size = "md",
+  uuid,
   src,
   className = "",
 }: MinecraftHeadProps) {
   const s = sizeClasses[size];
   const initial = username.trim().charAt(0).toUpperCase() || "S";
+  // 스킨 아바타 연동: 명시된 src > cravatar(uuid) > 이니셜 폴백
+  const resolvedSrc = src ?? (uuid ? `https://cravatar.eu/avatar/${uuid.replace(/-/g, "")}/${s.px * 2}.png` : undefined);
   return (
     <div
       className={`relative inline-block ${s.wrap} rounded-sm overflow-hidden ring-1 ring-white/15 shrink-0 ${className}`}
     >
-      {src ? (
+      {resolvedSrc ? (
         <Image
-          src={src}
+          src={resolvedSrc}
           alt={username}
           width={s.px}
           height={s.px}

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { Image as ImageIcon, Loader2, Pencil, Plus } from "lucide-react";
+import { Image as ImageIcon, ImagePlus, Loader2, Pencil, Plus, X } from "lucide-react";
 import {
   Badge,
   Button,
@@ -14,8 +14,11 @@ import {
   useToast,
   type TableColumn,
 } from "@/components/ui";
-import { adminApi, type Popup, type PopupUpsert } from "@/lib/admin-api";
+import { adminApi, uploadImage, type Popup, type PopupUpsert } from "@/lib/admin-api";
 import { ApiError } from "@/lib/api";
+
+// 메인 배너 슬라이더는 16:9 로 크롭한다. 권장 해상도를 운영진에게 안내한다.
+const RECOMMENDED_BANNER_SIZE = "1600 × 900px (16:9 비율) 권장 · 최대 5MB · JPG/PNG/WEBP";
 
 type Row = Popup & Record<string, unknown>;
 
@@ -36,6 +39,22 @@ export default function AdminBannersPage() {
   const [form, setForm] = useState<PopupUpsert>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [actingId, setActingId] = useState<number | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const onPickImage = async (file: File | undefined) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const { url } = await uploadImage(file);
+      setForm((f) => ({ ...f, imageUrl: url }));
+      toast({ title: "이미지를 업로드했습니다", variant: "success" });
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : "업로드에 실패했습니다.";
+      toast({ title: "업로드 실패", description: message, variant: "error" });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -112,7 +131,7 @@ export default function AdminBannersPage() {
       width: "80px",
       render: (r) => (
         <div className="relative w-12 h-9 rounded bg-white/5 overflow-hidden flex items-center justify-center">
-          <Image src={r.imageUrl} alt="popup" fill sizes="48px" className="object-cover" />
+          <Image src={r.imageUrl} alt="popup" fill sizes="48px" className="object-cover" unoptimized />
         </div>
       ),
     },
@@ -176,7 +195,42 @@ export default function AdminBannersPage() {
         }
       >
         <div className="space-y-4">
-          <Input label="이미지 URL" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="https://..." />
+          <div>
+            <p className="text-xs font-medium text-white/60 mb-2">배너 이미지</p>
+            <div className="flex items-start gap-3">
+              <div className="relative w-40 aspect-[16/9] rounded-lg bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center shrink-0">
+                {form.imageUrl ? (
+                  <Image src={form.imageUrl} alt="미리보기" fill sizes="160px" className="object-cover" unoptimized />
+                ) : (
+                  <ImagePlus size={22} className="text-white/25" />
+                )}
+              </div>
+              <div className="flex flex-col gap-2 min-w-0 flex-1">
+                <label className="inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-white/15 rounded-md cursor-pointer hover:bg-white/5 transition-colors w-fit">
+                  {uploading ? <Loader2 className="animate-spin" size={14} /> : <ImagePlus size={14} />}
+                  {form.imageUrl ? "이미지 변경" : "이미지 업로드"}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/gif,image/webp"
+                    className="hidden"
+                    disabled={uploading}
+                    onChange={(e) => onPickImage(e.target.files?.[0])}
+                  />
+                </label>
+                {form.imageUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, imageUrl: "" })}
+                    className="inline-flex items-center gap-1 text-xs text-white/40 hover:text-red-400 w-fit"
+                  >
+                    <X size={12} /> 이미지 제거
+                  </button>
+                )}
+                <p className="text-[11px] text-emerald-300/70">권장 해상도 {RECOMMENDED_BANNER_SIZE}</p>
+              </div>
+            </div>
+          </div>
+          <Input label="이미지 URL (직접 입력도 가능)" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="업로드하거나 https:// 주소 입력" />
           <Input label="링크 URL (선택)" value={form.linkUrl ?? ""} onChange={(e) => setForm({ ...form, linkUrl: e.target.value || null })} placeholder="클릭 시 이동할 주소" />
           <div className="grid sm:grid-cols-2 gap-4">
             <Input label="노출 시작" type="datetime-local" value={form.startAt} onChange={(e) => setForm({ ...form, startAt: e.target.value })} />

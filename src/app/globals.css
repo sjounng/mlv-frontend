@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  /* Surfaces — layered near-black with a faint cool cast for depth */
-  --color-surface-1: #0b0c0d;
-  --color-surface-2: #101113;
-  --color-surface-3: #16181b;
-  --color-surface-4: #1d2024;
+  /* Surfaces — 밤의 숲. 차가운 흑색 대신 에메랄드 기가 옅게 도는 깊은 다크 */
+  --color-surface-1: #0c110d;
+  --color-surface-2: #111711;
+  --color-surface-3: #171e17;
+  --color-surface-4: #1e261d;
 
   /* Hairlines */
-  --color-line: rgba(255, 255, 255, 0.08);
+  --color-line: rgba(214, 245, 222, 0.09);
 
   /* Brand + semantic accents (used sparingly as points) */
   --color-brand: #10b981;
@@ -31,26 +31,47 @@
 }
 
 :root {
-  --background: #0b0c0d;
-  --foreground: #ededed;
+  --background: #0c110d;
+  --foreground: #edefe9;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-plex);
+  --font-display: var(--font-jua);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: 'Pretendard Variable', 'Pretendard', -apple-system, 'Apple SD Gothic Neo', sans-serif;
-  /* Subtle layered glows keep the dark theme from reading as flat black */
+  font-family: var(--font-plex), 'Apple SD Gothic Neo', sans-serif;
+  /* 에메랄드 + 호박색 은은한 글로우 — 파란 기 대신 따뜻한 밤 분위기 */
   background-image:
-    radial-gradient(900px 500px at 12% -8%, rgba(16, 185, 129, 0.06), transparent 60%),
-    radial-gradient(800px 600px at 100% 0%, rgba(96, 165, 250, 0.05), transparent 55%);
+    radial-gradient(900px 500px at 12% -8%, rgba(16, 185, 129, 0.07), transparent 60%),
+    radial-gradient(800px 600px at 100% 0%, rgba(251, 191, 36, 0.04), transparent 55%);
   background-attachment: fixed;
+}
+
+/* 필름 그레인 — 균질한 디지털 표면에 미세한 질감을 얹는다 */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* 제목은 디스플레이체(Jua) — 페이지 전체에 일관된 개성을 준다 */
+h1,
+h2,
+.font-display {
+  font-family: var(--font-jua), var(--font-plex), sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
 }
 
 ::selection {

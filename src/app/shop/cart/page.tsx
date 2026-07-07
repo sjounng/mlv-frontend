@@ -82,7 +82,7 @@ export default function CartPage() {
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
                   <div className="relative w-14 h-14 rounded-lg bg-white/5 flex items-center justify-center shrink-0 overflow-hidden">
                     {item.imageUrl ? (
-                      <Image src={item.imageUrl} alt={item.name} fill sizes="56px" className="object-cover" />
+                      <Image src={item.imageUrl} alt={item.name} fill sizes="56px" className="object-cover" unoptimized />
                     ) : (
                       <Package size={22} className="text-white/25" />
                     )}

@@ -187,7 +187,7 @@ export default function MyPage() {
                 <Card padding="lg">
                   <div className="flex flex-col sm:flex-row gap-6 items-start">
                     <div className="flex items-center gap-4">
-                      <MinecraftHead username={profile.minecraftUsername} size="lg" />
+                      <MinecraftHead username={profile.minecraftUsername} uuid={profile.minecraftUuid} size="lg" />
                       <div>
                         <h2 className="text-xl font-bold">{profile.minecraftUsername}</h2>
                         <p className="text-xs text-white/45 mt-0.5">
