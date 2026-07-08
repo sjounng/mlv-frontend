@@ -18,17 +18,28 @@ interface PublicPopup {
 const AUTO_MS = 5_000; // 기본 자동 전환 주기
 const HOLD_MS = 5_000; // 수동 조작 후 자동 전환 정지 시간
 
-export default function IntroSlider() {
+export default function IntroSlider({
+  placement = "HOME",
+  hideWhenEmpty = false,
+}: {
+  /** 배너 노출 위치: 홈 인트로 / 이벤트 페이지 상단 */
+  placement?: "HOME" | "EVENT";
+  /** 배너가 없을 때 아예 렌더하지 않음(플레이스홀더 미표시) */
+  hideWhenEmpty?: boolean;
+}) {
   const [slides, setSlides] = useState<PublicPopup[]>([]);
+  const [ready, setReady] = useState(false);
   const [current, setCurrent] = useState(0);
   const holdUntilRef = useRef(0);
 
   useEffect(() => {
+    // 위치별 배너만 노출 (홈/이벤트 구분)
     void api
-      .get<PublicPopup[]>("/api/public/popups")
+      .get<PublicPopup[]>(`/api/public/popups?placement=${placement}`)
       .then(setSlides)
-      .catch(() => {});
-  }, []);
+      .catch(() => {})
+      .finally(() => setReady(true));
+  }, [placement]);
 
   useEffect(() => {
     if (slides.length < 2) return;
@@ -44,6 +55,9 @@ export default function IntroSlider() {
     holdUntilRef.current = Date.now() + HOLD_MS;
     setCurrent((c) => (c + dir + total) % total);
   };
+
+  // 이벤트 페이지 등: 배너가 없으면 영역 자체를 표시하지 않음
+  if (hideWhenEmpty && (!ready || total === 0)) return null;
 
   return (
     <div className="relative w-full aspect-[16/7] rounded-2xl overflow-hidden border border-white/10 shadow-[0_10px_0_rgba(0,0,0,0.4)] bg-linear-to-br from-surface-3 via-surface-4 to-black">
@@ -86,22 +100,22 @@ export default function IntroSlider() {
 
           {total > 1 && (
             <>
-              {/* 좌우 반투명 화살표 블록 */}
+              {/* 좌우 소형 원형 버튼 */}
               <button
                 type="button"
                 onClick={() => go(-1)}
                 aria-label="이전 배너"
-                className="focus-ring group/arrow absolute left-0 top-0 bottom-0 w-14 sm:w-16 flex items-center justify-center bg-black/25 hover:bg-black/45 transition-colors"
+                className="focus-ring absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center bg-black/40 hover:bg-black/65 text-white/80 hover:text-white border border-white/10 backdrop-blur-sm transition-colors"
               >
-                <ChevronLeft size={26} className="text-white/70 group-hover/arrow:text-white transition-colors" />
+                <ChevronLeft size={18} />
               </button>
               <button
                 type="button"
                 onClick={() => go(1)}
                 aria-label="다음 배너"
-                className="focus-ring group/arrow absolute right-0 top-0 bottom-0 w-14 sm:w-16 flex items-center justify-center bg-black/25 hover:bg-black/45 transition-colors"
+                className="focus-ring absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center bg-black/40 hover:bg-black/65 text-white/80 hover:text-white border border-white/10 backdrop-blur-sm transition-colors"
               >
-                <ChevronRight size={26} className="text-white/70 group-hover/arrow:text-white transition-colors" />
+                <ChevronRight size={18} />
               </button>
 
               {/* 하단 페이지 도트 */}

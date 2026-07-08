@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Gift, Calendar, Sparkles, Loader2, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import IntroSlider from "@/components/IntroSlider";
 import { Button, Card, Badge, EmptyState, useToast } from "@/components/ui";
 import ItemIcon from "@/components/minecraft/ItemIcon";
 import { api, ApiError } from "@/lib/api";
@@ -112,6 +113,9 @@ export default function EventPage() {
       <Navbar />
       <main className="pt-16">
         <section className="max-w-6xl mx-auto px-6 py-12 space-y-10">
+          {/* 이벤트 배너 슬라이더 (placement=EVENT) — 페이지 최상단. 배너 없으면 미표시 */}
+          <IntroSlider placement="EVENT" hideWhenEmpty />
+
           <div>
             <p className="text-xs text-emerald-300/70 uppercase tracking-widest font-medium mb-2">Events</p>
             <h1 className="text-3xl md:text-4xl font-bold">이벤트</h1>

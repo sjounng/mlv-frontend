@@ -10,12 +10,22 @@ import {
   EmptyState,
   Input,
   Modal,
+  Select,
   Table,
   useToast,
   type TableColumn,
 } from "@/components/ui";
-import { adminApi, uploadImage, type Popup, type PopupUpsert } from "@/lib/admin-api";
+import { adminApi, uploadImage, type BannerPlacement, type Popup, type PopupUpsert } from "@/lib/admin-api";
 import { ApiError } from "@/lib/api";
+
+const PLACEMENT_OPTIONS: { value: BannerPlacement; label: string }[] = [
+  { value: "HOME", label: "홈 인트로 슬라이더" },
+  { value: "EVENT", label: "이벤트 페이지 상단" },
+];
+const PLACEMENT_LABEL: Record<BannerPlacement, string> = {
+  HOME: "홈 인트로",
+  EVENT: "이벤트",
+};
 
 // 메인 배너 슬라이더는 16:9 로 크롭한다. 권장 해상도를 운영진에게 안내한다.
 const RECOMMENDED_BANNER_SIZE = "1600 × 900px (16:9 비율) 권장 · 최대 5MB · JPG/PNG/WEBP";
@@ -28,7 +38,7 @@ function toLocalInput(iso: string) {
   return new Date(d.getTime() - off * 60000).toISOString().slice(0, 16);
 }
 
-const emptyForm: PopupUpsert = { imageUrl: "", linkUrl: null, startAt: "", endAt: "", active: true };
+const emptyForm: PopupUpsert = { imageUrl: "", linkUrl: null, placement: "HOME", startAt: "", endAt: "", active: true };
 
 export default function AdminBannersPage() {
   const { toast } = useToast();
@@ -81,7 +91,7 @@ export default function AdminBannersPage() {
 
   const openEdit = (p: Popup) => {
     setEditingId(p.id);
-    setForm({ imageUrl: p.imageUrl, linkUrl: p.linkUrl, startAt: toLocalInput(p.startAt), endAt: toLocalInput(p.endAt), active: p.active });
+    setForm({ imageUrl: p.imageUrl, linkUrl: p.linkUrl, placement: p.placement, startAt: toLocalInput(p.startAt), endAt: toLocalInput(p.endAt), active: p.active });
     setOpen(true);
   };
 
@@ -135,6 +145,16 @@ export default function AdminBannersPage() {
         </div>
       ),
     },
+    {
+      key: "placement",
+      label: "노출 위치",
+      width: "110px",
+      render: (r) => (
+        <Badge variant={r.placement === "HOME" ? "info" : "default"} size="sm">
+          {PLACEMENT_LABEL[r.placement]}
+        </Badge>
+      ),
+    },
     { key: "linkUrl", label: "링크", render: (r) => <span className="text-xs text-white/55 break-all">{r.linkUrl ?? "-"}</span> },
     {
       key: "startAt",
@@ -165,7 +185,7 @@ export default function AdminBannersPage() {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">팝업 / 배너 관리</h1>
-          <p className="mt-1.5 text-sm text-white/50">메인 페이지 팝업 이미지와 노출 기간을 관리합니다.</p>
+          <p className="mt-1.5 text-sm text-white/50">노출 위치(홈 인트로 슬라이더 / 이벤트 페이지 상단)별로 배너 이미지와 노출 기간을 관리합니다.</p>
         </div>
         <Button leftIcon={<Plus size={16} />} onClick={openCreate} disabled={loading}>팝업 등록</Button>
       </div>
@@ -231,6 +251,12 @@ export default function AdminBannersPage() {
             </div>
           </div>
           <Input label="이미지 URL (직접 입력도 가능)" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="업로드하거나 https:// 주소 입력" />
+          <Select
+            label="노출 위치"
+            options={PLACEMENT_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+            value={form.placement}
+            onChange={(e) => setForm({ ...form, placement: e.target.value as BannerPlacement })}
+          />
           <Input label="링크 URL (선택)" value={form.linkUrl ?? ""} onChange={(e) => setForm({ ...form, linkUrl: e.target.value || null })} placeholder="클릭 시 이동할 주소" />
           <div className="grid sm:grid-cols-2 gap-4">
             <Input label="노출 시작" type="datetime-local" value={form.startAt} onChange={(e) => setForm({ ...form, startAt: e.target.value })} />

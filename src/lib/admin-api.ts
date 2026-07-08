@@ -176,10 +176,14 @@ export interface EventUpsert {
   active: boolean;
 }
 
+/** 배너 노출 위치: 홈 인트로 슬라이더 / 이벤트 페이지 상단 */
+export type BannerPlacement = "HOME" | "EVENT";
+
 export interface Popup extends Record<string, unknown> {
   id: number;
   imageUrl: string;
   linkUrl: string | null;
+  placement: BannerPlacement;
   startAt: string;
   endAt: string;
   active: boolean;
@@ -189,6 +193,7 @@ export interface Popup extends Record<string, unknown> {
 export interface PopupUpsert {
   imageUrl: string;
   linkUrl: string | null;
+  placement: BannerPlacement;
   startAt: string;
   endAt: string;
   active: boolean;
