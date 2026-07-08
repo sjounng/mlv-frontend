@@ -1,18 +1,12 @@
 import Navbar from "@/components/Navbar";
-import HeroSection from "@/components/HeroSection";
-import EventBannerSlider from "@/components/EventBannerSlider";
-import Footer from "@/components/Footer";
+import MainShowcase from "@/components/MainShowcase";
 
+// 홈 = 스크롤 스냅 단일 페이지 (인트로 → 소개 → 다운로드 + 푸터). Navbar 는 고정 오버레이.
 export default function HomePage() {
   return (
     <>
       <Navbar />
-      <main>
-        <HeroSection />
-        {/* 이벤트 이미지 배너 슬라이더 — 배너는 관리자 > 배너에서 등록 */}
-        <EventBannerSlider />
-      </main>
-      <Footer />
+      <MainShowcase />
     </>
   );
 }

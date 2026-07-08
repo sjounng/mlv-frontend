@@ -72,10 +72,10 @@ export default function PolicyDocument({
       <main className="pt-16">
         <section className="max-w-3xl mx-auto px-6 py-12">
           <Link
-            href="/info"
+            href="/"
             className="focus-ring rounded inline-flex items-center gap-1 text-xs text-white/40 hover:text-white/70 mb-4"
           >
-            <ChevronLeft size={14} /> 서비스 정보로 돌아가기
+            <ChevronLeft size={14} /> 홈으로 돌아가기
           </Link>
 
           <div className="mb-6">

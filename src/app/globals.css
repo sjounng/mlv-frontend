@@ -35,6 +35,18 @@
   --foreground: #edefe9;
 }
 
+/* 화면 전체 비율 ~12% 확대 (07-08 피드백: 레이아웃 보정 + 폰트 가독성).
+   Tailwind 가 rem 기반이라 base 를 키우면 전체가 비율대로 커진다. */
+html {
+  font-size: 112.5%;
+}
+/* 좁은 화면에선 과확대 방지 */
+@media (max-width: 640px) {
+  html {
+    font-size: 106.25%;
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

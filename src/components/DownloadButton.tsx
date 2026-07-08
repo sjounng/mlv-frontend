@@ -10,7 +10,13 @@ import { siteConfig } from "@/lib/site-config";
 const CLIENT_DOWNLOAD_URL = siteConfig.clientDownloadUrl;
 const GUIDE_URL = siteConfig.guideUrl;
 
-export default function DownloadButton({ compact = false }: { compact?: boolean }) {
+export default function DownloadButton({
+  compact = false,
+  large = false,
+}: {
+  compact?: boolean;
+  large?: boolean;
+}) {
   const [open, setOpen] = useState(false);
 
   // ESC 로 닫기
@@ -26,12 +32,12 @@ export default function DownloadButton({ compact = false }: { compact?: boolean 
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={`focus-ring inline-flex items-center gap-1.5 font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-md transition-[background-color,box-shadow,transform] duration-150 shadow-[0_2px_0_0_#065f46] active:translate-y-[1px] active:shadow-[0_1px_0_0_#065f46] ${
-          compact ? "px-3 py-1.5 text-xs" : "px-4 py-1.5 text-sm"
+        className={`focus-ring inline-flex items-center gap-1.5 whitespace-nowrap font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-md transition-[background-color,box-shadow,transform] duration-150 shadow-[0_2px_0_0_#065f46] active:translate-y-[1px] active:shadow-[0_1px_0_0_#065f46] ${
+          large ? "px-7 py-3 text-base gap-2 shadow-[0_4px_0_0_#065f46] active:translate-y-[2px]" : compact ? "px-3 py-1.5 text-xs" : "px-4 py-1.5 text-sm"
         }`}
       >
         다운로드
-        <Download size={compact ? 13 : 15} />
+        <Download size={large ? 18 : compact ? 13 : 15} />
       </button>
 
       {open && (

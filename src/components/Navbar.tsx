@@ -4,31 +4,30 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, LogOut, ShoppingCart } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { useCart } from "@/lib/cart";
 import MinecraftHead from "@/components/minecraft/MinecraftHead";
 import MailDropdown from "@/components/MailDropdown";
 import ProfileMenu from "@/components/ProfileMenu";
 import DownloadButton from "@/components/DownloadButton";
 
+// 최종 네비 구성 (07-08 피드백): 홈 / 이벤트 / 상점 / 마이페이지 / 고객지원
 const navLinks = [
-  { label: "소개", href: "/introduce" },
-  { label: "서버정보", href: "/info" },
-  { label: "웹상점", href: "/shop" },
+  { label: "홈", href: "/" },
   { label: "이벤트", href: "/event" },
-  { label: "문의", href: "/contact" },
+  { label: "상점", href: "/shop" },
+  { label: "마이페이지", href: "/mypage" },
+  { label: "고객지원", href: "/contact" },
 ];
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { status, profile, logout } = useAuth();
-  const { count } = useCart();
   const pathname = usePathname();
 
-  const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
-  // 장바구니 아이콘은 웹상점에서만 노출 (피드백)
-  const showCart = pathname.startsWith("/shop");
+  // 홈("/")은 정확 일치로만 활성 (모든 경로가 "/" 로 시작하므로)
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-surface-1/80 backdrop-blur-md border-b border-white/8">
@@ -51,10 +50,10 @@ export default function Navbar() {
             <li key={link.href}>
               <Link
                 href={link.href}
-                className={`relative py-1 text-sm transition-colors after:absolute after:-bottom-0.5 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:transition-colors ${
+                className={`relative py-1 text-sm transition-colors after:absolute after:-bottom-0.5 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-emerald-400 after:origin-center after:transition-transform after:duration-300 after:ease-out ${
                   isActive(link.href)
-                    ? "text-white font-medium after:bg-emerald-400"
-                    : "text-white/60 hover:text-white after:bg-transparent"
+                    ? "text-white font-medium after:scale-x-100"
+                    : "text-white/60 hover:text-white after:scale-x-0 hover:after:scale-x-100"
                 }`}
               >
                 {link.label}
@@ -63,23 +62,8 @@ export default function Navbar() {
           ))}
         </ul>
 
-        {/* Right Actions */}
+        {/* Right Actions (장바구니 버튼은 네비바에서 제외 — 07-08 피드백) */}
         <div className="hidden md:flex items-center gap-2 shrink-0 ml-auto">
-          {showCart && (
-            <Link
-              href="/shop/cart"
-              className="relative p-2 text-white/60 hover:text-white transition-colors"
-              aria-label="장바구니"
-            >
-              <ShoppingCart size={18} />
-              {count > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 bg-emerald-500 text-black text-[10px] font-bold rounded-full flex items-center justify-center">
-                  {count}
-                </span>
-              )}
-            </Link>
-          )}
-
           {status === "loading" ? (
             <div className="w-20 h-8 rounded-md bg-white/5 animate-pulse" />
           ) : status === "authenticated" && profile ? (
@@ -104,20 +88,10 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile right: download + cart + hamburger */}
+        {/* Mobile right: download + hamburger (장바구니 버튼 제외 — 07-08 피드백) */}
         <div className="md:hidden ml-auto flex items-center gap-1">
           <DownloadButton compact />
           {status === "authenticated" && <MailDropdown />}
-          {showCart && (
-            <Link href="/shop/cart" className="relative p-2 text-white/70" aria-label="장바구니">
-              <ShoppingCart size={19} />
-              {count > 0 && (
-                <span className="absolute top-0 right-0 min-w-4 h-4 px-1 bg-emerald-500 text-black text-[10px] font-bold rounded-full flex items-center justify-center">
-                  {count}
-                </span>
-              )}
-            </Link>
-          )}
           <button className="p-2 text-white/70" onClick={() => setMobileOpen(!mobileOpen)} aria-label="메뉴">
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>

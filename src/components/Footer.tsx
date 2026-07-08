@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { businessInfo, siteConfig } from "@/lib/site-config";
+import ServerStatus from "@/components/minecraft/ServerStatus";
+import SnsLinks from "@/components/SnsLinks";
 
 const legalLinks = [
   { label: "이용약관", href: "/info/terms" },
@@ -41,6 +43,22 @@ export default function Footer() {
               ))}
             </ul>
           </nav>
+        </div>
+
+        {/* 서버 정보 (구 "서버 정보" 페이지에서 편입) */}
+        <div className="pt-6 border-t border-white/5 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <dl className="flex flex-wrap items-center gap-x-8 gap-y-2 text-xs">
+            <div className="flex items-center gap-2">
+              <dt className="text-white/25">서버 상태</dt>
+              <dd><ServerStatus status={siteConfig.serverStatus} /></dd>
+            </div>
+            <div className="flex items-center gap-2">
+              <dt className="text-white/25">에디션 · 버전</dt>
+              <dd className="text-white/45">{siteConfig.serverEdition}</dd>
+            </div>
+          </dl>
+          {/* 공식 SNS */}
+          <SnsLinks size="sm" />
         </div>
 
         {/* 사업자 정보 */}

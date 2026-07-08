@@ -99,15 +99,18 @@ async function refreshAccessTokenOnce(): Promise<string | null> {
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { method = "GET", body, skipAuthRetry = false } = options;
 
+  // FormData(멀티파트)면 JSON 직렬화/Content-Type 을 건드리지 않는다(브라우저가 boundary 설정).
+  const isForm = typeof FormData !== "undefined" && body instanceof FormData;
+
   const send = async (): Promise<Response> => {
     const headers: Record<string, string> = {};
-    if (body !== undefined) headers["Content-Type"] = "application/json";
+    if (body !== undefined && !isForm) headers["Content-Type"] = "application/json";
     if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
     return fetch(`${API_BASE_URL}${path}`, {
       method,
       credentials: "include",
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: body === undefined ? undefined : isForm ? (body as FormData) : JSON.stringify(body),
     });
   };
 
@@ -135,6 +138,8 @@ export const api = {
   get: <T>(path: string) => request<T>(path),
   post: <T>(path: string, body?: unknown, opts?: RequestOptions) =>
     request<T>(path, { ...opts, method: "POST", body }),
+  upload: <T>(path: string, formData: FormData) =>
+    request<T>(path, { method: "POST", body: formData }),
   patch: <T>(path: string, body?: unknown) =>
     request<T>(path, { method: "PATCH", body }),
   del: <T>(path: string) => request<T>(path, { method: "DELETE" }),

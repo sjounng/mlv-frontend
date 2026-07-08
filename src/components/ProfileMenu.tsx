@@ -43,10 +43,13 @@ export default function ProfileMenu() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="focus-ring flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-white/80 transition-colors"
+        className="focus-ring group flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-white/80 hover:text-white transition-colors"
       >
         <MinecraftHead username={profile.minecraftUsername} uuid={profile.minecraftUuid} size="sm" />
-        <span className="max-w-[120px] truncate">{profile.minecraftUsername}</span>
+        {/* 호버 시 중앙→좌우로 퍼지는 밑줄 (07-08 피드백 6) */}
+        <span className="relative max-w-[120px] truncate py-0.5 after:absolute after:-bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-emerald-400 after:origin-center after:scale-x-0 after:transition-transform after:duration-300 after:ease-out group-hover:after:scale-x-100">
+          {profile.minecraftUsername}
+        </span>
       </button>
 
       {open && (
