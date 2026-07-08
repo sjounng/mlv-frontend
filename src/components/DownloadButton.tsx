@@ -3,12 +3,18 @@
 // 네비바 다운로드 버튼 + 플레이 방법 모달 (피드백: 히어로 버튼 제거 후 프로필 우측 배치)
 // 클릭 시 전용 런처 다운로드 안내 콜아웃 팝업을 연다.
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { Download, X } from "lucide-react";
 import { siteConfig } from "@/lib/site-config";
 
 const CLIENT_DOWNLOAD_URL = siteConfig.clientDownloadUrl;
 const GUIDE_URL = siteConfig.guideUrl;
+
+// 클라이언트 마운트 여부 (SSR 에서는 false) — setState-in-effect 없이 판별
+const subscribeNoop = () => () => {};
+const getClient = () => true;
+const getServer = () => false;
 
 export default function DownloadButton({
   compact = false,
@@ -18,6 +24,8 @@ export default function DownloadButton({
   large?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  // 모달을 body 로 포털해서 네비바 backdrop-filter/섹션 transform 의 containing block 을 벗어나 뷰포트 중앙에 뜨게 한다
+  const mounted = useSyncExternalStore(subscribeNoop, getClient, getServer);
 
   // ESC 로 닫기
   useEffect(() => {
@@ -40,7 +48,7 @@ export default function DownloadButton({
         <Download size={large ? 18 : compact ? 13 : 15} />
       </button>
 
-      {open && (
+      {open && mounted && createPortal(
         <div
           className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm"
           onClick={() => setOpen(false)}
@@ -91,7 +99,8 @@ export default function DownloadButton({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
