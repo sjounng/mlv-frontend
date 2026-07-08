@@ -13,7 +13,6 @@ import { mainShowcase, type ShowcaseSection } from "@/lib/site-config";
 import IntroSlider from "@/components/IntroSlider";
 import SnsLinks from "@/components/SnsLinks";
 import DownloadButton from "@/components/DownloadButton";
-import Footer from "@/components/Footer";
 
 // 소개 섹션 우측 미디어
 function SectionMedia({ media, isNew }: { media?: string; isNew?: boolean }) {
@@ -199,9 +198,6 @@ export default function MainShowcase() {
           </div>
         </div>
       </section>
-
-      {/* 서버 정보 텍스트를 편입한 푸터 (스냅 대상 아님 — 마지막에 일반 스크롤) */}
-      <Footer />
     </div>
   );
 }
