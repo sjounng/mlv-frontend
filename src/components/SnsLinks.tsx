@@ -11,12 +11,15 @@ type Sns = {
   icon: string;
   /** 호버 시 채워질 브랜드 배경 (단색 또는 그라데이션 CSS 값) */
   fill: string;
+  /** 아이콘 SVG마다 내부 여백이 달라 시각 크기를 맞추기 위한 배율 (기본 1) */
+  scale?: number;
 };
 
 const snsLinks: Sns[] = [
   // 디스코드=블러플, 네이버 카페=그린 (브랜드 실제 색상)
   { label: "디스코드", href: siteConfig.sns.discord, icon: "/assets/sns/discord_icon.svg", fill: "#5662f6" },
-  { label: "네이버 카페", href: siteConfig.sns.naver, icon: "/assets/sns/naver_icon.svg", fill: "#3ccb0e" },
+  // 네이버 아이콘은 내부 여백이 커서 얇게 보임 → 살짝 키워 굵기/크기를 맞춘다
+  { label: "네이버 카페", href: siteConfig.sns.naver, icon: "/assets/sns/naver_icon.svg", fill: "#3ccb0e", scale: 1.18 },
   { label: "X", href: siteConfig.sns.x, icon: "/assets/sns/x_icon.svg", fill: "#131313" },
   // 인스타그램 공식 그라데이션 (노랑→오렌지→마젠타→퍼플→블루)
   {
@@ -68,6 +71,7 @@ export default function SnsLinks({
               WebkitMaskRepeat: "no-repeat",
               maskPosition: "center",
               WebkitMaskPosition: "center",
+              transform: s.scale ? `scale(${s.scale})` : undefined,
             }}
           />
         </a>

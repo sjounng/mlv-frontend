@@ -6,9 +6,15 @@
 // - 메일 클릭 시 화면 중앙 팝업(제목+본문), ESC/X 로 닫아도 알림 패널은 유지
 // - 읽음 여부는 서버에 별도 API 가 없어 로컬(localStorage)로 관리한다
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { Loader2, Mail, X } from "lucide-react";
 import { api } from "@/lib/api";
+
+// 클라이언트 마운트 여부 (SSR=false) — 모달을 body 로 포털하기 위해
+const subscribeNoop = () => () => {};
+const getClient = () => true;
+const getServer = () => false;
 
 interface MailItem {
   id: number;
@@ -36,6 +42,7 @@ export default function MailDropdown() {
   const [loading, setLoading] = useState(false);
   const [readIds, setReadIds] = useState<Set<number>>(new Set());
   const [selected, setSelected] = useState<MailItem | null>(null);
+  const mounted = useSyncExternalStore(subscribeNoop, getClient, getServer);
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
   const load = useCallback(async () => {
@@ -163,8 +170,8 @@ export default function MailDropdown() {
         </div>
       )}
 
-      {/* 메일 확인 중앙 팝업 (닫아도 알림 패널은 유지) */}
-      {selected && (
+      {/* 메일 확인 중앙 팝업 (body 로 포털 — 네비바 backdrop-filter 밖으로 빼 뷰포트 중앙에 표시) */}
+      {selected && mounted && createPortal(
         <div
           className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 backdrop-blur-sm"
           onClick={() => setSelected(null)}
@@ -186,7 +193,8 @@ export default function MailDropdown() {
               {selected.content}
             </p>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

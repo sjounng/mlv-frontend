@@ -120,19 +120,20 @@ export default function MainShowcase() {
         ref={(el) => {
           sectionRefs.current[0] = el;
         }}
-        className="relative z-10 min-h-dvh snap-start snap-always flex flex-col items-center justify-center px-6 pt-24 pb-20"
+        className="relative z-10 min-h-dvh snap-start snap-always flex flex-col items-center justify-center px-6 pt-20 pb-14"
       >
         <div className="w-full max-w-4xl mx-auto flex flex-col items-center text-center">
-          <div className={`w-full ${reveal(0)}`}>
+          {/* 슬라이더는 16:9 유지하되, 화면 높이에 맞게 폭을 제한해 헤드라인·SNS·화살표가 한 화면에 들어오게 한다 */}
+          <div className={`mx-auto max-w-3xl [width:min(48rem,calc((100dvh_-_22rem)*16/9))] ${reveal(0)}`}>
             <IntroSlider />
           </div>
-          <h1 className={`mt-10 text-[2.4rem] leading-[1.1] sm:text-5xl md:text-6xl tracking-tight ${reveal(0, true)}`}>
+          <h1 className={`mt-6 text-[2.2rem] leading-[1.1] sm:text-4xl md:text-5xl tracking-tight ${reveal(0, true)}`}>
             <span className="text-emerald-300">MLV</span>
             {mainShowcase.intro.titleTop.replace(/^MLV/, "")}
             <br />
             {mainShowcase.intro.titleBottom}
           </h1>
-          <SnsLinks className={`mt-8 justify-center ${reveal(0, true)}`} />
+          <SnsLinks className={`mt-6 justify-center ${reveal(0, true)}`} />
         </div>
 
         {/* 중앙 하단 애니메이션 화살표 */}

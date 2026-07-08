@@ -113,8 +113,11 @@ export default function EventPage() {
       <Navbar />
       <main className="pt-16">
         <section className="max-w-6xl mx-auto px-6 py-12 space-y-10">
-          {/* 이벤트 배너 슬라이더 (placement=EVENT) — 페이지 최상단. 배너 없으면 미표시 */}
-          <IntroSlider placement="EVENT" hideWhenEmpty />
+          {/* 이벤트 배너 슬라이더 (placement=EVENT) — 페이지 최상단. 배너 없으면 미표시.
+              16:9 유지하되 높이를 화면에 맞춰 제한해 첫 진입 시 잘리지 않게 한다. */}
+          <div className="mx-auto [width:min(100%,calc(38dvh*16/9))]">
+            <IntroSlider placement="EVENT" hideWhenEmpty />
+          </div>
 
           <div>
             <p className="text-xs text-emerald-300/70 uppercase tracking-widest font-medium mb-2">Events</p>
