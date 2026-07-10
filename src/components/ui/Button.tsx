@@ -64,7 +64,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
       ref={ref}
       type={type}
       disabled={disabled || loading}
-      className={`focus-ring inline-flex items-center justify-center font-semibold transition-[background-color,border-color,box-shadow,transform] duration-150 disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`focus-ring inline-flex items-center justify-center whitespace-nowrap font-semibold transition-[background-color,border-color,box-shadow,transform] duration-150 disabled:cursor-not-allowed ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       {...rest}
     >
       {loading ? (

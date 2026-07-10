@@ -180,9 +180,9 @@ export default function AdminMembersPage() {
     {
       key: "actions",
       label: "관리",
-      width: "170px",
+      width: "190px",
       render: (r) => (
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 flex-nowrap">
           <Button size="sm" variant="outline" onClick={() => setDetailId(r.id)}>
             상세·경고
           </Button>
