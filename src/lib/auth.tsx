@@ -21,6 +21,8 @@ export interface Profile {
   email: string | null;
   status: UserStatus;
   agreedTermsAt: string | null;
+  /** 누적 경고 횟수 (07-09 피드백). 백엔드 배포 전 구버전 응답 호환 위해 옵셔널 */
+  warningCount?: number;
   createdAt: string;
 }
 

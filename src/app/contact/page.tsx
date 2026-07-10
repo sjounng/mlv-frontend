@@ -28,8 +28,17 @@ import { useAuth } from "@/lib/auth";
 const PAGE_SIZE = 5; // 문의 내역 5개씩 표시 (07-08 피드백)
 const ATTACH_MAX_BYTES = 5 * 1024 * 1024;
 
-type ContactCategory = "PAYMENT" | "ACCOUNT" | "EVENT" | "OTHER";
+type ContactCategory = "PAYMENT" | "ACCOUNT" | "EVENT" | "PLAYER_REPORT" | "BUG_REPORT" | "OTHER";
 type ContactStatus = "OPEN" | "ANSWERED" | "CLOSED";
+
+// 신고 분류 선택 시 본문에 자동 입력되는 폼 템플릿 (07-09 피드백)
+const REPORT_TEMPLATES: Partial<Record<ContactCategory, string>> = {
+  PLAYER_REPORT:
+    "신고할 플레이어 (닉네임): \n사건 발생일 (현실 일시): \n사건 내용: \n신고자 디스코드 ID: \n\nTIP: 문의 내용을 구체적으로 서술해주실수록 문의 해결에 도움이 됩니다",
+  BUG_REPORT:
+    "버그 발생일 (현실 일시): \n버그 내용: \n신고자 디스코드 ID: \n\nTIP: 문의 내용을 구체적으로 서술해주실수록 문의 해결에 도움이 됩니다",
+};
+const TEMPLATE_VALUES = Object.values(REPORT_TEMPLATES);
 
 interface Inquiry extends Record<string, unknown> {
   id: number;
@@ -45,6 +54,8 @@ const categories: { value: ContactCategory; label: string }[] = [
   { value: "PAYMENT", label: "결제 / 환불" },
   { value: "ACCOUNT", label: "계정" },
   { value: "EVENT", label: "이벤트" },
+  { value: "PLAYER_REPORT", label: "플레이어 신고" },
+  { value: "BUG_REPORT", label: "버그 신고" },
   { value: "OTHER", label: "기타" },
 ];
 
@@ -52,6 +63,8 @@ const CATEGORY_LABEL: Record<ContactCategory, string> = {
   PAYMENT: "결제/환불",
   ACCOUNT: "계정",
   EVENT: "이벤트",
+  PLAYER_REPORT: "플레이어 신고",
+  BUG_REPORT: "버그 신고",
   OTHER: "기타",
 };
 
@@ -79,6 +92,18 @@ export default function ContactPage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1); // 1-based
   const [detail, setDetail] = useState<Inquiry | null>(null); // 제목 클릭 시 팝업 대상
+
+  // 분류 변경: 신고 분류를 고르면 템플릿 자동 입력, 벗어나면(내용이 템플릿 그대로면) 비움.
+  // 사용자가 직접 쓴 내용은 덮어쓰지 않는다.
+  const onCategoryChange = (next: ContactCategory) => {
+    setContent((prev) => {
+      const prevIsTemplateOrEmpty = prev === "" || TEMPLATE_VALUES.includes(prev);
+      const tpl = REPORT_TEMPLATES[next];
+      if (tpl) return prevIsTemplateOrEmpty ? tpl : prev;
+      return TEMPLATE_VALUES.includes(prev) ? "" : prev;
+    });
+    setCategory(next);
+  };
 
   const loadMine = useCallback(async () => {
     setLoading(true);
@@ -250,7 +275,7 @@ export default function ContactPage() {
                         label="분류"
                         options={categories.map((c) => ({ value: c.value, label: c.label }))}
                         value={category}
-                        onChange={(e) => setCategory(e.target.value as ContactCategory)}
+                        onChange={(e) => onCategoryChange(e.target.value as ContactCategory)}
                       />
                       <Input label="제목" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="문의 제목" />
                     </div>

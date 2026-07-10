@@ -225,6 +225,13 @@ export default function MyPage() {
                         label="약관 동의"
                         value={profile.agreedTermsAt ? formatDateTime(profile.agreedTermsAt) : "미동의"}
                       />
+                      {/* 누적 경고 (07-09 피드백) — 0회는 옅게, 1회 이상은 빨간색 강조 */}
+                      <div>
+                        <p className="text-xs text-white/40 mb-1">누적 경고</p>
+                        <p className={`text-sm font-medium ${(profile.warningCount ?? 0) > 0 ? "text-red-300" : "text-white/85"}`}>
+                          {profile.warningCount ?? 0}회
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </Card>

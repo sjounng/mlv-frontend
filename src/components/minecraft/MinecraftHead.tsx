@@ -47,7 +47,8 @@ export default function MinecraftHead({
   const s = sizeClasses[size];
   const initial = username.trim().charAt(0).toUpperCase() || "S";
   // 스킨 아바타 연동: 명시된 src > cravatar(uuid) > 이니셜 폴백
-  const resolvedSrc = src ?? (uuid ? `https://cravatar.eu/avatar/${uuid.replace(/-/g, "")}/${s.px * 2}.png` : undefined);
+  // helmavatar: 헤드 위에 덮이는 헬멧(오버레이) 레이어까지 포함 (07-09 피드백)
+  const resolvedSrc = src ?? (uuid ? `https://cravatar.eu/helmavatar/${uuid.replace(/-/g, "")}/${s.px * 2}.png` : undefined);
   return (
     <div
       className={`relative inline-block ${s.wrap} rounded-sm overflow-hidden ring-1 ring-white/15 shrink-0 ${className}`}

@@ -1,25 +1,18 @@
 import type { Metadata } from "next";
-import { Geist_Mono, IBM_Plex_Sans_KR, Jua } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui";
 import { AuthProvider } from "@/lib/auth";
 import { CartProvider } from "@/lib/cart";
 import { siteConfig } from "@/lib/site-config";
 
-// 본문: 담백하지만 기계적이지 않은 한글 산세리프
-const bodyFont = IBM_Plex_Sans_KR({
-  weight: ["400", "500", "600", "700"],
-  subsets: ["latin"],
-  variable: "--font-plex",
+// 07-09 피드백: 타이틀/본문을 Pretendard 로 단일화하고 두께 차이로만 구분한다.
+const pretendard = localFont({
+  src: "./fonts/PretendardVariable.woff2",
+  variable: "--font-pretendard",
   display: "swap",
-});
-
-// 제목: 둥글둥글한 디스플레이체 — "마이리틀밸리"의 아기자기한 인상을 만든다
-const displayFont = Jua({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-jua",
-  display: "swap",
+  weight: "45 920",
 });
 
 const geistMono = Geist_Mono({
@@ -122,7 +115,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${bodyFont.variable} ${displayFont.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${pretendard.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-surface-1 text-white">
         <script

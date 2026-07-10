@@ -13,6 +13,7 @@ import { mainShowcase, type ShowcaseSection } from "@/lib/site-config";
 import IntroSlider from "@/components/IntroSlider";
 import SnsLinks from "@/components/SnsLinks";
 import DownloadButton from "@/components/DownloadButton";
+import Footer from "@/components/Footer";
 
 // 소개 섹션 우측 미디어
 function SectionMedia({ media, isNew }: { media?: string; isNew?: boolean }) {
@@ -57,9 +58,9 @@ function SectionMedia({ media, isNew }: { media?: string; isNew?: boolean }) {
 
 export default function MainShowcase() {
   const sections = mainShowcase.sections;
-  // 전체 섹션 수 = 인트로(1) + 소개(n) + 다운로드(1)
-  const total = 2 + sections.length;
-  const labels = ["홈", ...sections.map((_, i) => `소개 ${i + 1}`), "다운로드"];
+  // 전체 섹션 수 = 인트로(1) + 소개(n) + 다운로드(1) + 푸터(1)
+  const total = 3 + sections.length;
+  const labels = ["홈", ...sections.map((_, i) => `소개 ${i + 1}`), "다운로드", "정보"];
 
   const [active, setActive] = useState(0);
   const [seen, setSeen] = useState<boolean[]>(() => Array.from({ length: total }, (_, i) => i === 0));
@@ -178,26 +179,36 @@ export default function MainShowcase() {
         );
       })}
 
-      {/* 마지막) 다운로드 권장 */}
+      {/* 다운로드 권장 */}
       <section
         ref={(el) => {
-          sectionRefs.current[total - 1] = el;
+          sectionRefs.current[total - 2] = el;
         }}
         className="relative z-10 min-h-dvh snap-start snap-always flex items-center px-6 py-24"
       >
         <div className="w-full max-w-3xl mx-auto text-center">
-          <h2 className={`text-5xl md:text-6xl leading-[1.15] tracking-tight ${reveal(total - 1)}`}>
+          <h2 className={`text-5xl md:text-6xl leading-[1.15] tracking-tight ${reveal(total - 2)}`}>
             {dl.titleTop}
             <span style={{ color: dl.titleEmColor }}>{dl.titleEm}</span>
             {dl.titleBottom}
           </h2>
-          <p className={`mt-7 text-base md:text-lg text-white/55 max-w-xl mx-auto leading-relaxed break-keep ${reveal(total - 1, true)}`}>
+          <p className={`mt-7 text-base md:text-lg text-white/55 max-w-xl mx-auto leading-relaxed break-keep ${reveal(total - 2, true)}`}>
             {dl.body}
           </p>
-          <div className={`mt-9 flex justify-center ${reveal(total - 1, true)}`}>
+          <div className={`mt-9 flex justify-center ${reveal(total - 2, true)}`}>
             <DownloadButton large />
           </div>
         </div>
+      </section>
+
+      {/* 마지막) 푸터 — 한 페이지 크기의 스냅 섹션. 스크롤하면 마지막에 푸터가 표시된다 (07-09 피드백) */}
+      <section
+        ref={(el) => {
+          sectionRefs.current[total - 1] = el;
+        }}
+        className="relative z-10 min-h-dvh snap-start snap-always flex flex-col justify-end"
+      >
+        <Footer />
       </section>
     </div>
   );
