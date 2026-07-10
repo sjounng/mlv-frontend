@@ -20,10 +20,10 @@ import {
 import { ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 
+// 대시보드에서는 USER ↔ OPERATOR 만 관리 (SUPER_ADMIN 은 DB 로만 지정)
 const ROLE_OPTIONS: { value: Role; label: string }[] = [
   { value: "USER", label: "USER · 일반 유저" },
   { value: "OPERATOR", label: "OPERATOR · 운영자" },
-  { value: "SUPER_ADMIN", label: "SUPER_ADMIN · 최고 관리자" },
 ];
 const ROLE_LABEL: Record<Role, string> = {
   USER: "일반 유저",
@@ -199,15 +199,19 @@ export default function MemberDetailModal({
                 <p className="text-sm font-semibold mb-3 flex items-center gap-2">
                   <ShieldCheck size={15} className="text-emerald-300" /> 권한 관리
                 </p>
-                {profile?.id === detail.id ? (
+                {detail.role === "SUPER_ADMIN" ? (
+                  <p className="text-sm text-white/45">
+                    최고 관리자(SUPER_ADMIN)의 권한은 대시보드에서 변경할 수 없습니다. (DB 에서만 관리)
+                  </p>
+                ) : profile?.id === detail.id ? (
                   <p className="text-sm text-white/45">본인의 권한은 변경할 수 없습니다.</p>
                 ) : (
                   <div className="flex items-end gap-2">
                     <div className="flex-1">
                       <Select
-                        label="역할"
+                        label="역할 (USER ↔ OPERATOR)"
                         options={ROLE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
-                        value={roleValue}
+                        value={roleValue === "SUPER_ADMIN" ? "OPERATOR" : roleValue}
                         onChange={(e) => setRoleValue(e.target.value as Role)}
                       />
                     </div>
