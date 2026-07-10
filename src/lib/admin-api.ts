@@ -44,6 +44,7 @@ export interface PageResponse<T> {
 }
 
 export type UserStatus = "ACTIVE" | "SUSPENDED" | "WITHDRAWN";
+export type Role = "USER" | "OPERATOR" | "SUPER_ADMIN";
 
 export interface DashboardStats {
   activeUsers: number;
@@ -93,6 +94,7 @@ export interface AdminMemberDetail {
   email: string | null;
   discordId: string | null;
   status: UserStatus;
+  role: Role;
   warningCount: number;
   totalPaidKrw: number;
   createdAt: string;
@@ -159,6 +161,8 @@ export const adminApi = {
     api.post<Warning>(`/api/admin/members/${id}/warnings`, body),
   cancelWarning: (warningId: number, reason: string) =>
     api.post<Warning>(`/api/admin/warnings/${warningId}/cancel`, { reason }),
+  changeRole: (id: number, role: Role) =>
+    api.patch<AdminMember>(`/api/admin/members/${id}/role`, { role }),
 
   auditLogs: (opts: { page?: number; size?: number }) =>
     api.get<PageResponse<AuditLog>>(`/api/admin/audit-logs${query(opts)}`),

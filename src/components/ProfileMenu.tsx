@@ -7,7 +7,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import MinecraftHead from "@/components/minecraft/MinecraftHead";
 
@@ -66,6 +66,17 @@ export default function ProfileMenu() {
             </Link>
             <p className="mt-1 text-xs text-white/40 truncate">{profile.email ?? "이메일 정보 없음"}</p>
           </div>
+          {/* 어드민(OPERATOR/SUPER_ADMIN)만 대시보드 진입 버튼 노출 */}
+          {(profile.role === "OPERATOR" || profile.role === "SUPER_ADMIN") && (
+            <Link
+              href="/admin"
+              onClick={() => setOpen(false)}
+              className="focus-ring flex items-center gap-2 px-4 py-3 text-sm text-emerald-300 hover:bg-white/5 border-b border-white/8 transition-colors"
+            >
+              <LayoutDashboard size={15} />
+              관리자 대시보드
+            </Link>
+          )}
           <button
             type="button"
             onClick={onLogout}

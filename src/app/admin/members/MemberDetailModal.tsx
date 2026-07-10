@@ -2,7 +2,7 @@
 
 // 회원 통합 조회 + 경고 부여/취소 모달 (07-09 피드백)
 import { useCallback, useEffect, useState } from "react";
-import { AlertTriangle, Ban, Loader2 } from "lucide-react";
+import { AlertTriangle, Ban, Loader2, ShieldCheck } from "lucide-react";
 import {
   Badge,
   Button,
@@ -14,9 +14,22 @@ import {
 import {
   adminApi,
   type AdminMemberDetail,
+  type Role,
   type WarningReason,
 } from "@/lib/admin-api";
 import { ApiError } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
+
+const ROLE_OPTIONS: { value: Role; label: string }[] = [
+  { value: "USER", label: "USER · 일반 유저" },
+  { value: "OPERATOR", label: "OPERATOR · 운영자" },
+  { value: "SUPER_ADMIN", label: "SUPER_ADMIN · 최고 관리자" },
+];
+const ROLE_LABEL: Record<Role, string> = {
+  USER: "일반 유저",
+  OPERATOR: "운영자",
+  SUPER_ADMIN: "최고 관리자",
+};
 
 const REASON_OPTIONS: { value: WarningReason; label: string }[] = [
   { value: "MISCONDUCT", label: "비매너 행위" },
@@ -41,8 +54,14 @@ export default function MemberDetailModal({
   onChanged: (id: number, warningCount: number) => void;
 }) {
   const { toast } = useToast();
+  const { profile } = useAuth();
+  const isSuperAdmin = profile?.role === "SUPER_ADMIN";
+
   const [detail, setDetail] = useState<AdminMemberDetail | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const [roleValue, setRoleValue] = useState<Role>("USER");
+  const [savingRole, setSavingRole] = useState(false);
 
   const [reason, setReason] = useState<WarningReason>("MISCONDUCT");
   const [detailText, setDetailText] = useState("");
@@ -54,7 +73,9 @@ export default function MemberDetailModal({
     if (memberId == null) return;
     setLoading(true);
     try {
-      setDetail(await adminApi.memberDetail(memberId));
+      const d = await adminApi.memberDetail(memberId);
+      setDetail(d);
+      setRoleValue(d.role);
     } catch (error) {
       const message = error instanceof ApiError ? error.message : "회원 정보를 불러오지 못했습니다.";
       toast({ title: "불러오기 실패", description: message, variant: "error" });
@@ -96,6 +117,23 @@ export default function MemberDetailModal({
       toast({ title: "부여 실패", description: message, variant: "error" });
     } finally {
       setGranting(false);
+    }
+  };
+
+  const onChangeRole = async () => {
+    if (memberId == null || !detail) return;
+    if (roleValue === detail.role) return;
+    setSavingRole(true);
+    try {
+      await adminApi.changeRole(memberId, roleValue);
+      setDetail({ ...detail, role: roleValue });
+      toast({ title: "권한을 변경했습니다", description: `${ROLE_LABEL[roleValue]}로 설정`, variant: "success" });
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : "권한 변경에 실패했습니다.";
+      toast({ title: "변경 실패", description: message, variant: "error" });
+      setRoleValue(detail.role);
+    } finally {
+      setSavingRole(false);
     }
   };
 
@@ -151,8 +189,39 @@ export default function MemberDetailModal({
                 <Info label="가입일" value={new Date(detail.createdAt).toLocaleDateString("ko-KR")} />
                 <Info label="후원 금액" value={won(detail.totalPaidKrw)} />
                 <Info label="누적 경고" value={`${detail.warningCount}회`} highlight={detail.warningCount > 0} />
+                <Info label="권한" value={ROLE_LABEL[detail.role] ?? detail.role} />
               </dl>
             </div>
+
+            {/* 권한(역할) 관리 — 최고 관리자 전용 */}
+            {isSuperAdmin && (
+              <div className="border border-emerald-500/20 rounded-lg p-4">
+                <p className="text-sm font-semibold mb-3 flex items-center gap-2">
+                  <ShieldCheck size={15} className="text-emerald-300" /> 권한 관리
+                </p>
+                {profile?.id === detail.id ? (
+                  <p className="text-sm text-white/45">본인의 권한은 변경할 수 없습니다.</p>
+                ) : (
+                  <div className="flex items-end gap-2">
+                    <div className="flex-1">
+                      <Select
+                        label="역할"
+                        options={ROLE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+                        value={roleValue}
+                        onChange={(e) => setRoleValue(e.target.value as Role)}
+                      />
+                    </div>
+                    <Button
+                      onClick={onChangeRole}
+                      disabled={savingRole || roleValue === detail.role}
+                      leftIcon={savingRole ? <Loader2 className="animate-spin" size={15} /> : undefined}
+                    >
+                      권한 적용
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* 경고 부여 폼 */}
             <div className="border border-white/10 rounded-lg p-4">

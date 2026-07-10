@@ -20,6 +20,8 @@ export interface Profile {
   minecraftUsername: string;
   email: string | null;
   status: UserStatus;
+  /** 권한 — OPERATOR/SUPER_ADMIN 이면 어드민 (대시보드 접근). 구버전 응답 호환 위해 옵셔널 */
+  role?: Role;
   agreedTermsAt: string | null;
   /** 누적 경고 횟수 (07-09 피드백). 백엔드 배포 전 구버전 응답 호환 위해 옵셔널 */
   warningCount?: number;
