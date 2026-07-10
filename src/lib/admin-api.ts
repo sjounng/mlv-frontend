@@ -46,6 +46,12 @@ export interface PageResponse<T> {
 export type UserStatus = "ACTIVE" | "SUSPENDED" | "WITHDRAWN";
 export type Role = "USER" | "OPERATOR" | "SUPER_ADMIN";
 
+export interface AdminMe {
+  memberId: number | null;
+  displayName: string | null;
+  role: Role;
+}
+
 export interface DashboardStats {
   activeUsers: number;
   paidCharges: number;
@@ -148,6 +154,7 @@ function query(params: Record<string, string | number | undefined>): string {
 
 export const adminApi = {
   dashboard: () => api.get<DashboardStats>("/api/admin/dashboard"),
+  me: () => api.get<AdminMe>("/api/admin/me"),
 
   members: (opts: { status?: string; keyword?: string; page?: number; size?: number }) =>
     api.get<PageResponse<AdminMember>>(`/api/admin/members${query(opts)}`),

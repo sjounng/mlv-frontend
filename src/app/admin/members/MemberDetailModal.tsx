@@ -18,7 +18,6 @@ import {
   type WarningReason,
 } from "@/lib/admin-api";
 import { ApiError } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
 
 // 대시보드에서는 USER ↔ OPERATOR 만 관리 (SUPER_ADMIN 은 DB 로만 지정)
 const ROLE_OPTIONS: { value: Role; label: string }[] = [
@@ -46,16 +45,21 @@ const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 
 export default function MemberDetailModal({
   memberId,
+  viewerRole,
+  viewerMemberId,
   onClose,
   onChanged,
 }: {
   memberId: number | null;
+  /** 현재 로그인한 관리자의 role (권한 관리 UI 노출 판단) */
+  viewerRole?: Role;
+  /** 현재 관리자의 memberId (본인 여부 판별). 부트스트랩 관리자면 null */
+  viewerMemberId?: number | null;
   onClose: () => void;
   onChanged: (id: number, warningCount: number) => void;
 }) {
   const { toast } = useToast();
-  const { profile } = useAuth();
-  const isSuperAdmin = profile?.role === "SUPER_ADMIN";
+  const isSuperAdmin = viewerRole === "SUPER_ADMIN";
 
   const [detail, setDetail] = useState<AdminMemberDetail | null>(null);
   const [loading, setLoading] = useState(false);
@@ -203,7 +207,7 @@ export default function MemberDetailModal({
                   <p className="text-sm text-white/45">
                     최고 관리자(SUPER_ADMIN)의 권한은 대시보드에서 변경할 수 없습니다. (DB 에서만 관리)
                   </p>
-                ) : profile?.id === detail.id ? (
+                ) : viewerMemberId != null && viewerMemberId === detail.id ? (
                   <p className="text-sm text-white/45">본인의 권한은 변경할 수 없습니다.</p>
                 ) : (
                   <div className="flex items-end gap-2">

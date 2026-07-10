@@ -18,6 +18,7 @@ import MinecraftHead from "@/components/minecraft/MinecraftHead";
 import {
   adminApi,
   type AdminMember,
+  type AdminMe,
   type MaliciousMember,
   type UserStatus,
 } from "@/lib/admin-api";
@@ -73,6 +74,12 @@ export default function AdminMembersPage() {
   const [maliciousLoading, setMaliciousLoading] = useState(false);
 
   const [detailId, setDetailId] = useState<number | null>(null);
+  const [me, setMe] = useState<AdminMe | null>(null);
+
+  useEffect(() => {
+    // 현재 로그인한 관리자 role (권한 관리 UI 노출 판단). 어드민 페이지는 유저 프로필을 로드하지 않으므로 별도 조회.
+    void adminApi.me().then(setMe).catch(() => {});
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -292,6 +299,8 @@ export default function AdminMembersPage() {
       {detailId != null && (
         <MemberDetailModal
           memberId={detailId}
+          viewerRole={me?.role}
+          viewerMemberId={me?.memberId ?? null}
           onClose={() => setDetailId(null)}
           onChanged={onWarningChanged}
         />
