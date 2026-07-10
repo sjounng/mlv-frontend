@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Loader2, Search } from "lucide-react";
+import { Loader2, Search, ShieldAlert } from "lucide-react";
 import {
   Badge,
   Button,
@@ -15,8 +15,14 @@ import {
   type TableColumn,
 } from "@/components/ui";
 import MinecraftHead from "@/components/minecraft/MinecraftHead";
-import { adminApi, type AdminMember, type UserStatus } from "@/lib/admin-api";
+import {
+  adminApi,
+  type AdminMember,
+  type MaliciousMember,
+  type UserStatus,
+} from "@/lib/admin-api";
 import { ApiError } from "@/lib/api";
+import MemberDetailModal from "./MemberDetailModal";
 
 const statusOptions = [
   { value: "", label: "전체" },
@@ -31,9 +37,25 @@ const STATUS_LABEL: Record<UserStatus, string> = {
   WITHDRAWN: "탈퇴",
 };
 
+const REASON_LABEL: Record<string, string> = {
+  MISCONDUCT: "비매너",
+  BUG_ABUSE: "버그악용",
+  CUSTOM: "직접작성",
+};
+
 const PAGE_SIZE = 20;
 
 type Row = AdminMember & Record<string, unknown>;
+
+function WarningBadge({ count }: { count: number }) {
+  const c = count ?? 0;
+  if (c <= 0) return <span className="text-xs text-white/30">0</span>;
+  return (
+    <Badge variant={c >= 3 ? "error" : "warning"} size="sm">
+      {c}회{c >= 3 ? " · 악성" : ""}
+    </Badge>
+  );
+}
 
 export default function AdminMembersPage() {
   const { toast } = useToast();
@@ -45,6 +67,12 @@ export default function AdminMembersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [actingId, setActingId] = useState<number | null>(null);
+
+  const [maliciousView, setMaliciousView] = useState(false);
+  const [malicious, setMalicious] = useState<MaliciousMember[]>([]);
+  const [maliciousLoading, setMaliciousLoading] = useState(false);
+
+  const [detailId, setDetailId] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -60,10 +88,27 @@ export default function AdminMembersPage() {
     }
   }, [status, submittedKeyword, page, toast]);
 
+  const loadMalicious = useCallback(async () => {
+    setMaliciousLoading(true);
+    try {
+      setMalicious(await adminApi.maliciousMembers());
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : "악성 유저를 불러오지 못했습니다.";
+      toast({ title: "불러오기 실패", description: message, variant: "error" });
+    } finally {
+      setMaliciousLoading(false);
+    }
+  }, [toast]);
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    void load();
-  }, [load]);
+    if (!maliciousView) void load();
+  }, [load, maliciousView]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (maliciousView) void loadMalicious();
+  }, [maliciousView, loadMalicious]);
 
   const onSearch = () => {
     setPage(0);
@@ -77,7 +122,7 @@ export default function AdminMembersPage() {
         member.status === "SUSPENDED"
           ? await adminApi.activateMember(member.id)
           : await adminApi.suspendMember(member.id);
-      setData((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
+      setData((prev) => prev.map((m) => (m.id === updated.id ? { ...m, status: updated.status } : m)));
       toast({
         title: updated.status === "SUSPENDED" ? "회원을 정지했습니다" : "정지를 해제했습니다",
         variant: "success",
@@ -90,13 +135,19 @@ export default function AdminMembersPage() {
     }
   };
 
+  // 경고 부여/취소 후 목록의 경고 수 동기화
+  const onWarningChanged = (id: number, warningCount: number) => {
+    setData((prev) => prev.map((m) => (m.id === id ? { ...m, warningCount } : m)));
+    if (maliciousView) void loadMalicious();
+  };
+
   const columns: TableColumn<Row>[] = [
     {
       key: "minecraftUsername",
       label: "회원",
       render: (r) => (
         <div className="flex items-center gap-2.5">
-          <MinecraftHead username={r.minecraftUsername} size="sm" />
+          <MinecraftHead username={r.minecraftUsername} uuid={r.minecraftUuid} size="sm" />
           <div>
             <p className="font-medium">{r.minecraftUsername}</p>
             <p className="text-xs text-white/35 mt-0.5">{r.email ?? "이메일 미등록"}</p>
@@ -105,23 +156,21 @@ export default function AdminMembersPage() {
       ),
     },
     {
-      key: "minecraftUuid",
-      label: "UUID",
-      width: "150px",
-      render: (r) => (
-        <code className="text-xs text-white/55">{r.minecraftUuid.slice(0, 8)}…{r.minecraftUuid.slice(-4)}</code>
-      ),
+      key: "warningCount",
+      label: "경고",
+      width: "90px",
+      render: (r) => <WarningBadge count={r.warningCount} />,
     },
     {
       key: "createdAt",
       label: "가입일",
-      width: "120px",
+      width: "110px",
       render: (r) => new Date(r.createdAt).toLocaleDateString("ko-KR"),
     },
     {
       key: "status",
       label: "상태",
-      width: "90px",
+      width: "80px",
       render: (r) => (
         <Badge variant={r.status === "ACTIVE" ? "success" : r.status === "SUSPENDED" ? "error" : "default"} size="sm">
           {STATUS_LABEL[r.status]}
@@ -131,69 +180,120 @@ export default function AdminMembersPage() {
     {
       key: "actions",
       label: "관리",
-      width: "120px",
-      render: (r) =>
-        r.status === "WITHDRAWN" ? (
-          <span className="text-xs text-white/30">-</span>
-        ) : (
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={actingId === r.id}
-            onClick={() => onToggleStatus(r)}
-            leftIcon={actingId === r.id ? <Loader2 className="animate-spin" size={13} /> : undefined}
-          >
-            {r.status === "SUSPENDED" ? "정지 해제" : "정지하기"}
+      width: "170px",
+      render: (r) => (
+        <div className="flex items-center gap-1.5">
+          <Button size="sm" variant="outline" onClick={() => setDetailId(r.id)}>
+            상세·경고
           </Button>
-        ),
+          {r.status !== "WITHDRAWN" && (
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={actingId === r.id}
+              onClick={() => onToggleStatus(r)}
+              leftIcon={actingId === r.id ? <Loader2 className="animate-spin" size={13} /> : undefined}
+            >
+              {r.status === "SUSPENDED" ? "해제" : "정지"}
+            </Button>
+          )}
+        </div>
+      ),
     },
   ];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">회원 관리</h1>
-        <p className="mt-1.5 text-sm text-white/50">회원을 검색하고 제재(정지/해제)를 관리합니다.</p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold">회원 관리</h1>
+          <p className="mt-1.5 text-sm text-white/50">회원 검색·제재, 경고 부여/취소 및 악성 유저를 관리합니다.</p>
+        </div>
+        <Button
+          variant={maliciousView ? "solid" : "outline"}
+          leftIcon={<ShieldAlert size={15} />}
+          onClick={() => setMaliciousView((v) => !v)}
+        >
+          {maliciousView ? "전체 회원 보기" : "악성 유저 보기"}
+        </Button>
       </div>
 
-      <Card padding="md">
-        <div className="grid sm:grid-cols-[1fr_180px_auto] gap-3">
-          <Input
-            placeholder="닉네임 또는 UUID로 검색"
-            leftIcon={<Search size={14} />}
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && onSearch()}
-          />
-          <Select
-            options={statusOptions}
-            value={status}
-            onChange={(e) => {
-              setPage(0);
-              setStatus(e.target.value);
-            }}
-          />
-          <Button onClick={onSearch}>검색</Button>
-        </div>
-      </Card>
+      {maliciousView ? (
+        <Card padding="none">
+          {maliciousLoading ? (
+            <div className="flex items-center justify-center py-12 text-white/40"><Loader2 className="animate-spin" size={22} /></div>
+          ) : malicious.length === 0 ? (
+            <EmptyState icon={ShieldAlert} title="악성 유저가 없습니다" description="경고 3회 이상 누적된 회원이 없습니다." />
+          ) : (
+            <ul className="divide-y divide-white/6">
+              {malicious.map((m) => (
+                <li key={m.id} className="p-4 flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <MinecraftHead username={m.minecraftUsername} uuid={m.minecraftUuid} size="sm" />
+                      <span className="font-medium">{m.minecraftUsername}</span>
+                      <Badge variant="error" size="sm">경고 {m.warningCount}회</Badge>
+                    </div>
+                    <p className="mt-1.5 text-xs text-white/45">
+                      사유: {m.warnings.map((w) => REASON_LABEL[w.reason] ?? w.reason).join(", ") || "-"}
+                    </p>
+                  </div>
+                  <Button size="sm" variant="outline" onClick={() => setDetailId(m.id)}>상세·경고</Button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+      ) : (
+        <>
+          <Card padding="md">
+            <div className="grid sm:grid-cols-[1fr_180px_auto] gap-3">
+              <Input
+                placeholder="닉네임 · UUID · 이메일로 검색"
+                leftIcon={<Search size={14} />}
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && onSearch()}
+              />
+              <Select
+                options={statusOptions}
+                value={status}
+                onChange={(e) => {
+                  setPage(0);
+                  setStatus(e.target.value);
+                }}
+              />
+              <Button onClick={onSearch}>검색</Button>
+            </div>
+          </Card>
 
-      <Card padding="none">
-        {loading ? (
-          <div className="flex items-center justify-center py-12 text-white/40">
-            <Loader2 className="animate-spin" size={22} />
-          </div>
-        ) : data.length === 0 ? (
-          <EmptyState icon={Search} title="조건에 맞는 회원이 없습니다" />
-        ) : (
-          <Table columns={columns} data={data} />
-        )}
-      </Card>
+          <Card padding="none">
+            {loading ? (
+              <div className="flex items-center justify-center py-12 text-white/40">
+                <Loader2 className="animate-spin" size={22} />
+              </div>
+            ) : data.length === 0 ? (
+              <EmptyState icon={Search} title="조건에 맞는 회원이 없습니다" />
+            ) : (
+              <Table columns={columns} data={data} />
+            )}
+          </Card>
 
-      {totalPages > 1 && (
-        <Pagination
-          currentPage={page + 1}
-          totalPages={totalPages}
-          onPageChange={(p) => setPage(p - 1)}
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={page + 1}
+              totalPages={totalPages}
+              onPageChange={(p) => setPage(p - 1)}
+            />
+          )}
+        </>
+      )}
+
+      {detailId != null && (
+        <MemberDetailModal
+          memberId={detailId}
+          onClose={() => setDetailId(null)}
+          onChanged={onWarningChanged}
         />
       )}
     </div>

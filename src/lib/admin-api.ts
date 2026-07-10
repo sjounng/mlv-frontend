@@ -61,7 +61,51 @@ export interface AdminMember extends Record<string, unknown> {
   minecraftUsername: string;
   email: string | null;
   status: UserStatus;
+  warningCount: number;
   createdAt: string;
+}
+
+export type WarningReason = "MISCONDUCT" | "BUG_ABUSE" | "CUSTOM";
+
+export interface Warning extends Record<string, unknown> {
+  id: number;
+  reason: WarningReason;
+  detail: string;
+  customText: string | null;
+  countAtIssue: number;
+  issuedBy: string | null;
+  canceled: boolean;
+  canceledReason: string | null;
+  canceledAt: string | null;
+  createdAt: string;
+}
+
+export interface WarningGrant {
+  reason: WarningReason;
+  detail: string;
+  customText?: string | null;
+}
+
+export interface AdminMemberDetail {
+  id: number;
+  minecraftUuid: string;
+  minecraftUsername: string;
+  email: string | null;
+  discordId: string | null;
+  status: UserStatus;
+  warningCount: number;
+  totalPaidKrw: number;
+  createdAt: string;
+  warnings: Warning[];
+}
+
+export interface MaliciousMember extends Record<string, unknown> {
+  id: number;
+  minecraftUuid: string;
+  minecraftUsername: string;
+  email: string | null;
+  warningCount: number;
+  warnings: Warning[];
 }
 
 export interface AuditLog extends Record<string, unknown> {
@@ -107,6 +151,14 @@ export const adminApi = {
     api.get<PageResponse<AdminMember>>(`/api/admin/members${query(opts)}`),
   suspendMember: (id: number) => api.patch<AdminMember>(`/api/admin/members/${id}/suspend`),
   activateMember: (id: number) => api.patch<AdminMember>(`/api/admin/members/${id}/activate`),
+
+  // 경고 시스템 (07-09 피드백)
+  memberDetail: (id: number) => api.get<AdminMemberDetail>(`/api/admin/members/${id}`),
+  maliciousMembers: () => api.get<MaliciousMember[]>("/api/admin/members/malicious"),
+  grantWarning: (id: number, body: WarningGrant) =>
+    api.post<Warning>(`/api/admin/members/${id}/warnings`, body),
+  cancelWarning: (warningId: number, reason: string) =>
+    api.post<Warning>(`/api/admin/warnings/${warningId}/cancel`, { reason }),
 
   auditLogs: (opts: { page?: number; size?: number }) =>
     api.get<PageResponse<AuditLog>>(`/api/admin/audit-logs${query(opts)}`),
