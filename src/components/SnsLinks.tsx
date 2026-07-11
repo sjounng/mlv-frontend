@@ -58,10 +58,11 @@ export default function SnsLinks({
             className="absolute inset-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"
             style={{ background: s.fill }}
           />
-          {/* 아이콘 (mask 단색): 기본 옅은 회색 → 호버 시 흰색 */}
+          {/* 아이콘 (mask 단색): 기본은 테마 전경색, 호버 시엔 브랜드 색 위라 '진짜 흰색' 고정
+              (라이트에서 bg-white 가 다크로 반전되면 X 검정 배경 위에서 안 보이는 문제 방지) */}
           <span
             aria-hidden
-            className={`relative z-10 block ${ic} bg-white/70 group-hover:bg-white transition-colors duration-300`}
+            className={`relative z-10 block ${ic} bg-white/70 group-hover:bg-[#ffffff] transition-colors duration-300`}
             style={{
               maskImage: `url(${s.icon})`,
               WebkitMaskImage: `url(${s.icon})`,

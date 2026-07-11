@@ -31,6 +31,7 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+            <SnsLinks size="sm" />
             <nav aria-label="정보">
               <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
                 {legalLinks.map((item) => (
@@ -42,7 +43,6 @@ export default function Footer() {
                 ))}
               </ul>
             </nav>
-            <SnsLinks size="sm" />
           </div>
         </div>
 
