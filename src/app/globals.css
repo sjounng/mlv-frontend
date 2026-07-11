@@ -47,16 +47,32 @@
   --color-surface-4: #eaeee6;
   --color-line: rgba(20, 34, 22, 0.12);
   --color-white: #1b211b;
-  /* 강조(초록)·코인(노랑)이 밝은 배경에서 잘 보이도록 조정 (선명하되 과하게 어둡지 않게) */
+  /* 밝은 계열(-200/300/400) 시맨틱 색을 라이트용 진한 톤으로 일괄 반전.
+     Tailwind v4 는 색을 CSS 변수로 참조하므로 /70 같은 투명도 변형까지 함께 적용된다. */
   --color-emerald-200: #10b981;
   --color-emerald-300: #10b981;
+  --color-emerald-400: #059669;
+  --color-amber-200: #d97706;
   --color-amber-300: #d97706;
-  --color-amber-400: #d97706;
+  --color-amber-400: #b45309;
   --color-yellow-300: #ca8a04;
-  --color-yellow-400: #ca8a04;
+  --color-yellow-400: #a16207;
+  --color-red-300: #dc2626;
+  --color-red-400: #dc2626;
+  --color-blue-300: #2563eb;
+  --color-blue-400: #2563eb;
+  --color-green-300: #16a34a;
+  --color-green-400: #16a34a;
+  --color-purple-300: #9333ea;
+  --color-sky-300: #0284c7;
   --color-cash: #d97706;
   --color-accent-yellow: #d97706;
+  --color-accent-red: #dc2626;
+  --color-accent-blue: #2563eb;
+  --color-accent-purple: #9333ea;
   --color-mc-gold: #d97706;
+  --color-mc-diamond: #0891b2;
+  --color-mc-emerald: #16a34a;
   --color-brand-strong: #10b981;
   --color-accent-green: #10b981;
 }
@@ -65,14 +81,35 @@
 :root[data-theme="light"] [class~="bg-emerald-600"],
 :root[data-theme="light"] [class~="bg-emerald-500"],
 :root[data-theme="light"] [class~="bg-emerald-600/90"],
-:root[data-theme="light"] [class~="bg-indigo-500"] {
+:root[data-theme="light"] [class~="bg-emerald-500/90"],
+:root[data-theme="light"] [class~="bg-red-500/90"],
+:root[data-theme="light"] [class~="bg-blue-500/90"],
+:root[data-theme="light"] [class~="bg-indigo-500"],
+:root[data-theme="light"] [class~="bg-amber-700"],
+:root[data-theme="light"] [class~="bg-emerald-700"],
+:root[data-theme="light"] [class~="bg-cyan-700"],
+:root[data-theme="light"] [class~="bg-indigo-700"],
+:root[data-theme="light"] [class~="bg-rose-700"],
+:root[data-theme="light"] [class~="bg-orange-700"],
+:root[data-theme="light"] [class~="bg-purple-700"],
+:root[data-theme="light"] [class~="bg-teal-700"] {
   color: #fff;
 }
 /* 진한 색 버튼 내부 요소도 흰색 상속 (text-white 가 다크 뉴트럴로 반전되는 것 방지) */
 :root[data-theme="light"] [class~="bg-emerald-600"] *,
 :root[data-theme="light"] [class~="bg-emerald-500"] *,
-:root[data-theme="light"] [class~="bg-emerald-600/90"] * {
+:root[data-theme="light"] [class~="bg-emerald-600/90"] *,
+:root[data-theme="light"] [class~="bg-emerald-500/90"] *,
+:root[data-theme="light"] [class~="bg-red-500/90"] *,
+:root[data-theme="light"] [class~="bg-blue-500/90"] * {
   color: inherit;
+}
+
+/* 인버스(반전) 요소 — 다크에서 bg-white+text-black(흰 버튼/활성 페이지네이션/체크박스 체크).
+   라이트에선 bg-white 가 다크 뉴트럴로 뒤집히므로 text-black 도 밝은 색으로 반전시킨다.
+   (Microsoft 로그인 버튼 → 라이트에선 차콜 버튼 + 흰 글자 = MS 공식 다크 버튼 스타일) */
+:root[data-theme="light"] .text-black {
+  color: #f4f6f1;
 }
 
 /* ── 라이트 모드: 다크 전용 잔재 정리 ──
