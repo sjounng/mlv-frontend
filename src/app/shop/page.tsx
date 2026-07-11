@@ -6,6 +6,7 @@ import ShopSidebar from "@/components/shop/ShopSidebar";
 import HeroBanner from "@/components/shop/HeroBanner";
 import ProductGrid from "@/components/shop/ProductGrid";
 import RightSidebar from "@/components/shop/RightSidebar";
+import ShopFooter from "@/components/shop/ShopFooter";
 import { useToast } from "@/components/ui";
 import { shopApi, toUiProduct, type ShopCategory } from "@/lib/shop-api";
 import type { Product } from "@/components/shop/ProductCard";
@@ -37,21 +38,28 @@ export default function ShopPage() {
   }, [load]);
 
   return (
-    <div className="flex flex-1 max-w-[1400px] w-full mx-auto px-4 py-6 gap-5">
-      <ShopSidebar />
+    <div className="flex flex-col flex-1 max-w-[1400px] w-full mx-auto px-4 py-6 gap-8">
+      <div className="flex gap-5">
+        {/* 좌: 추천 상품 + 이벤트 */}
+        <ShopSidebar products={products} />
 
-      <main className="flex-1 min-w-0 flex flex-col gap-5">
-        <HeroBanner />
-        {loading ? (
-          <div className="flex items-center justify-center py-20 text-white/40">
-            <Loader2 className="animate-spin" size={26} />
-          </div>
-        ) : (
-          <ProductGrid products={products} categories={categories.map((c) => ({ id: String(c.id), label: c.name }))} />
-        )}
-      </main>
+        <main className="flex-1 min-w-0 flex flex-col gap-5">
+          <HeroBanner />
+          {loading ? (
+            <div className="flex items-center justify-center py-20 text-white/40">
+              <Loader2 className="animate-spin" size={26} />
+            </div>
+          ) : (
+            <ProductGrid products={products} categories={categories.map((c) => ({ id: String(c.id), label: c.name }))} />
+          )}
+        </main>
 
-      <RightSidebar products={products} />
+        {/* 우: 보유 코인 + 충전 + 장바구니 */}
+        <RightSidebar />
+      </div>
+
+      {/* 하단: 구매 안내 + 문의 */}
+      <ShopFooter />
     </div>
   );
 }

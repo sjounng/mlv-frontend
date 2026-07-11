@@ -5,6 +5,7 @@ import "./globals.css";
 import { ToastProvider } from "@/components/ui";
 import { AuthProvider } from "@/lib/auth";
 import { CartProvider } from "@/lib/cart";
+import { ThemeProvider } from "@/lib/theme";
 import { siteConfig } from "@/lib/site-config";
 
 // 07-09 피드백: 타이틀/본문을 Pretendard 로 단일화하고 두께 차이로만 구분한다.
@@ -118,16 +119,25 @@ export default function RootLayout({
       className={`${pretendard.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-surface-1 text-white">
+        {/* 테마 초기 적용(FOUC 방지): 저장된 선택 없으면 브라우저 환경(prefers-color-scheme)을 따른다 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var s=localStorage.getItem('mlv-theme');var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){}})();",
+          }}
+        />
         <script
           type="application/ld+json"
           // 구조화 데이터(Organization + WebSite) — 브랜드 검색 이해도 향상
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <ToastProvider>
-          <AuthProvider>
-            <CartProvider>{children}</CartProvider>
-          </AuthProvider>
-        </ToastProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <CartProvider>{children}</CartProvider>
+            </AuthProvider>
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

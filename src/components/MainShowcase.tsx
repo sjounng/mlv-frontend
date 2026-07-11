@@ -14,12 +14,13 @@ import IntroSlider from "@/components/IntroSlider";
 import SnsLinks from "@/components/SnsLinks";
 import DownloadButton from "@/components/DownloadButton";
 import Footer from "@/components/Footer";
+import FooterSlideshow from "@/components/FooterSlideshow";
 
 // 소개 섹션 우측 미디어
 function SectionMedia({ media, isNew }: { media?: string; isNew?: boolean }) {
   const isVideo = !!media && (media.endsWith(".mp4") || media.includes("youtube") || media.includes("youtu.be"));
   return (
-    <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-white/10 shadow-[0_8px_0_rgba(0,0,0,0.4)] bg-linear-to-br from-surface-3 via-surface-4 to-black">
+    <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-white/10 shadow-[0_8px_0_rgba(0,0,0,0.4)] bg-linear-to-br from-surface-3 via-surface-4 to-surface-2">
       {media ? (
         isVideo ? (
           media.endsWith(".mp4") ? (
@@ -96,7 +97,7 @@ export default function MainShowcase() {
     <div ref={scrollerRef} className="relative h-dvh overflow-y-auto snap-y snap-mandatory">
       {/* 배경 그라데이션 (은은한 고정 레이어) */}
       <div className="fixed inset-0 z-0 pointer-events-none" aria-hidden>
-        <div className="absolute inset-0 bg-linear-to-br from-[#0c110d] via-[#111711] to-[#17201a]" />
+        <div className="absolute inset-0 bg-linear-to-br from-surface-1 via-surface-2 to-surface-3" />
         <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[46rem] h-[46rem] rounded-full bg-emerald-500/10 blur-[130px]" />
       </div>
 
@@ -201,13 +202,16 @@ export default function MainShowcase() {
         </div>
       </section>
 
-      {/* 마지막) 푸터 — 한 페이지 크기의 스냅 섹션. 스크롤하면 마지막에 푸터가 표시된다 (07-09 피드백) */}
+      {/* 마지막) 푸터 섹션 — 상단 빈 공간을 좌우 슬라이드쇼로 채우고 하단에 컴팩트 푸터 (07-10 피드백) */}
       <section
         ref={(el) => {
           sectionRefs.current[total - 1] = el;
         }}
-        className="relative z-10 min-h-dvh snap-start snap-always flex flex-col justify-end"
+        className="relative z-10 min-h-dvh snap-start snap-always flex flex-col"
       >
+        <div className="flex-1 flex items-center justify-center px-6 py-16">
+          <FooterSlideshow />
+        </div>
         <Footer />
       </section>
     </div>

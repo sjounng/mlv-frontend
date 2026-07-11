@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
-import ShopComingSoon from "@/components/shop/ShopComingSoon";
-import { siteConfig } from "@/lib/site-config";
+import ShopGate from "@/components/shop/ShopGate";
 
 export const metadata: Metadata = {
   title: "웹상점",
@@ -13,8 +12,8 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen flex flex-col bg-surface-1">
       <Navbar />
       <div className="pt-16 flex flex-1 flex-col">
-        {/* 상점 미오픈 시 준비 중 게이트로 막는다 (프론트 전용 토글) */}
-        {siteConfig.shopEnabled ? children : <ShopComingSoon />}
+        {/* 상점 활성/비활성은 웹패널(관리자)에서 제어 — 비활성 시 관리자만 접근 (07-10 피드백) */}
+        <ShopGate>{children}</ShopGate>
       </div>
     </div>
   );

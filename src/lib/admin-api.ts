@@ -156,6 +156,11 @@ export const adminApi = {
   dashboard: () => api.get<DashboardStats>("/api/admin/dashboard"),
   me: () => api.get<AdminMe>("/api/admin/me"),
 
+  // 상점 활성화/비활성화 (07-10 피드백)
+  shopStatus: () => api.get<{ enabled: boolean }>("/api/admin/shop-status"),
+  setShopStatus: (enabled: boolean) =>
+    api.patch<{ enabled: boolean }>("/api/admin/shop-status", { enabled }),
+
   members: (opts: { status?: string; keyword?: string; page?: number; size?: number }) =>
     api.get<PageResponse<AdminMember>>(`/api/admin/members${query(opts)}`),
   suspendMember: (id: number) => api.patch<AdminMember>(`/api/admin/members/${id}/suspend`),

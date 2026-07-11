@@ -12,17 +12,17 @@ const legalLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-[#090d0a] border-t border-white/5 py-10">
+    <footer className="bg-surface-1 border-t border-white/8 py-7">
       <div className="max-w-7xl mx-auto px-6">
-        {/* 로고 + 서버 간략설명 */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-8">
+        {/* 상단 한 줄: 로고+소개(좌) / 약관 링크 + SNS(우) — 07-10 피드백: 위치 교체 + 높이 축소 */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
             <Image
               src="/assets/brand/maribel-logo.png"
               alt={siteConfig.name}
               width={600}
               height={214}
-              className="h-8 w-auto opacity-90"
+              className="h-7 w-auto opacity-90"
             />
             <p className="text-sm text-white/45">
               {siteConfig.fullName} <span className="text-white/20 mx-1">|</span> 최고의 힐링 판타지
@@ -30,27 +30,24 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* 법적 정보 링크 */}
-          <nav aria-label="정보">
-            <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
-              {legalLinks.map((item) => (
-                <li key={item.label}>
-                  <Link href={item.href} className="text-xs text-white/40 hover:text-white transition-colors">
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
-
-        {/* 공식 SNS */}
-        <div className="pt-6 border-t border-white/5 mb-6 flex justify-center sm:justify-end">
-          <SnsLinks size="sm" />
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+            <nav aria-label="정보">
+              <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                {legalLinks.map((item) => (
+                  <li key={item.label}>
+                    <Link href={item.href} className="text-xs text-white/45 hover:text-white transition-colors">
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <SnsLinks size="sm" />
+          </div>
         </div>
 
         {/* 사업자 정보 */}
-        <div className="pt-6 border-t border-white/5 mb-6">
+        <div className="pt-5 border-t border-white/5 mb-5">
           <p className="text-xs font-semibold text-white/30 uppercase tracking-wider mb-3">
             사업자 정보
           </p>
@@ -64,7 +61,7 @@ export default function Footer() {
           </dl>
         </div>
 
-        <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row justify-between gap-2">
+        <div className="pt-5 border-t border-white/5 flex flex-col sm:flex-row justify-between gap-2">
           <p className="text-xs text-white/20">
             © 2026 {siteConfig.fullName}. All rights reserved.
           </p>

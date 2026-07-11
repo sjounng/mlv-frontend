@@ -10,6 +10,7 @@ import MinecraftHead from "@/components/minecraft/MinecraftHead";
 import MailDropdown from "@/components/MailDropdown";
 import ProfileMenu from "@/components/ProfileMenu";
 import DownloadButton from "@/components/DownloadButton";
+import ThemeToggle from "@/components/ThemeToggle";
 
 // 최종 네비 구성 (07-08 피드백): 홈 / 이벤트 / 상점 / 마이페이지 / 고객지원
 const navLinks = [
@@ -70,6 +71,8 @@ export default function Navbar() {
             <div className="flex items-center gap-2">
               {/* 우편함 (운영진 알림/결제 안내) */}
               <MailDropdown />
+              {/* 라이트/다크 전환 (우편함 우측 — 07-10 피드백) */}
+              <ThemeToggle />
               {/* 프로필: 클릭 시 닉네임/이메일/로그아웃 패널 */}
               <ProfileMenu />
               {/* 다운로드 버튼 (프로필 우측) */}
@@ -77,6 +80,7 @@ export default function Navbar() {
             </div>
           ) : (
             <div className="flex items-center gap-2">
+              <ThemeToggle />
               <Link
                 href="/login"
                 className="focus-ring px-4 py-1.5 text-sm text-white bg-white/10 hover:bg-white/15 border border-white/15 rounded-md transition-colors font-medium"
@@ -92,6 +96,7 @@ export default function Navbar() {
         <div className="md:hidden ml-auto flex items-center gap-1">
           <DownloadButton compact />
           {status === "authenticated" && <MailDropdown />}
+          <ThemeToggle />
           <button className="p-2 text-white/70" onClick={() => setMobileOpen(!mobileOpen)} aria-label="메뉴">
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>

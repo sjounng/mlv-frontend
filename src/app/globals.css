@@ -35,6 +35,99 @@
   --foreground: #edefe9;
 }
 
+/* 라이트 모드 (07-10 피드백). 기본은 다크, data-theme="light" 시 반전.
+   이 디자인은 'white' 계열 유틸(text-white/bg-white/border-white)을 뉴트럴 전경색으로 쓰므로
+   라이트에서는 --color-white 를 어두운 뉴트럴로 반전시켜 일괄 대응한다. */
+:root[data-theme="light"] {
+  --background: #f2f5ef;
+  --foreground: #1a201a;
+  --color-surface-1: #f2f5ef;
+  --color-surface-2: #ffffff;
+  --color-surface-3: #ffffff;
+  --color-surface-4: #eaeee6;
+  --color-line: rgba(20, 34, 22, 0.12);
+  --color-white: #1b211b;
+  /* 강조(초록)·코인(노랑)이 밝은 배경에서 잘 보이도록 조정 (선명하되 과하게 어둡지 않게) */
+  --color-emerald-200: #10b981;
+  --color-emerald-300: #10b981;
+  --color-amber-300: #d97706;
+  --color-amber-400: #d97706;
+  --color-yellow-300: #ca8a04;
+  --color-yellow-400: #ca8a04;
+  --color-cash: #d97706;
+  --color-accent-yellow: #d97706;
+  --color-mc-gold: #d97706;
+  --color-brand-strong: #10b981;
+  --color-accent-green: #10b981;
+}
+/* 라이트에서 '진한 색 배경' 버튼/뱃지 위 글자는 흰색 유지 (가독성).
+   [class~=] 단어 매칭으로 solid 배경만 잡는다 — bg-emerald-500/10 같은 옅은 틴트는 제외. */
+:root[data-theme="light"] [class~="bg-emerald-600"],
+:root[data-theme="light"] [class~="bg-emerald-500"],
+:root[data-theme="light"] [class~="bg-emerald-600/90"],
+:root[data-theme="light"] [class~="bg-indigo-500"] {
+  color: #fff;
+}
+/* 진한 색 버튼 내부 요소도 흰색 상속 (text-white 가 다크 뉴트럴로 반전되는 것 방지) */
+:root[data-theme="light"] [class~="bg-emerald-600"] *,
+:root[data-theme="light"] [class~="bg-emerald-500"] *,
+:root[data-theme="light"] [class~="bg-emerald-600/90"] * {
+  color: inherit;
+}
+
+/* ── 라이트 모드: 다크 전용 잔재 정리 ──
+   슬라이더/배너의 작은 오버레이 컨트롤(bg-black/40~60)은 밝은 글래스로.
+   (모달 배경 스크림 bg-black/70 은 라이트에서도 어두운 것이 표준이라 유지) */
+:root[data-theme="light"] .bg-black\/40 {
+  background-color: rgba(255, 255, 255, 0.82);
+}
+:root[data-theme="light"] .bg-black\/60 {
+  background-color: rgba(255, 255, 255, 0.92);
+}
+:root[data-theme="light"] .hover\:bg-black\/60:hover,
+:root[data-theme="light"] .hover\:bg-black\/65:hover {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+/* 두꺼운 검은 블록 섀도(레트로 입체감)는 라이트에서 부드러운 엘리베이션으로 */
+:root[data-theme="light"] [class*="rgba(0,0,0"][class*="shadow-[0_"] {
+  box-shadow: 0 4px 16px rgba(24, 36, 26, 0.10), 0 1px 3px rgba(24, 36, 26, 0.08);
+}
+/* 상품 카드 + 버튼의 검은 그림자 → 은은한 그림자 */
+:root[data-theme="light"] .shadow-black\/40 {
+  --tw-shadow-color: rgba(24, 36, 26, 0.18);
+}
+
+/* 스크롤바: 흰색 기반이라 라이트 배경에서 안 보임 → 어두운 스크롤바로 */
+:root[data-theme="light"] * {
+  scrollbar-color: rgba(20, 34, 22, 0.28) transparent;
+}
+:root[data-theme="light"] *::-webkit-scrollbar-thumb {
+  background: rgba(20, 34, 22, 0.24);
+  background-clip: padding-box;
+}
+:root[data-theme="light"] *::-webkit-scrollbar-thumb:hover {
+  background: rgba(20, 34, 22, 0.4);
+  background-clip: padding-box;
+}
+
+/* 필름 그레인은 라이트에서 살짝만 */
+:root[data-theme="light"] body::after {
+  opacity: 0.02;
+}
+
+/* 테마 전환 순간에만 전체 색이 서서히 크로스페이드 (전환 후엔 기존 hover/transform 트랜지션 복원) */
+:root.theme-switching *,
+:root.theme-switching *::before,
+:root.theme-switching *::after {
+  transition:
+    background-color 0.45s ease,
+    color 0.45s ease,
+    border-color 0.45s ease,
+    fill 0.45s ease,
+    stroke 0.45s ease !important;
+}
+
 /* 화면 전체 비율 ~12% 확대 (07-08 피드백: 레이아웃 보정 + 폰트 가독성).
    Tailwind 가 rem 기반이라 base 를 키우면 전체가 비율대로 커진다. */
 html {
@@ -58,6 +151,8 @@ html {
 body {
   background-color: var(--background);
   color: var(--foreground);
+  /* 라이트/다크 전환 시 부드러운 색 전환 */
+  transition: background-color 0.3s ease, color 0.3s ease;
   font-family: var(--font-pretendard), 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
   /* 에메랄드 + 호박색 은은한 글로우 — 파란 기 대신 따뜻한 밤 분위기 */
   background-image:

@@ -10,9 +10,12 @@ import {
   Loader2,
   Mail,
   Receipt,
+  Settings,
   ShoppingBag,
   Ticket,
   User,
+  Moon,
+  Sun,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -32,6 +35,7 @@ import MinecraftHead from "@/components/minecraft/MinecraftHead";
 import CashDisplay from "@/components/minecraft/CashDisplay";
 import { api, ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import { useTheme } from "@/lib/theme";
 
 interface CashTransaction extends Record<string, unknown> {
   id: number;
@@ -77,6 +81,7 @@ const tabs = [
   { id: "cash", label: "캐시 내역", icon: Coins },
   { id: "payments", label: "결제 내역", icon: CreditCard },
   { id: "rewards", label: "보상 내역", icon: Gift },
+  { id: "settings", label: "설정", icon: Settings },
 ];
 
 const CASH_TYPE_LABEL: Record<CashTransaction["type"], string> = {
@@ -101,6 +106,7 @@ export default function MyPage() {
   const router = useRouter();
   const { status, profile, cashBalance, logout } = useAuth();
   const { toast } = useToast();
+  const { theme, isSystem, setTheme, followSystem } = useTheme();
 
   const [active, setActive] = useState("profile");
   const [loading, setLoading] = useState(true);
@@ -359,6 +365,54 @@ export default function MyPage() {
                   </>
                 )}
               </Card>
+            )}
+
+            {active === "settings" && (
+              <div className="mt-6 space-y-4">
+                <Card padding="lg">
+                  <h2 className="text-base font-semibold mb-1">화면 테마</h2>
+                  <p className="text-sm text-white/50 mb-5">
+                    기본값은 브라우저 환경 설정을 따릅니다. 원하는 테마로 고정할 수 있어요.
+                  </p>
+                  <div className="grid grid-cols-2 gap-3 max-w-sm">
+                    <button
+                      type="button"
+                      onClick={() => setTheme("light")}
+                      className={`focus-ring flex items-center justify-center gap-2 py-3 rounded-lg border text-sm font-medium transition-colors ${
+                        !isSystem && theme === "light"
+                          ? "border-emerald-400 bg-emerald-500/10 text-white"
+                          : "border-white/10 text-white/60 hover:border-white/25 hover:text-white"
+                      }`}
+                    >
+                      <Sun size={16} /> 라이트 모드
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTheme("dark")}
+                      className={`focus-ring flex items-center justify-center gap-2 py-3 rounded-lg border text-sm font-medium transition-colors ${
+                        !isSystem && theme === "dark"
+                          ? "border-emerald-400 bg-emerald-500/10 text-white"
+                          : "border-white/10 text-white/60 hover:border-white/25 hover:text-white"
+                      }`}
+                    >
+                      <Moon size={16} /> 다크 모드
+                    </button>
+                  </div>
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={followSystem}
+                      className={`focus-ring text-xs px-3 py-1.5 rounded-md border transition-colors ${
+                        isSystem
+                          ? "border-emerald-400/50 text-emerald-300"
+                          : "border-white/10 text-white/50 hover:text-white hover:border-white/25"
+                      }`}
+                    >
+                      {isSystem ? "✓ 브라우저 환경 따름 (기본)" : "브라우저 환경 따르기"}
+                    </button>
+                  </div>
+                </Card>
+              </div>
             )}
           </div>
         </section>

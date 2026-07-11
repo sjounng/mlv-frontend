@@ -63,6 +63,27 @@ export default function AdminItemsPage() {
   const [saving, setSaving] = useState(false);
   const [savingCategory, setSavingCategory] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [shopEnabled, setShopEnabled] = useState<boolean | null>(null);
+  const [togglingShop, setTogglingShop] = useState(false);
+
+  useEffect(() => {
+    void adminApi.shopStatus().then((r) => setShopEnabled(r.enabled)).catch(() => {});
+  }, []);
+
+  const onToggleShop = async () => {
+    if (shopEnabled === null) return;
+    setTogglingShop(true);
+    try {
+      const r = await adminApi.setShopStatus(!shopEnabled);
+      setShopEnabled(r.enabled);
+      toast({ title: r.enabled ? "상점을 활성화했습니다" : "상점을 비활성화했습니다", variant: "success" });
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : "변경에 실패했습니다.";
+      toast({ title: "변경 실패", description: message, variant: "error" });
+    } finally {
+      setTogglingShop(false);
+    }
+  };
 
   const onPickImage = async (file: File | undefined) => {
     if (!file) return;
@@ -238,6 +259,32 @@ export default function AdminItemsPage() {
           <Button leftIcon={<Plus size={16} />} onClick={openCreate} disabled={loading}>상품 등록</Button>
         </div>
       </div>
+
+      {/* 상점 활성화/비활성화 (07-10 피드백) — 비활성 시 유저는 접근 불가, 오퍼레이터 이상만 접근 */}
+      <Card padding="md">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold">웹상점 노출</p>
+            <p className="mt-1 text-xs text-white/50">
+              비활성화하면 일반 유저는 상점에 접근할 수 없고, 오퍼레이터 이상 관리자만 접근할 수 있습니다.
+            </p>
+          </div>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <span className={`text-xs font-medium ${shopEnabled ? "text-emerald-300" : "text-white/40"}`}>
+              {shopEnabled === null ? "..." : shopEnabled ? "활성" : "비활성"}
+            </span>
+            <button
+              type="button"
+              onClick={onToggleShop}
+              disabled={shopEnabled === null || togglingShop}
+              aria-pressed={!!shopEnabled}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50 ${shopEnabled ? "bg-emerald-500" : "bg-white/15"}`}
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${shopEnabled ? "translate-x-6" : "translate-x-1"}`} />
+            </button>
+          </div>
+        </div>
+      </Card>
 
       <Card padding="none">
         {loading ? (

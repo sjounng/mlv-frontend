@@ -57,6 +57,10 @@ export type ShowcaseSection = {
   isNew?: boolean;
 };
 
+// 홈 마지막(푸터) 섹션 상단을 채우는 좌우 슬라이드쇼 이미지 (07-10 피드백).
+//   public/assets/scenes/ 등에 이미지를 넣고 경로를 추가하세요. 비우면 플레이스홀더 표시.
+export const footerSlides: string[] = [];
+
 export const mainShowcase = {
   intro: {
     titleTop: "MLV에서 시작하는",

@@ -31,8 +31,10 @@ const ATTACH_MAX_BYTES = 5 * 1024 * 1024;
 type ContactCategory = "PAYMENT" | "ACCOUNT" | "EVENT" | "PLAYER_REPORT" | "BUG_REPORT" | "OTHER";
 type ContactStatus = "OPEN" | "ANSWERED" | "CLOSED";
 
-// 신고 분류 선택 시 본문에 자동 입력되는 폼 템플릿 (07-09 피드백)
+// 분류 선택 시 본문에 자동 입력되는 폼 템플릿 (07-09/07-10 피드백)
 const REPORT_TEMPLATES: Partial<Record<ContactCategory, string>> = {
+  PAYMENT:
+    "상품명: \n환불계좌: \n\nTIP: 환불 정책에 해당하는지 확인 후 문의해주시기 바랍니다 (홈페이지 하단 > 환불 정책)",
   PLAYER_REPORT:
     "신고할 플레이어 (닉네임): \n사건 발생일 (현실 일시): \n사건 내용: \n신고자 디스코드 ID: \n\nTIP: 문의 내용을 구체적으로 서술해주실수록 문의 해결에 도움이 됩니다",
   BUG_REPORT:

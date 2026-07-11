@@ -60,7 +60,7 @@ export default function IntroSlider({
   if (hideWhenEmpty && (!ready || total === 0)) return null;
 
   return (
-    <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-[0_10px_0_rgba(0,0,0,0.4)] bg-linear-to-br from-surface-3 via-surface-4 to-black">
+    <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-[0_10px_0_rgba(0,0,0,0.4)] bg-linear-to-br from-surface-3 via-surface-4 to-surface-2">
       {total === 0 ? (
         // 배너 미등록 시 플레이스홀더
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-linear-to-tr from-emerald-500/10 via-transparent to-cyan-500/10">
