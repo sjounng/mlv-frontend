@@ -331,6 +331,8 @@ export interface MailTemplate extends Record<string, unknown> {
   createdAt: string;
 }
 
+export type PurchaseLimitType = "NONE" | "WEEKLY" | "MONTHLY" | "ONCE";
+
 export interface AdminProduct extends Record<string, unknown> {
   id: number;
   name: string;
@@ -343,6 +345,8 @@ export interface AdminProduct extends Record<string, unknown> {
   stockQuantity: number | null;
   recommended: boolean;
   newBadge: boolean;
+  purchaseLimitType: PurchaseLimitType;
+  purchaseLimitCount: number;
 }
 
 export interface ProductUpsert {
@@ -356,6 +360,8 @@ export interface ProductUpsert {
   stockQuantity: number | null;
   recommended: boolean;
   newBadge: boolean;
+  purchaseLimitType: PurchaseLimitType;
+  purchaseLimitCount: number;
 }
 
 export type ContactCategory = "PAYMENT" | "ACCOUNT" | "EVENT" | "OTHER";

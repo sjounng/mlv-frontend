@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Loader2, Minus, Package, Plus, ShoppingCart, Trash2 } from "lucide-react";
-import { Button, Card, EmptyState, useToast } from "@/components/ui";
+import { Info, Loader2, Minus, Package, Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { Button, Card, useToast } from "@/components/ui";
 import CashDisplay from "@/components/minecraft/CashDisplay";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
@@ -65,18 +65,22 @@ export default function CartPage() {
         <h1 className="text-2xl font-bold">장바구니</h1>
       </div>
 
-      {items.length === 0 ? (
-        <Card padding="lg">
-          <EmptyState
-            icon={Package}
-            title="장바구니가 비어 있습니다"
-            description="웹상점에서 원하는 상품을 담아보세요."
-            action={<Link href="/shop" className="text-sm text-emerald-300 hover:text-emerald-200 underline">상점으로 가기</Link>}
-          />
-        </Card>
-      ) : (
-        <div className="grid lg:grid-cols-[1fr_320px] gap-6">
+      {/* 비어있어도 동일한 슬롯 구성 유지 — 최상단에 빈 슬롯 표시 (07-12 피드백 5번) */}
+      <div className="grid lg:grid-cols-[1fr_320px] gap-6">
           <div className="space-y-3">
+            {items.length === 0 && (
+              <div className="flex items-center gap-4 p-4 rounded-xl border border-dashed border-white/15 bg-white/[0.02]">
+                <div className="w-14 h-14 rounded-lg bg-white/5 border border-white/8 flex items-center justify-center shrink-0">
+                  <Package size={22} className="text-white/20" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-white/45">장바구니가 비어 있습니다</p>
+                  <Link href="/shop" className="text-xs text-emerald-300 hover:text-emerald-200 underline">
+                    상점에서 상품 담으러 가기
+                  </Link>
+                </div>
+              </div>
+            )}
             {items.map((item) => (
               <Card key={item.productId} padding="md">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
@@ -126,9 +130,28 @@ export default function CartPage() {
                 </div>
               </Card>
             ))}
-            <button type="button" onClick={clear} className="text-xs text-white/40 hover:text-white/70">
-              장바구니 비우기
-            </button>
+            {items.length > 0 && (
+              <button type="button" onClick={clear} className="text-xs text-white/40 hover:text-white/70">
+                장바구니 비우기
+              </button>
+            )}
+
+            {/* 구매 안내 (07-12 피드백: 상점 푸터 → 장바구니 페이지로 이동) */}
+            <div className="mt-4 p-4 rounded-xl bg-white/[0.03] border border-white/8">
+              <p className="text-xs font-semibold text-white/60 mb-2.5">구매 안내</p>
+              <ul className="flex flex-col gap-2">
+                {[
+                  "구매한 상품은 인게임 우편함으로 자동 지급됩니다.",
+                  "결제 후 문제가 발생하면 고객지원 > 직접 문의를 이용해주세요.",
+                  "환불 정책은 홈페이지 하단 > 환불 정책에서 확인하세요.",
+                ].map((notice, i) => (
+                  <li key={i} className="flex gap-2 items-start">
+                    <Info size={12} className="text-white/25 mt-0.5 shrink-0" />
+                    <p className="text-xs text-white/40 leading-relaxed">{notice}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           <div className="lg:sticky lg:top-20 lg:self-start">
@@ -162,7 +185,7 @@ export default function CartPage() {
 
               <Button
                 className="w-full mt-5"
-                disabled={checkingOut}
+                disabled={checkingOut || items.length === 0}
                 leftIcon={checkingOut ? <Loader2 className="animate-spin" size={16} /> : undefined}
                 onClick={onCheckout}
               >
@@ -170,8 +193,7 @@ export default function CartPage() {
               </Button>
             </Card>
           </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

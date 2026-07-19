@@ -57,9 +57,14 @@ export type ShowcaseSection = {
   isNew?: boolean;
 };
 
-// 홈 마지막(푸터) 섹션 상단을 채우는 좌우 슬라이드쇼 이미지 (07-10 피드백).
-//   public/assets/scenes/ 등에 이미지를 넣고 경로를 추가하세요. 비우면 플레이스홀더 표시.
-export const footerSlides: string[] = [];
+// 홈 최하단 3분할 패널의 서버위키 링크 (07-12 피드백). URL 이 비어 있으면 "준비 중" 처리.
+//   위키 사이트가 열리면 여기에 주소만 채우면 된다. (운영자 패널 편집은 추후 웹패널 라운드에서)
+export const wikiLinks = {
+  main: { label: "서버 가이드", desc: "처음 오셨다면 위키를 먼저 확인해보세요", url: "" },
+  tutorial: { label: "플레이 튜토리얼", desc: "접속부터 정착까지 차근차근", url: "" },
+  system: { label: "게임 시스템", desc: "직업·경제·컨텐츠 시스템 설명", url: "" },
+  faq: { label: "자주 묻는 질문", desc: "궁금한 점 빠르게 해결하기", url: "/info/faq" },
+} as const;
 
 export const mainShowcase = {
   intro: {

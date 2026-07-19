@@ -117,6 +117,9 @@ export default function RootLayout({
     <html
       lang="ko"
       className={`${pretendard.variable} ${geistMono.variable} h-full antialiased`}
+      // 테마(data-theme)는 FOUC 방지를 위해 인라인 스크립트가 하이드레이션 전에 설정한다.
+      // 서버 HTML 에는 없는 속성이라 React 불일치 경고가 나므로 이 엘리먼트만 검증을 끈다.
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-surface-1 text-white">
         {/* 테마 초기 적용(FOUC 방지): 저장된 선택 없으면 브라우저 환경(prefers-color-scheme)을 따른다 */}

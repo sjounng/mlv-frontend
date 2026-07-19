@@ -9,6 +9,8 @@ export interface ShopCategory {
   active: boolean;
 }
 
+export type PurchaseLimitType = "NONE" | "WEEKLY" | "MONTHLY" | "ONCE";
+
 export interface ShopProductResponse {
   id: number;
   name: string;
@@ -21,6 +23,8 @@ export interface ShopProductResponse {
   stockQuantity: number | null;
   recommended: boolean;
   newBadge: boolean;
+  purchaseLimitType?: PurchaseLimitType;
+  purchaseLimitCount?: number;
 }
 
 export function toUiProduct(p: ShopProductResponse): Product {
@@ -32,6 +36,8 @@ export function toUiProduct(p: ShopProductResponse): Product {
     imageUrl: p.imageUrl,
     categoryId: String(p.category.id),
     badge: p.recommended ? "HOT" : p.newBadge ? "NEW" : undefined,
+    limitType: p.purchaseLimitType ?? "NONE",
+    limitCount: p.purchaseLimitCount ?? 1,
   };
 }
 

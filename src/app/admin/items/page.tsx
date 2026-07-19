@@ -41,7 +41,17 @@ const emptyForm: ProductUpsert = {
   stockQuantity: null,
   recommended: false,
   newBadge: false,
+  purchaseLimitType: "NONE",
+  purchaseLimitCount: 1,
 };
+
+// 구매 제한 옵션 (07-12 피드백)
+const LIMIT_OPTIONS = [
+  { value: "NONE", label: "제한 없음" },
+  { value: "WEEKLY", label: "매주 월요일 초기화" },
+  { value: "MONTHLY", label: "매월 1일 초기화" },
+  { value: "ONCE", label: "1회성 구매 (계정 당 1회)" },
+];
 
 const emptyCategoryForm: CategoryUpsert = {
   name: "",
@@ -154,6 +164,8 @@ export default function AdminItemsPage() {
       stockQuantity: p.stockQuantity,
       recommended: p.recommended,
       newBadge: p.newBadge,
+      purchaseLimitType: p.purchaseLimitType ?? "NONE",
+      purchaseLimitCount: p.purchaseLimitCount ?? 1,
     });
     setModalOpen(true);
   };
@@ -325,6 +337,24 @@ export default function AdminItemsPage() {
           <div className="grid sm:grid-cols-2 gap-4">
             <Select label="카테고리" options={categoryOptions} value={String(form.categoryId)} onChange={(e) => setForm({ ...form, categoryId: Number(e.target.value) })} />
             <Select label="연결 우편 템플릿" options={templateOptions} value={String(form.mailTemplateId)} onChange={(e) => setForm({ ...form, mailTemplateId: Number(e.target.value) })} />
+          </div>
+          {/* 구매 제한 (07-12 피드백) */}
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Select
+              label="구매 제한"
+              options={LIMIT_OPTIONS}
+              value={form.purchaseLimitType}
+              onChange={(e) => setForm({ ...form, purchaseLimitType: e.target.value as ProductUpsert["purchaseLimitType"] })}
+            />
+            {(form.purchaseLimitType === "WEEKLY" || form.purchaseLimitType === "MONTHLY") && (
+              <Input
+                label="기간 내 구매 가능 횟수"
+                type="number"
+                min={1}
+                value={form.purchaseLimitCount || 1}
+                onChange={(e) => setForm({ ...form, purchaseLimitCount: Math.max(1, Number(e.target.value)) })}
+              />
+            )}
           </div>
           <div>
             <p className="text-xs font-medium text-white/60 mb-2">상품 이미지</p>

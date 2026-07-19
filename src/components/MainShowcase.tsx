@@ -14,7 +14,7 @@ import IntroSlider from "@/components/IntroSlider";
 import SnsLinks from "@/components/SnsLinks";
 import DownloadButton from "@/components/DownloadButton";
 import Footer from "@/components/Footer";
-import FooterSlideshow from "@/components/FooterSlideshow";
+import HomeInfoPanels from "@/components/HomeInfoPanels";
 
 // 소개 섹션 우측 미디어
 function SectionMedia({ media, isNew }: { media?: string; isNew?: boolean }) {
@@ -202,15 +202,15 @@ export default function MainShowcase() {
         </div>
       </section>
 
-      {/* 마지막) 푸터 섹션 — 상단 빈 공간을 좌우 슬라이드쇼로 채우고 하단에 컴팩트 푸터 (07-10 피드백) */}
+      {/* 마지막) 푸터 섹션 — 상단에 3분할 패널(서버위키/이벤트/서버정보), 하단에 푸터 (07-12 피드백) */}
       <section
         ref={(el) => {
           sectionRefs.current[total - 1] = el;
         }}
         className="relative z-10 min-h-dvh snap-start snap-always flex flex-col"
       >
-        <div className="flex-1 flex items-center justify-center px-6 py-16">
-          <FooterSlideshow />
+        <div className="flex-1 flex items-center justify-center px-6 pt-24 pb-10">
+          <HomeInfoPanels />
         </div>
         <Footer />
       </section>
