@@ -153,6 +153,11 @@
   opacity: 0.02;
 }
 
+/* 상점 카드 호버 info 팝업: 라이트에서는 순백 배경으로 */
+:root[data-theme="light"] [class~="bg-surface-4/97"] {
+  background-color: rgba(255, 255, 255, 0.98);
+}
+
 /* 테마 전환 순간에만 전체 색이 서서히 크로스페이드 (전환 후엔 기존 hover/transform 트랜지션 복원) */
 :root.theme-switching *,
 :root.theme-switching *::before,
