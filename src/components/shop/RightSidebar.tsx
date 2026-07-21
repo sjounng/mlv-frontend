@@ -28,7 +28,7 @@ export default function RightSidebar() {
         <button
           type="button"
           onClick={() => toast({ title: "충전 기능은 준비 중입니다", variant: "default" })}
-          className="focus-ring mt-4 w-full inline-flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm font-semibold bg-emerald-600 text-white shadow-[0_3px_0_0_#065f46] hover:bg-emerald-500 active:translate-y-[2px] active:shadow-[0_1px_0_0_#065f46] transition-[background-color,box-shadow,transform] duration-150"
+          className="focus-ring mt-4 w-full inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-semibold whitespace-nowrap bg-emerald-600 text-white shadow-[0_3px_0_0_#065f46] hover:bg-emerald-500 active:translate-y-[2px] active:shadow-[0_1px_0_0_#065f46] transition-[background-color,box-shadow,transform] duration-150"
         >
           <Plus size={15} /> 충전하기
         </button>
@@ -43,16 +43,16 @@ export default function RightSidebar() {
           <span className="text-xs text-white/40 tabular-nums">{count}개</span>
         </div>
         {count === 0 ? (
-          <p className="text-xs text-white/40 leading-relaxed">담긴 상품이 없습니다.</p>
+          <p className="text-xs text-white/40 leading-relaxed mb-4">담긴 상품이 없습니다.</p>
         ) : (
-          <div className="flex items-center justify-between text-sm mb-3">
+          <div className="flex items-center justify-between text-sm mb-4">
             <span className="text-white/50">합계</span>
             <CashDisplay amount={totalPrice} size="sm" />
           </div>
         )}
         <Link
           href="/shop/cart"
-          className="focus-ring flex items-center justify-center w-full py-2.5 rounded-lg text-sm font-medium bg-white/8 hover:bg-white/12 border border-white/10 transition-colors"
+          className="focus-ring flex items-center justify-center w-full px-3 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap bg-white/8 hover:bg-white/12 border border-white/10 transition-colors"
         >
           장바구니 보기
         </Link>

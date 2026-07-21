@@ -127,9 +127,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="mt-2.5 flex items-center gap-1.5">
           <Link
             href={href}
-            className="focus-ring flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium bg-white/8 hover:bg-white/14 border border-white/10 transition-colors"
+            className="focus-ring flex-1 flex items-center justify-center gap-1 px-1.5 py-2 rounded-lg text-[11px] font-medium whitespace-nowrap bg-white/8 hover:bg-white/14 border border-white/10 transition-colors"
           >
-            <Search size={13} /> 상품정보 상세보기
+            <Search size={12} className="shrink-0" /> 상품정보 상세보기
           </Link>
           <button
             type="button"

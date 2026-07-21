@@ -65,7 +65,7 @@ export default function HomeInfoPanels() {
   const panelTitle = "text-sm font-bold flex items-center gap-2 mb-1";
   const panelSub = "text-xs text-white/40 mb-4";
   const bottomBtn =
-    "focus-ring mt-4 flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg text-xs font-medium bg-white/6 hover:bg-white/12 border border-white/10 transition-colors";
+    "focus-ring mt-4 flex items-center justify-center gap-1.5 w-full px-3 py-2.5 rounded-lg text-xs font-medium whitespace-nowrap bg-white/6 hover:bg-white/12 border border-white/10 transition-colors";
 
   return (
     <div className="w-full max-w-6xl mx-auto grid gap-4 md:grid-cols-3">

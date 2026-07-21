@@ -47,7 +47,7 @@ export default function ShopGate({ children }: { children: ReactNode }) {
             </p>
             <Link
               href="/"
-              className="focus-ring inline-flex items-center gap-2 mt-7 px-5 py-2.5 rounded-md text-sm font-semibold bg-emerald-600 text-white shadow-[0_3px_0_0_#065f46] hover:bg-emerald-500 active:translate-y-[2px] active:shadow-[0_1px_0_0_#065f46] transition-[background-color,box-shadow,transform] duration-150"
+              className="focus-ring inline-flex items-center gap-2 mt-7 px-5 py-2.5 rounded-md text-sm font-semibold whitespace-nowrap bg-emerald-600 text-white shadow-[0_3px_0_0_#065f46] hover:bg-emerald-500 active:translate-y-[2px] active:shadow-[0_1px_0_0_#065f46] transition-[background-color,box-shadow,transform] duration-150"
             >
               <ArrowLeft size={15} />
               메인으로 돌아가기
