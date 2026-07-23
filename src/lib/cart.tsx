@@ -29,6 +29,8 @@ interface CartState {
 }
 
 const STORAGE_KEY = "maribel.cart";
+// 상품별 최대 수량 — 백엔드 구매 수량 상한(@Max(100))과 일치. (점검 #8)
+const MAX_QUANTITY = 100;
 const CartContext = createContext<CartState | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -58,10 +60,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const existing = prev.find((i) => i.productId === item.productId);
       if (existing) {
         return prev.map((i) =>
-          i.productId === item.productId ? { ...i, quantity: i.quantity + quantity } : i,
+          i.productId === item.productId
+            ? { ...i, quantity: Math.min(MAX_QUANTITY, i.quantity + quantity) }
+            : i,
         );
       }
-      return [...prev, { ...item, quantity }];
+      return [...prev, { ...item, quantity: Math.min(MAX_QUANTITY, quantity) }];
     });
   }, []);
 
@@ -69,7 +73,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((prev) =>
       quantity <= 0
         ? prev.filter((i) => i.productId !== productId)
-        : prev.map((i) => (i.productId === productId ? { ...i, quantity } : i)),
+        : prev.map((i) =>
+            i.productId === productId ? { ...i, quantity: Math.min(MAX_QUANTITY, quantity) } : i,
+          ),
     );
   }, []);
 

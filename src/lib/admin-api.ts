@@ -364,7 +364,7 @@ export interface ProductUpsert {
   purchaseLimitCount: number;
 }
 
-export type ContactCategory = "PAYMENT" | "ACCOUNT" | "EVENT" | "OTHER";
+export type ContactCategory = "PAYMENT" | "ACCOUNT" | "EVENT" | "PLAYER_REPORT" | "BUG_REPORT" | "OTHER";
 export type ContactStatus = "OPEN" | "ANSWERED" | "CLOSED";
 
 export interface Inquiry extends Record<string, unknown> {

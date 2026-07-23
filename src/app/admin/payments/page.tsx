@@ -93,9 +93,17 @@ export default function AdminPaymentsPage() {
   }, [tab, loadCharges, loadRefunds]);
 
   const onProcess = async (refund: Refund, status: RefundStatus) => {
+    // 처리 사유(운영 메모)를 입력받는다. 거절은 사유 필수, 완료는 선택.
+    const label = status === "REJECTED" ? "거절 사유를 입력하세요" : "처리 메모를 입력하세요 (선택)";
+    const memo = window.prompt(label);
+    if (memo === null) return; // 프롬프트 취소 시 중단
+    if (status === "REJECTED" && !memo.trim()) {
+      toast({ title: "거절 사유를 입력해 주세요", variant: "warning" });
+      return;
+    }
     setActingId(refund.id);
     try {
-      const updated = await adminApi.processRefund(refund.id, status, "");
+      const updated = await adminApi.processRefund(refund.id, status, memo.trim());
       setRefunds((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
       toast({ title: `환불 요청을 ${REFUND_STATUS_LABEL[status]} 처리했습니다`, variant: "success" });
     } catch (error) {

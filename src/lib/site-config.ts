@@ -100,13 +100,19 @@ export const mainShowcase = {
 
 // 통신판매업 법적 표기 정보. 실제 사업자 정보로 교체하거나 환경변수로 덮어쓴다.
 // (실서비스 전 반드시 실제 값으로 채워야 함)
-export const businessInfo: { label: string; value: string }[] = [
-  { label: "상호", value: process.env.NEXT_PUBLIC_BIZ_NAME ?? "마이리틀밸리" },
-  { label: "대표자", value: process.env.NEXT_PUBLIC_BIZ_CEO ?? "김민수" },
-  { label: "사업자 등록번호", value: process.env.NEXT_PUBLIC_BIZ_REG_NO ?? "123-45-67890" },
-  { label: "통신판매업 신고번호", value: process.env.NEXT_PUBLIC_BIZ_MAILORDER_NO ?? "제 2026-서울강남-0123 호" },
-  { label: "주소", value: process.env.NEXT_PUBLIC_BIZ_ADDRESS ?? "서울특별시 강남구 테헤란로 152, 5층" },
-  { label: "호스팅 제공", value: process.env.NEXT_PUBLIC_BIZ_HOSTING ?? "Stella IT, Inc." },
-  { label: "고객센터", value: process.env.NEXT_PUBLIC_BIZ_SUPPORT ?? "support@maribel.kr · 1577-0000" },
-  { label: "운영 시간", value: process.env.NEXT_PUBLIC_BIZ_HOURS ?? "평일 10:00 - 18:00 (점심 12:00 - 13:00)" },
-];
+// 사업자 정보는 실제 값이 env 로 설정된 항목만 노출한다.
+//  허위 사업자 등록번호/대표자/주소가 표시되면 안 되므로 임시 기본값을 두지 않는다.
+//  (운영자가 NEXT_PUBLIC_BIZ_* 를 채우면 자동으로 푸터에 표시됨)
+export const businessInfo: { label: string; value: string }[] = (
+  [
+    { label: "상호", value: process.env.NEXT_PUBLIC_BIZ_NAME },
+    { label: "대표자", value: process.env.NEXT_PUBLIC_BIZ_CEO },
+    { label: "사업자 등록번호", value: process.env.NEXT_PUBLIC_BIZ_REG_NO },
+    { label: "통신판매업 신고번호", value: process.env.NEXT_PUBLIC_BIZ_MAILORDER_NO },
+    { label: "주소", value: process.env.NEXT_PUBLIC_BIZ_ADDRESS },
+    { label: "호스팅 제공", value: process.env.NEXT_PUBLIC_BIZ_HOSTING },
+    { label: "고객센터", value: process.env.NEXT_PUBLIC_BIZ_SUPPORT },
+    { label: "운영 시간", value: process.env.NEXT_PUBLIC_BIZ_HOURS },
+  ] as { label: string; value: string | undefined }[]
+)
+  .filter((item): item is { label: string; value: string } => Boolean(item.value?.trim()));

@@ -143,7 +143,9 @@ export default function MemberDetailModal({
 
   const onCancel = async (warningId: number) => {
     if (memberId == null) return;
-    const why = window.prompt("경고 취소 사유를 입력하세요 (선택)") ?? "";
+    // 프롬프트에서 '취소'를 누르면(null) 경고 취소 자체를 중단한다. 빈 사유로 진행되지 않도록.
+    const why = window.prompt("경고 취소 사유를 입력하세요 (선택)");
+    if (why === null) return;
     setCancelingId(warningId);
     try {
       await adminApi.cancelWarning(warningId, why);

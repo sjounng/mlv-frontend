@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Loader2, MessageSquare } from "lucide-react";
+import { Loader2, MessageSquare, Paperclip } from "lucide-react";
 import {
   Badge,
   Button,
@@ -20,6 +20,8 @@ const CATEGORY_LABEL: Record<ContactCategory, string> = {
   PAYMENT: "결제/환불",
   ACCOUNT: "계정",
   EVENT: "이벤트",
+  PLAYER_REPORT: "플레이어 신고",
+  BUG_REPORT: "버그 신고",
   OTHER: "기타",
 };
 
@@ -157,6 +159,17 @@ export default function AdminInquiriesPage() {
             <div className="p-3 bg-white/3 border border-white/8 rounded-lg text-sm text-white/80 whitespace-pre-wrap">
               {selected.content}
             </div>
+            {selected.attachmentUrl && (
+              <a
+                href={selected.attachmentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="focus-ring inline-flex items-center gap-1.5 text-sm text-emerald-300 hover:text-emerald-200 hover:underline"
+              >
+                <Paperclip size={14} className="shrink-0" />
+                첨부파일 보기
+              </a>
+            )}
             <Textarea label="답변" rows={5} value={reply} onChange={(e) => setReply(e.target.value)} placeholder="답변 내용을 입력하세요" />
           </div>
         )}

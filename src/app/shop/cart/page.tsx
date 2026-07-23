@@ -110,7 +110,8 @@ export default function CartPage() {
                     <button
                       type="button"
                       onClick={() => setQuantity(item.productId, item.quantity + 1)}
-                      className="focus-ring w-7 h-7 rounded-md border border-white/10 text-white/70 hover:bg-white/5 flex items-center justify-center transition-colors"
+                      disabled={item.quantity >= 100}
+                      className="focus-ring w-7 h-7 rounded-md border border-white/10 text-white/70 hover:bg-white/5 flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                       aria-label="수량 증가"
                     >
                       <Plus size={12} />
