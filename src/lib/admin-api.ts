@@ -213,6 +213,7 @@ export const adminApi = {
   events: () => api.get<AdminEvent[]>("/api/admin/events"),
   createEvent: (body: EventUpsert) => api.post<AdminEvent>("/api/admin/events", body),
   updateEvent: (id: number, body: EventUpsert) => api.patch<AdminEvent>(`/api/admin/events/${id}`, body),
+  deleteEvent: (id: number) => api.del(`/api/admin/events/${id}`),
 
   popups: () => api.get<Popup[]>("/api/admin/popups"),
   createPopup: (body: PopupUpsert) => api.post<Popup>("/api/admin/popups", body),
@@ -231,25 +232,33 @@ export const adminApi = {
 };
 
 export type EventType = "ATTENDANCE" | "INVITE" | "PAYBACK" | "GENERAL";
+export type EventStatus = "UPCOMING" | "ONGOING" | "ENDED";
 
 export interface AdminEvent extends Record<string, unknown> {
   id: number;
   name: string;
   type: EventType;
-  description: string;
+  bannerImageUrl: string | null;
+  description: string | null;
   startAt: string;
   endAt: string;
+  status: EventStatus;
+  featured: boolean;
   active: boolean;
-  mailTemplateId: number;
+  mailTemplateId: number | null;
+  publishedAt: string;
 }
 
 export interface EventUpsert {
   name: string;
   type: EventType;
-  description: string;
+  bannerImageUrl: string | null;
+  description: string | null;
   startAt: string;
   endAt: string;
-  mailTemplateId: number;
+  status: EventStatus;
+  featured: boolean;
+  mailTemplateId: number | null;
   active: boolean;
 }
 
