@@ -10,7 +10,7 @@ import Link from "next/link";
 import { Search, Loader2, CalendarDays, ImageOff } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import EventFeaturedSlider from "@/components/event/EventFeaturedSlider";
+import IntroSlider from "@/components/IntroSlider";
 import { Badge, EmptyState, Pagination, useToast } from "@/components/ui";
 import { eventsApi, EVENT_STATUS_LABEL, type PublicEvent } from "@/lib/events-api";
 
@@ -62,13 +62,14 @@ export default function EventPage() {
   };
 
   return (
-    <>
+    // 화면 전체 높이를 채우고 푸터를 항상 하단에 고정 (스티키 푸터)
+    <div className="flex min-h-screen flex-col">
       <Navbar />
-      <main className="pt-16">
+      <main className="flex-1 pt-16">
         <section className="max-w-6xl mx-auto px-6 py-12 space-y-8">
-          {/* 상단 featured 슬라이더 */}
+          {/* 상단 배너 슬라이더 (placement=EVENT — 관리자 배너에서 설정) */}
           <div className="mx-auto [width:min(100%,calc(38dvh*16/9))]">
-            <EventFeaturedSlider />
+            <IntroSlider placement="EVENT" hideWhenEmpty />
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -100,7 +101,8 @@ export default function EventPage() {
             </div>
           </div>
 
-          {/* 목록 */}
+          {/* 목록 — 항목 수와 무관하게 페이저/푸터 위치가 흔들리지 않도록 6행 높이를 예약 */}
+          <div className="min-h-[40rem]">
           {loading ? (
             <div className="flex items-center justify-center py-16 text-white/40">
               <Loader2 className="animate-spin" size={24} />
@@ -162,6 +164,7 @@ export default function EventPage() {
               })}
             </div>
           )}
+          </div>
 
           {!loading && totalPages > 1 && (
             <Pagination
@@ -173,6 +176,6 @@ export default function EventPage() {
         </section>
       </main>
       <Footer />
-    </>
+    </div>
   );
 }
