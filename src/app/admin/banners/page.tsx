@@ -38,7 +38,7 @@ function toLocalInput(iso: string) {
   return new Date(d.getTime() - off * 60000).toISOString().slice(0, 16);
 }
 
-const emptyForm: PopupUpsert = { imageUrl: "", linkUrl: null, placement: "HOME", startAt: "", endAt: "", active: true };
+const emptyForm: PopupUpsert = { imageUrl: "", linkUrl: null, placement: "HOME", startAt: "", endAt: "", sortOrder: 0, active: true };
 
 export default function AdminBannersPage() {
   const { toast } = useToast();
@@ -91,7 +91,7 @@ export default function AdminBannersPage() {
 
   const openEdit = (p: Popup) => {
     setEditingId(p.id);
-    setForm({ imageUrl: p.imageUrl, linkUrl: p.linkUrl, placement: p.placement, startAt: toLocalInput(p.startAt), endAt: toLocalInput(p.endAt), active: p.active });
+    setForm({ imageUrl: p.imageUrl, linkUrl: p.linkUrl, placement: p.placement, startAt: toLocalInput(p.startAt), endAt: toLocalInput(p.endAt), sortOrder: p.sortOrder, active: p.active });
     setOpen(true);
   };
 
@@ -162,6 +162,7 @@ export default function AdminBannersPage() {
       width: "200px",
       render: (r) => `${new Date(r.startAt).toLocaleDateString("ko-KR")} ~ ${new Date(r.endAt).toLocaleDateString("ko-KR")}`,
     },
+    { key: "sortOrder", label: "순서", width: "60px", render: (r) => <span className="text-white/55 tabular-nums">{r.sortOrder}</span> },
     { key: "active", label: "상태", width: "80px", render: (r) => <Badge variant={r.active ? "success" : "default"} size="sm">{r.active ? "노출" : "숨김"}</Badge> },
     {
       key: "actions",
@@ -262,6 +263,12 @@ export default function AdminBannersPage() {
             <Input label="노출 시작" type="datetime-local" value={form.startAt} onChange={(e) => setForm({ ...form, startAt: e.target.value })} />
             <Input label="노출 종료" type="datetime-local" value={form.endAt} onChange={(e) => setForm({ ...form, endAt: e.target.value })} />
           </div>
+          <Input
+            label="노출 순서 (작을수록 슬라이더에서 먼저 표시)"
+            type="number"
+            value={form.sortOrder}
+            onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })}
+          />
           <div className="flex items-center gap-2.5">
             <button
               type="button"

@@ -272,6 +272,7 @@ export interface Popup extends Record<string, unknown> {
   placement: BannerPlacement;
   startAt: string;
   endAt: string;
+  sortOrder: number;
   active: boolean;
   createdAt: string;
 }
@@ -282,6 +283,7 @@ export interface PopupUpsert {
   placement: BannerPlacement;
   startAt: string;
   endAt: string;
+  sortOrder: number;
   active: boolean;
 }
 
