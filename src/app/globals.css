@@ -305,13 +305,13 @@ h2,
 .rte-content h2 { font-size: 1.2rem; font-weight: 700; margin: 0.75rem 0 0.4rem; }
 .rte-content ul { list-style: disc; padding-left: 1.25rem; }
 
-/* 숫자 입력의 브라우저 기본 스피너(증감 화살표) 제거 — 커스텀 +/- 버튼을 쓰는 곳에 사용 */
-.no-spinner::-webkit-outer-spin-button,
-.no-spinner::-webkit-inner-spin-button {
+/* 숫자 입력의 브라우저 기본 스피너(증감 화살표) 전역 제거 (07-24: 모든 곳) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-.no-spinner {
+input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
 }

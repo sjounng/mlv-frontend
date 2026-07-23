@@ -82,7 +82,7 @@ export default function ProductPurchasePanel({ productId, price, productName, st
             value={qty}
             aria-label="수량"
             onChange={(e) => setQty(Math.max(1, Math.min(maxQty, Number(e.target.value) || 1)))}
-            className="no-spinner flex-1 bg-white/5 border border-white/10 rounded-lg text-center py-2 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-emerald-400/15 focus:border-emerald-400/50 transition-colors"
+            className="flex-1 bg-white/5 border border-white/10 rounded-lg text-center py-2 text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-emerald-400/15 focus:border-emerald-400/50 transition-colors"
           />
           <button
             type="button"

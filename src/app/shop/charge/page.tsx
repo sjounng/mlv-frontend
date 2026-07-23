@@ -1,7 +1,7 @@
 "use client";
 
 // 캐시 충전 페이지 (07-22 웹상점 개편)
-//  - 로그인 필요, 상단 이벤트 슬라이더 재사용
+//  - 로그인 필요
 //  - 캐시 충전 상품(KRW 패키지) 목록 + 정렬(총 개수 미표시)
 //  - 상품 클릭 → 개별 충전 상품 페이지
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -10,7 +10,6 @@ import Image from "next/image";
 import { Loader2, Coins, Lock, ArrowLeft, ImageOff } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import IntroSlider from "@/components/IntroSlider";
 import { Select, useToast } from "@/components/ui";
 import { shopApi, type CashProductResponse } from "@/lib/shop-api";
 import { useAuth } from "@/lib/auth";
@@ -58,11 +57,6 @@ export default function ChargePage() {
       <Navbar />
       <main className="pt-16">
         <section className="max-w-6xl mx-auto px-6 py-12 space-y-8">
-          {/* 상단 슬라이더 (이벤트 페이지와 동일 재사용) */}
-          <div className="mx-auto [width:min(100%,calc(38dvh*16/9))]">
-            <IntroSlider placement="EVENT" hideWhenEmpty />
-          </div>
-
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-xs text-emerald-300/70 uppercase tracking-widest font-medium mb-2">Cash Shop</p>
