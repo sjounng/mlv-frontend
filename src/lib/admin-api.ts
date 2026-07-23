@@ -197,6 +197,15 @@ export const adminApi = {
   createProduct: (body: ProductUpsert) => api.post<AdminProduct>("/api/admin/products", body),
   updateProduct: (id: number, body: ProductUpsert) => api.patch<AdminProduct>(`/api/admin/products/${id}`, body),
 
+  // 캐시 충전 상품 (07-22 웹상점 개편)
+  cashProducts: () => api.get<AdminCashProduct[]>("/api/admin/cash-products"),
+  createCashProduct: (body: CashProductUpsert) => api.post<AdminCashProduct>("/api/admin/cash-products", body),
+  updateCashProduct: (id: number, body: CashProductUpsert) => api.patch<AdminCashProduct>(`/api/admin/cash-products/${id}`, body),
+  deleteCashProduct: (id: number) => api.del(`/api/admin/cash-products/${id}`),
+  cashProductDescription: () => api.get<{ description: string }>("/api/admin/cash-product-description"),
+  setCashProductDescription: (description: string) =>
+    api.put<{ description: string }>("/api/admin/cash-product-description", { description }),
+
   inquiries: () => api.get<Inquiry[]>("/api/admin/inquiries"),
   replyInquiry: (id: number, content: string) =>
     api.post<Inquiry>(`/api/admin/inquiries/${id}/reply`, { content }),
@@ -362,6 +371,26 @@ export interface ProductUpsert {
   newBadge: boolean;
   purchaseLimitType: PurchaseLimitType;
   purchaseLimitCount: number;
+}
+
+// 캐시 충전 상품 (07-22 웹상점 개편)
+export interface AdminCashProduct extends Record<string, unknown> {
+  id: number;
+  name: string;
+  priceKrw: number;
+  cashAmount: number;
+  iconUrl: string | null;
+  sortOrder: number;
+  active: boolean;
+}
+
+export interface CashProductUpsert {
+  name: string;
+  priceKrw: number;
+  cashAmount: number;
+  iconUrl: string | null;
+  sortOrder: number;
+  active: boolean;
 }
 
 export type ContactCategory = "PAYMENT" | "ACCOUNT" | "EVENT" | "PLAYER_REPORT" | "BUG_REPORT" | "OTHER";

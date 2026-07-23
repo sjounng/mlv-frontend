@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Minus, Plus, ShoppingCart, Zap } from "lucide-react";
+import { Loader2, Minus, Plus, Zap } from "lucide-react";
 import { Button, Card, useToast } from "@/components/ui";
 import CashDisplay from "@/components/minecraft/CashDisplay";
 import { useAuth } from "@/lib/auth";
-import { useCart } from "@/lib/cart";
 import { shopApi } from "@/lib/shop-api";
 import { ApiError } from "@/lib/api";
 
@@ -14,14 +13,12 @@ interface Props {
   productId: number;
   price: number;
   productName: string;
-  imageUrl: string | null;
   stockQuantity: number | null;
 }
 
-export default function ProductPurchasePanel({ productId, price, productName, imageUrl, stockQuantity }: Props) {
+export default function ProductPurchasePanel({ productId, price, productName, stockQuantity }: Props) {
   const router = useRouter();
   const { status, cashBalance, refresh } = useAuth();
-  const { add } = useCart();
   const { toast } = useToast();
   const [qty, setQty] = useState(1);
   const [buying, setBuying] = useState(false);
@@ -40,9 +37,10 @@ export default function ProductPurchasePanel({ productId, price, productName, im
     if (insufficient) {
       toast({
         title: "보유 캐시가 부족합니다",
-        description: "캐시 충전 기능은 현재 준비 중입니다.",
+        description: "충전 페이지로 이동합니다.",
         variant: "warning",
       });
+      router.push("/shop/charge");
       return;
     }
     setBuying(true);
@@ -105,25 +103,14 @@ export default function ProductPurchasePanel({ productId, price, productName, im
         <span className="text-xl font-bold text-amber-300 tabular-nums">{total.toLocaleString()} C</span>
       </div>
 
-      <div className="mt-5 flex flex-col gap-2">
-        <Button
-          variant="outline"
-          className="w-full"
-          leftIcon={<ShoppingCart size={16} />}
-          onClick={() => {
-            add({ productId, name: productName, price, imageUrl }, qty);
-            toast({ title: "장바구니에 담았어요", variant: "success" });
-          }}
-        >
-          장바구니 담기
-        </Button>
+      <div className="mt-5">
         <Button
           className="w-full"
           disabled={buying}
           leftIcon={buying ? <Loader2 className="animate-spin" size={16} /> : <Zap size={16} />}
           onClick={onBuy}
         >
-          {status === "authenticated" ? "바로 구매" : "로그인하고 구매"}
+          {status === "authenticated" ? "구매하기" : "로그인하고 구매"}
         </Button>
       </div>
 

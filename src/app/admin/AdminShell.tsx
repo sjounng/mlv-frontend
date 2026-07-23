@@ -16,6 +16,7 @@ import {
   Menu,
   MessageSquare,
   ShoppingBag,
+  Coins,
   Tags,
   Users,
   X,
@@ -24,6 +25,7 @@ import {
 const navItems = [
   { href: "/admin", label: "대시보드", icon: LayoutDashboard },
   { href: "/admin/items", label: "상점 아이템 관리", icon: ShoppingBag },
+  { href: "/admin/cash-products", label: "캐시 충전 상품", icon: Coins },
   { href: "/admin/categories", label: "상점 카테고리 관리", icon: Tags },
   { href: "/admin/mail", label: "우편 관리", icon: Mail },
   { href: "/admin/payments", label: "결제/환불 관리", icon: CreditCard },

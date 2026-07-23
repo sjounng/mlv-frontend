@@ -50,6 +50,17 @@ export interface ShopPage<T> {
   hasNext: boolean;
 }
 
+// 캐시 충전 상품(패키지) — 07-22 웹상점 개편
+export interface CashProductResponse {
+  id: number;
+  name: string;
+  priceKrw: number;
+  cashAmount: number;
+  iconUrl: string | null;
+  sortOrder: number;
+  active: boolean;
+}
+
 export const shopApi = {
   categories: () => api.get<ShopCategory[]>("/api/shop/categories"),
   // 서버가 페이지네이션 응답으로 바뀌었다. UI 페이저가 생기기 전까지는 최대 크기로 한 번에 가져온다.
@@ -58,4 +69,10 @@ export const shopApi = {
   product: (id: string) => api.get<ShopProductResponse>(`/api/shop/products/${id}`),
   purchase: (productId: number, quantity: number) =>
     api.post<{ orderNumber: string }>("/api/shop/purchases", { productId, quantity }),
+
+  // 캐시 충전 상품
+  cashProducts: () => api.get<CashProductResponse[]>("/api/shop/cash-products"),
+  cashProduct: (id: string) => api.get<CashProductResponse>(`/api/shop/cash-products/${id}`),
+  cashProductDescription: () =>
+    api.get<{ description: string }>("/api/shop/cash-product-description"),
 };
