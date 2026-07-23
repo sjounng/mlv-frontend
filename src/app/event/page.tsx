@@ -1,61 +1,49 @@
 "use client";
 
+// 이벤트 목록 페이지 (07-22 개편: FC 온라인식 목록형)
+//  - 상단 featured 자동 슬라이더
+//  - 제목 검색(띄어쓰기 무관 다중 키워드, Enter/돋보기)
+//  - 목록 6개씩 + 페이지네이션, 종료 이벤트 구분 표시, 호버 효과, 클릭 시 상세 이동
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Gift, Calendar, Sparkles, Loader2, Check } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { Search, Loader2, CalendarDays, ImageOff } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import IntroSlider from "@/components/IntroSlider";
-import { Button, Card, Badge, EmptyState, useToast } from "@/components/ui";
-import ItemIcon from "@/components/minecraft/ItemIcon";
-import { api, ApiError } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
+import EventFeaturedSlider from "@/components/event/EventFeaturedSlider";
+import { Badge, EmptyState, Pagination, useToast } from "@/components/ui";
+import { eventsApi, EVENT_STATUS_LABEL, type PublicEvent } from "@/lib/events-api";
 
-interface EventItem {
-  id: number;
-  name: string;
-  type: "ATTENDANCE" | "INVITE" | "PAYBACK" | "GENERAL";
-  description: string;
-  startAt: string;
-  endAt: string;
-  active: boolean;
-}
-
-interface AttendanceBoard {
-  eventId: number | null;
-  eventName: string | null;
-  today: string; // YYYY-MM-DD
-  todayClaimed: boolean;
-  claimedDates: string[];
-  claimable: boolean;
-}
-
-const TYPE_EMOJI: Record<EventItem["type"], string> = {
-  ATTENDANCE: "📅",
-  INVITE: "👥",
-  PAYBACK: "💰",
-  GENERAL: "🎁",
-};
+const PAGE_SIZE = 6;
 
 function formatPeriod(start: string, end: string) {
   const f = (iso: string) => new Date(iso).toLocaleDateString("ko-KR");
   return `${f(start)} ~ ${f(end)}`;
 }
 
+function statusVariant(status: PublicEvent["status"]) {
+  if (status === "ONGOING") return "success" as const;
+  if (status === "UPCOMING") return "info" as const;
+  return "default" as const;
+}
+
 export default function EventPage() {
-  const router = useRouter();
-  const { status } = useAuth();
   const { toast } = useToast();
 
-  const [events, setEvents] = useState<EventItem[]>([]);
-  const [board, setBoard] = useState<AttendanceBoard | null>(null);
+  const [events, setEvents] = useState<PublicEvent[]>([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [claimingId, setClaimingId] = useState<number | null>(null);
+  // 입력 중 검색어와 실제 적용된 검색어를 분리 (Enter/돋보기로만 적용)
+  const [queryInput, setQueryInput] = useState("");
+  const [appliedQuery, setAppliedQuery] = useState("");
 
-  const loadEvents = useCallback(async () => {
+  const load = useCallback(async (q: string, p: number) => {
     setLoading(true);
     try {
-      setEvents(await api.get<EventItem[]>("/api/events"));
+      const res = await eventsApi.list({ q, page: p, size: PAGE_SIZE });
+      setEvents(res.content);
+      setTotalPages(Math.max(1, res.totalPages));
     } catch {
       toast({ title: "이벤트를 불러오지 못했습니다", variant: "error" });
     } finally {
@@ -63,211 +51,128 @@ export default function EventPage() {
     }
   }, [toast]);
 
-  const loadBoard = useCallback(async () => {
-    try {
-      setBoard(await api.get<AttendanceBoard>("/api/events/attendance"));
-    } catch {
-      setBoard(null);
-    }
-  }, []);
-
-  useEffect(() => {
-    // 데이터 로딩 시작 시의 setLoading 은 의도된 동작이다.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void loadEvents();
-  }, [loadEvents]);
-
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (status === "authenticated") void loadBoard();
-  }, [status, loadBoard]);
+    void load(appliedQuery, page);
+  }, [load, appliedQuery, page]);
 
-  const requireLogin = () => {
-    toast({ title: "로그인이 필요합니다", variant: "warning" });
-    router.push("/login");
+  const runSearch = () => {
+    setPage(0);
+    setAppliedQuery(queryInput);
   };
-
-  const onClaim = async (event: EventItem) => {
-    if (status !== "authenticated") return requireLogin();
-    setClaimingId(event.id);
-    try {
-      await api.post(`/api/events/${event.id}/claim`);
-      toast({
-        title: "보상을 수령했어요!",
-        description: "인게임 우편함으로 보상이 발송되었습니다.",
-        variant: "success",
-      });
-      if (event.type === "ATTENDANCE") await loadBoard();
-    } catch (error) {
-      const message = error instanceof ApiError ? error.message : "수령에 실패했습니다.";
-      toast({ title: "수령 실패", description: message, variant: "error" });
-    } finally {
-      setClaimingId(null);
-    }
-  };
-
-  const attendanceEvent = events.find((e) => e.type === "ATTENDANCE" && e.active);
 
   return (
     <>
       <Navbar />
       <main className="pt-16">
-        <section className="max-w-6xl mx-auto px-6 py-12 space-y-10">
-          {/* 이벤트 배너 슬라이더 (placement=EVENT) — 페이지 최상단. 배너 없으면 미표시.
-              16:9 유지하되 높이를 화면에 맞춰 제한해 첫 진입 시 잘리지 않게 한다. */}
+        <section className="max-w-6xl mx-auto px-6 py-12 space-y-8">
+          {/* 상단 featured 슬라이더 */}
           <div className="mx-auto [width:min(100%,calc(38dvh*16/9))]">
-            <IntroSlider placement="EVENT" hideWhenEmpty />
+            <EventFeaturedSlider />
           </div>
 
-          <div>
-            <p className="text-xs text-emerald-300/70 uppercase tracking-widest font-medium mb-2">Events</p>
-            <h1 className="text-3xl md:text-4xl font-bold">이벤트</h1>
-            <p className="mt-3 text-sm text-white/50">
-              출석체크, 리딤코드 등 다양한 이벤트로 보상을 받아가세요.
-            </p>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div>
+              <p className="text-xs text-emerald-300/70 uppercase tracking-widest font-medium mb-2">Events</p>
+              <h1 className="text-3xl md:text-4xl font-bold">이벤트</h1>
+            </div>
+            {/* 검색 */}
+            <div className="flex items-center gap-2 w-full sm:w-80">
+              <div className="relative flex-1">
+                <input
+                  value={queryInput}
+                  onChange={(e) => setQueryInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") runSearch();
+                  }}
+                  placeholder="이벤트 제목 검색"
+                  className="focus-ring w-full h-10 rounded-lg bg-surface-2 border border-white/10 pl-4 pr-10 text-sm placeholder:text-white/30"
+                />
+                <button
+                  type="button"
+                  onClick={runSearch}
+                  aria-label="검색"
+                  className="focus-ring absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-md flex items-center justify-center text-white/50 hover:text-white hover:bg-white/5 transition-colors"
+                >
+                  <Search size={16} />
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* Attendance */}
-          <Card padding="lg">
-            <div className="flex items-center justify-between gap-4 mb-5">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-green-500/15 text-green-300 flex items-center justify-center">
-                  <Calendar size={18} />
-                </div>
-                <div>
-                  <h2 className="text-base font-semibold">출석체크</h2>
-                  <p className="text-xs text-white/40">매일 접속하여 보상을 받아가세요</p>
-                </div>
-              </div>
-              <Badge variant={attendanceEvent ? "success" : "default"}>
-                {attendanceEvent ? "진행중" : "준비중"}
-              </Badge>
+          {/* 목록 */}
+          {loading ? (
+            <div className="flex items-center justify-center py-16 text-white/40">
+              <Loader2 className="animate-spin" size={24} />
             </div>
-
-            {/* 출석 달력 보드 */}
-            {status === "authenticated" && board?.eventId ? (
-              <AttendanceCalendar today={board.today} claimedDates={board.claimedDates} />
-            ) : status !== "authenticated" ? (
-              <p className="text-sm text-white/40 py-4">로그인하면 출석 보드를 확인할 수 있어요.</p>
-            ) : null}
-
-            <div className="mt-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <ItemIcon emoji="🎁" color="bg-red-500/15" size="md" />
-                <div>
-                  <p className="text-xs text-white/40">오늘의 출석 보상</p>
-                  <p className="text-sm font-medium">
-                    {attendanceEvent ? attendanceEvent.name : "진행 중인 출석 이벤트가 없습니다"}
-                  </p>
-                </div>
-              </div>
-              <Button
-                onClick={() => attendanceEvent && onClaim(attendanceEvent)}
-                disabled={!attendanceEvent || board?.todayClaimed || claimingId === attendanceEvent?.id}
-                leftIcon={
-                  claimingId === attendanceEvent?.id ? (
-                    <Loader2 className="animate-spin" size={16} />
-                  ) : board?.todayClaimed ? (
-                    <Check size={16} />
-                  ) : (
-                    <Sparkles size={16} />
-                  )
-                }
-              >
-                {board?.todayClaimed ? "오늘 출석 완료" : "출석하기"}
-              </Button>
+          ) : events.length === 0 ? (
+            <div className="py-8">
+              <EmptyState
+                icon={CalendarDays}
+                title={appliedQuery ? "검색 결과가 없습니다" : "등록된 이벤트가 없습니다"}
+                description={appliedQuery ? `"${appliedQuery}"에 해당하는 이벤트를 찾지 못했어요.` : undefined}
+              />
             </div>
-          </Card>
-
-          {/* 리딤코드 입력은 마이페이지 > 리딤코드 로 이동함 */}
-
-          {/* Event list */}
-          <div>
-            <h2 className="text-lg font-semibold mb-4">진행 중인 이벤트</h2>
-            {loading ? (
-              <div className="flex items-center justify-center py-12 text-white/40">
-                <Loader2 className="animate-spin" size={24} />
-              </div>
-            ) : events.length === 0 ? (
-              <Card padding="lg">
-                <EmptyState icon={Gift} title="진행 중인 이벤트가 없습니다" />
-              </Card>
-            ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {events.map((e) => (
-                  <Card key={e.id} padding="lg" className="flex flex-col">
-                    <div className="flex items-start justify-between gap-3 mb-3">
-                      <ItemIcon emoji={TYPE_EMOJI[e.type]} color="bg-white/5" size="md" />
-                      <Badge variant={e.active ? "success" : "default"}>
-                        {e.active ? "진행중" : "종료"}
+          ) : (
+            <div className="space-y-3">
+              {events.map((e) => {
+                const ended = e.status === "ENDED";
+                return (
+                  <Link
+                    key={e.id}
+                    href={`/event/${e.id}`}
+                    className={`focus-ring group flex items-stretch gap-4 rounded-xl border border-white/8 bg-surface-2 overflow-hidden transition-all hover:border-emerald-400/30 hover:bg-surface-3 hover:-translate-y-0.5 ${
+                      ended ? "opacity-60" : ""
+                    }`}
+                  >
+                    {/* 썸네일 */}
+                    <div className="relative w-40 sm:w-56 shrink-0 aspect-[16/7] bg-surface-4 overflow-hidden">
+                      {e.bannerImageUrl ? (
+                        <Image
+                          src={e.bannerImageUrl}
+                          alt={e.name}
+                          fill
+                          sizes="224px"
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          unoptimized
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-white/20">
+                          <ImageOff size={22} />
+                        </div>
+                      )}
+                    </div>
+                    {/* 본문 */}
+                    <div className="flex-1 min-w-0 flex items-center justify-between gap-4 py-3 pr-4">
+                      <div className="min-w-0">
+                        <h3 className="text-base font-semibold truncate group-hover:text-emerald-200 transition-colors">
+                          {e.name}
+                        </h3>
+                        <p className="mt-1 text-xs text-white/45 flex items-center gap-1.5">
+                          <CalendarDays size={13} className="shrink-0" />
+                          {formatPeriod(e.startAt, e.endAt)}
+                        </p>
+                      </div>
+                      <Badge variant={statusVariant(e.status)} size="sm" className="shrink-0">
+                        {EVENT_STATUS_LABEL[e.status]}
                       </Badge>
                     </div>
-                    <h3 className="text-base font-semibold">{e.name}</h3>
-                    <p className="mt-1.5 text-sm text-white/50 leading-relaxed flex-1">{e.description}</p>
-                    <div className="mt-4 pt-4 border-t border-white/8 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-white/40">기간</span>
-                        <span className="text-white/70">{formatPeriod(e.startAt, e.endAt)}</span>
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <Button
-                        variant={e.active ? "solid" : "outline"}
-                        size="sm"
-                        disabled={!e.active || claimingId === e.id}
-                        className="w-full"
-                        onClick={() => onClaim(e)}
-                        leftIcon={claimingId === e.id ? <Loader2 className="animate-spin" size={14} /> : <Check size={14} />}
-                      >
-                        {e.active ? "보상 수령" : "종료된 이벤트"}
-                      </Button>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+
+          {!loading && totalPages > 1 && (
+            <Pagination
+              currentPage={page + 1}
+              totalPages={totalPages}
+              onPageChange={(p) => setPage(p - 1)}
+            />
+          )}
         </section>
       </main>
       <Footer />
     </>
-  );
-}
-
-function AttendanceCalendar({ today, claimedDates }: { today: string; claimedDates: string[] }) {
-  const [y, m] = today.split("-").map(Number);
-  const daysInMonth = new Date(y, m, 0).getDate();
-  const claimed = new Set(claimedDates);
-  const pad = (n: number) => String(n).padStart(2, "0");
-
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-sm font-medium text-white/70">{y}년 {m}월 출석 현황</p>
-        <p className="text-xs text-white/40">이번 달 {claimedDates.length}일 출석</p>
-      </div>
-      <div className="grid grid-cols-7 sm:grid-cols-10 gap-1.5">
-        {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => {
-          const dateStr = `${y}-${pad(m)}-${pad(d)}`;
-          const isChecked = claimed.has(dateStr);
-          const isToday = dateStr === today;
-          return (
-            <div
-              key={d}
-              className={`aspect-square rounded-lg flex flex-col items-center justify-center text-xs border ${
-                isToday ? "ring-2 ring-emerald-400/50" : ""
-              } ${
-                isChecked
-                  ? "bg-emerald-500/20 text-emerald-200 border-emerald-500/30"
-                  : "bg-white/3 text-white/30 border-white/5"
-              }`}
-            >
-              <span className="font-semibold">{d}</span>
-              {isChecked && <Check size={11} className="mt-0.5" />}
-            </div>
-          );
-        })}
-      </div>
-    </div>
   );
 }
