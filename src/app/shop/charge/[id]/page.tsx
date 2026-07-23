@@ -90,9 +90,9 @@ export default function ChargeDetailPage() {
                   <p className="mt-2 text-sm text-amber-300/90 flex items-center gap-1.5">
                     <Coins size={15} /> {product.cashAmount.toLocaleString()} 캐시 지급
                   </p>
-                  <div className="mt-4 flex items-baseline gap-1">
+                  <div className="mt-4 flex items-baseline gap-1.5">
                     <span className="text-3xl font-bold tabular-nums">{product.priceKrw.toLocaleString()}</span>
-                    <span className="text-sm text-white/50">원 (KRW)</span>
+                    <span className="text-sm text-white/50">KRW</span>
                   </div>
 
                   {/* 수량 */}
@@ -111,7 +111,7 @@ export default function ChargeDetailPage() {
 
                   <div className="mt-4 flex items-center justify-between rounded-lg bg-surface-2 border border-white/8 px-4 py-3">
                     <span className="text-sm text-white/60">결제 금액</span>
-                    <span className="text-lg font-bold tabular-nums">{(product.priceKrw * qty).toLocaleString()}원</span>
+                    <span className="text-lg font-bold tabular-nums">{(product.priceKrw * qty).toLocaleString()} KRW</span>
                   </div>
 
                   <Button onClick={onBuy} className="w-full mt-4" size="lg">구매하기</Button>

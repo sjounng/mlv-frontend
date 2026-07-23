@@ -96,26 +96,24 @@ export default function ChargePage() {
                   <Select options={SORT_OPTIONS} value={sort} onChange={(e) => setSort(e.target.value as SortKey)} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {/* 카드 크기 절반 → 한 줄 8개 (07-24). 표기는 상품명 + KRW 가격만 (중복 제거) */}
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2.5">
                 {sorted.map((p) => (
                   <Link
                     key={p.id}
                     href={`/shop/charge/${p.id}`}
-                    className="focus-ring group rounded-2xl border border-white/8 bg-surface-2 overflow-hidden transition-all hover:border-amber-400/30 hover:-translate-y-0.5"
+                    className="focus-ring group rounded-xl border border-white/8 bg-surface-2 overflow-hidden transition-all hover:border-amber-400/30 hover:-translate-y-0.5"
                   >
                     <div className="relative aspect-square bg-surface-3 overflow-hidden">
                       {p.iconUrl ? (
-                        <Image src={p.iconUrl} alt={p.name} fill sizes="220px" className="object-contain p-4 transition-transform duration-300 group-hover:scale-105" unoptimized />
+                        <Image src={p.iconUrl} alt={p.name} fill sizes="120px" className="object-contain p-2 transition-transform duration-300 group-hover:scale-105" unoptimized />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center text-white/20"><ImageOff size={26} /></div>
+                        <div className="absolute inset-0 flex items-center justify-center text-white/20"><ImageOff size={18} /></div>
                       )}
                     </div>
-                    <div className="p-3.5">
-                      <h3 className="text-sm font-semibold truncate">{p.name}</h3>
-                      <p className="mt-1 text-xs text-amber-300/90 flex items-center gap-1">
-                        <Coins size={12} /> {p.cashAmount.toLocaleString()} 캐시
-                      </p>
-                      <p className="mt-2 text-base font-bold tabular-nums">{p.priceKrw.toLocaleString()}원</p>
+                    <div className="p-2">
+                      <h3 className="text-xs font-semibold truncate">{p.name}</h3>
+                      <p className="mt-1 text-xs font-bold tabular-nums">{p.priceKrw.toLocaleString()} KRW</p>
                     </div>
                   </Link>
                 ))}
