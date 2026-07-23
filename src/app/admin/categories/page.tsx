@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { FolderTree, Loader2, Pencil, Plus } from "lucide-react";
+import { FolderTree, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import {
   Badge,
   Button,
@@ -95,6 +95,23 @@ export default function AdminCategoriesPage() {
     }
   };
 
+  const onDelete = async () => {
+    if (editingId == null) return;
+    if (!window.confirm("이 카테고리를 삭제할까요? 되돌릴 수 없습니다.")) return;
+    setSaving(true);
+    try {
+      await adminApi.deleteCategory(editingId);
+      toast({ title: "카테고리를 삭제했습니다", variant: "success" });
+      setOpen(false);
+      await load();
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : "삭제에 실패했습니다.";
+      toast({ title: "삭제 실패", description: message, variant: "error" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const columns: TableColumn<Row>[] = [
     { key: "name", label: "카테고리명" },
     {
@@ -160,14 +177,19 @@ export default function AdminCategoriesPage() {
         onClose={() => !saving && setOpen(false)}
         title={editingId == null ? "카테고리 등록" : "카테고리 수정"}
         footer={
-          <>
-            <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>
-              취소
-            </Button>
-            <Button onClick={onSave} disabled={saving} leftIcon={saving ? <Loader2 className="animate-spin" size={15} /> : undefined}>
-              {editingId == null ? "등록하기" : "수정하기"}
-            </Button>
-          </>
+          <div className="flex items-center justify-between w-full">
+            {editingId != null ? (
+              <Button variant="ghost" onClick={onDelete} disabled={saving} leftIcon={<Trash2 size={15} />} className="text-red-300 hover:text-red-200">삭제</Button>
+            ) : <span />}
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>
+                취소
+              </Button>
+              <Button onClick={onSave} disabled={saving} leftIcon={saving ? <Loader2 className="animate-spin" size={15} /> : undefined}>
+                {editingId == null ? "등록하기" : "수정하기"}
+              </Button>
+            </div>
+          </div>
         }
       >
         <div className="space-y-4">
