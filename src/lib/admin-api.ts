@@ -185,6 +185,7 @@ export const adminApi = {
   categories: () => api.get<Category[]>("/api/admin/categories"),
   createCategory: (body: CategoryUpsert) => api.post<Category>("/api/admin/categories", body),
   updateCategory: (id: number, body: CategoryUpsert) => api.patch<Category>(`/api/admin/categories/${id}`, body),
+  deleteCategory: (id: number) => api.del(`/api/admin/categories/${id}`),
   mailTemplates: () => api.get<MailTemplate[]>("/api/admin/mail-templates"),
   createMailTemplate: (body: { mailCode: string; subject: string; content: string; rewardsJson: string }) =>
     api.post<MailTemplate>("/api/admin/mail-templates", body),
@@ -196,6 +197,7 @@ export const adminApi = {
   products: () => api.get<AdminProduct[]>("/api/admin/products"),
   createProduct: (body: ProductUpsert) => api.post<AdminProduct>("/api/admin/products", body),
   updateProduct: (id: number, body: ProductUpsert) => api.patch<AdminProduct>(`/api/admin/products/${id}`, body),
+  deleteProduct: (id: number) => api.del(`/api/admin/products/${id}`),
 
   // 캐시 충전 상품 (07-22 웹상점 개편)
   cashProducts: () => api.get<AdminCashProduct[]>("/api/admin/cash-products"),

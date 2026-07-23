@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { Loader2, Pencil, Plus, Tags } from "lucide-react";
+import { Loader2, Pencil, Plus, Tags, Trash2 } from "lucide-react";
 import {
   Badge,
   Button,
@@ -194,6 +194,23 @@ export default function AdminItemsPage() {
     }
   };
 
+  const onDelete = async () => {
+    if (editingId == null) return;
+    if (!window.confirm("이 상품을 삭제할까요? 되돌릴 수 없습니다.")) return;
+    setSaving(true);
+    try {
+      await adminApi.deleteProduct(editingId);
+      toast({ title: "상품을 삭제했습니다", variant: "success" });
+      setModalOpen(false);
+      await load();
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : "삭제에 실패했습니다.";
+      toast({ title: "삭제 실패", description: message, variant: "error" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const onSaveCategory = async () => {
     const body: CategoryUpsert = {
       ...categoryForm,
@@ -314,12 +331,17 @@ export default function AdminItemsPage() {
         title={editingId == null ? "상품 등록" : "상품 수정"}
         size="lg"
         footer={
-          <>
-            <Button variant="outline" onClick={() => setModalOpen(false)} disabled={saving}>취소</Button>
-            <Button onClick={onSave} disabled={saving} leftIcon={saving ? <Loader2 className="animate-spin" size={15} /> : undefined}>
-              {editingId == null ? "등록하기" : "수정하기"}
-            </Button>
-          </>
+          <div className="flex items-center justify-between w-full">
+            {editingId != null ? (
+              <Button variant="ghost" onClick={onDelete} disabled={saving} leftIcon={<Trash2 size={15} />} className="text-red-300 hover:text-red-200">삭제</Button>
+            ) : <span />}
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={() => setModalOpen(false)} disabled={saving}>취소</Button>
+              <Button onClick={onSave} disabled={saving} leftIcon={saving ? <Loader2 className="animate-spin" size={15} /> : undefined}>
+                {editingId == null ? "등록하기" : "수정하기"}
+              </Button>
+            </div>
+          </div>
         }
       >
         <div className="space-y-4">
