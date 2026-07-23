@@ -4,7 +4,6 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui";
 import { AuthProvider } from "@/lib/auth";
-import { CartProvider } from "@/lib/cart";
 import { ThemeProvider } from "@/lib/theme";
 import { siteConfig } from "@/lib/site-config";
 
@@ -136,9 +135,7 @@ export default function RootLayout({
         />
         <ThemeProvider>
           <ToastProvider>
-            <AuthProvider>
-              <CartProvider>{children}</CartProvider>
-            </AuthProvider>
+            <AuthProvider>{children}</AuthProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>

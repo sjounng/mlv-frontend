@@ -104,7 +104,6 @@ export default function ProductDetailPage() {
             productId={product.id}
             price={product.price}
             productName={product.name}
-            imageUrl={product.imageUrl}
             stockQuantity={product.stockQuantity}
           />
           <Separator className="my-4" />

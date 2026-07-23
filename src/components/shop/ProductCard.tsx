@@ -4,12 +4,10 @@
 // - 썸네일 + 본문 텍스트(2줄) 표시, 4열 그리드 기준 확장형 카드
 // - 카드 상단에 구매 제한 뱃지 (매주 초기화 / 매월 초기화 / 계정 당 1회)
 // - 호버 시 세부 설명 info 팝업(설명 + 구매 제한 안내 자동 기입)
-// - 장바구니 버튼은 카트 아이콘
+// - 07-22 개편: 장바구니 제거 → 카드/버튼은 상품 상세로 이동(상세에서 개수 설정 후 구매)
 import Link from "next/link";
 import Image from "next/image";
-import { Package, Search, ShoppingCart } from "lucide-react";
-import { useCart } from "@/lib/cart";
-import { useToast } from "@/components/ui";
+import { Package, Search, ArrowRight } from "lucide-react";
 import type { PurchaseLimitType } from "@/lib/shop-api";
 
 export interface Product {
@@ -49,17 +47,10 @@ const LIMIT_DESC: Partial<Record<PurchaseLimitType, string>> = {
 };
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const { add } = useCart();
-  const { toast } = useToast();
   const href = `/shop/product/${product.id}`;
   const limitType = product.limitType ?? "NONE";
   const limitBadge = LIMIT_BADGE[limitType];
   const limitDesc = LIMIT_DESC[limitType];
-
-  const onAdd = () => {
-    add({ productId: Number(product.id), name: product.name, price: product.price, imageUrl: product.imageUrl });
-    toast({ title: "장바구니에 담았어요", variant: "success" });
-  };
 
   return (
     <div className="group relative flex flex-col bg-surface-3 border border-white/8 hover:border-white/20 rounded-xl transition-colors">
@@ -101,14 +92,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         <p className="text-xs text-white/45 leading-relaxed line-clamp-2 flex-1">{product.desc}</p>
         <div className="flex items-center justify-between mt-1">
           <p className="text-sm font-semibold text-amber-300 tabular-nums">{product.price.toLocaleString()} C</p>
-          <button
-            type="button"
-            onClick={onAdd}
-            aria-label={`${product.name} 장바구니 담기`}
+          <Link
+            href={href}
+            aria-label={`${product.name} 구매하기`}
             className="focus-ring w-8 h-8 rounded-lg bg-emerald-600/90 hover:bg-emerald-500 text-white flex items-center justify-center transition-colors"
           >
-            <ShoppingCart size={15} />
-          </button>
+            <ArrowRight size={15} />
+          </Link>
         </div>
       </div>
 
@@ -131,14 +121,13 @@ export default function ProductCard({ product }: ProductCardProps) {
           >
             <Search size={12} className="shrink-0" /> 상품정보 상세보기
           </Link>
-          <button
-            type="button"
-            onClick={onAdd}
-            aria-label={`${product.name} 장바구니 담기`}
+          <Link
+            href={href}
+            aria-label={`${product.name} 구매하기`}
             className="focus-ring w-9 h-8 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center transition-colors"
           >
-            <ShoppingCart size={15} />
-          </button>
+            <ArrowRight size={15} />
+          </Link>
         </div>
       </div>
     </div>
